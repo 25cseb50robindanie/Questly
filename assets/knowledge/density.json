@@ -1,0 +1,75 @@
+{
+  "moduleId": "mod_density",
+  "concepts": [
+    {
+      "id": "density_def",
+      "concept": "Density",
+      "lessonId": "density_les1",
+      "text": "Density is a measure of how much mass is contained in a given volume of space. It is calculated by dividing mass by volume. A high-density object is packed tightly with matter, whereas a low-density object has more space between its particles.",
+      "keywords": ["density", "particles", "atoms", "definition", "packed"]
+    },
+    {
+      "id": "density_formula",
+      "concept": "Density Formula",
+      "lessonId": "density_les2",
+      "text": "The formula for density is: Density = Mass / Volume (D = M/V). In science, mass is usually measured in grams (g) and volume in cubic centimeters (cm³) or milliliters (ml), making the units of density g/cm³ or g/ml.",
+      "keywords": ["formula", "calculation", "units", "divide", "equation"]
+    },
+    {
+      "id": "mass_def",
+      "concept": "Mass",
+      "lessonId": "density_les2",
+      "text": "Mass measures the amount of matter in an object, usually weighed in grams (g) or kilograms (kg). Mass does not change depending on where the object is, unlike weight which changes with gravity.",
+      "keywords": ["mass", "grams", "kilograms", "weigh", "matter"]
+    },
+    {
+      "id": "volume_def",
+      "concept": "Volume",
+      "lessonId": "density_les2",
+      "text": "Volume is the amount of three-dimensional space that an object occupies, measured in cubic centimeters (cm³) or milliliters (ml). It can be calculated by multiplication (Length x Width x Height) or by water displacement.",
+      "keywords": ["volume", "space", "milliliters", "displacement", "size"]
+    },
+    {
+      "id": "floating_principle",
+      "concept": "Floating in Water",
+      "lessonId": "density_les3",
+      "text": "An object floats in water if its average density is less than the density of pure water, which is exactly 1.0 g/cm³. For example, wood floats because its density is typically around 0.6 g/cm³, which is less than 1.0 g/cm³.",
+      "keywords": ["float", "wood", "water", "density of water", "buoyant", "buoyancy"]
+    },
+    {
+      "id": "sinking_principle",
+      "concept": "Sinking in Water",
+      "lessonId": "density_les3",
+      "text": "An object sinks in water if its average density is greater than the density of pure water (1.0 g/cm³). For example, a solid iron nail sinks because iron has a density of 7.8 g/cm³, which is much heavier than 1.0 g/cm³.",
+      "keywords": ["sink", "iron", "nail", "gravity", "submerge", "water"]
+    },
+    {
+      "id": "ship_buoyancy",
+      "concept": "Steel Ship Buoyancy",
+      "lessonId": "density_les5",
+      "text": "A steel ship floats because it is hollow and contains a large volume of air inside. Even though steel is dense, the overall average density of the ship (steel plus the air inside) is much less than the density of water (1.0 g/cm³). This creates enough buoyant force to support the ship's weight.",
+      "keywords": ["ship", "boat", "steel", "hollow", "air", "displacement", "archimedes"]
+    },
+    {
+      "id": "cricket_analogy",
+      "concept": "Sports Analogy",
+      "lessonId": "density_les1",
+      "text": "Think of a solid leather cricket ball and a hollow tennis ball of similar size. The cricket ball has a lot of matter packed tightly inside, making it heavy and dense. The tennis ball is filled with air, making it light and low-density, even though they take up the same amount of space.",
+      "keywords": ["cricket", "tennis", "ball", "analogy", "sports", "comparison"]
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "misconception_heavy",
+      "incorrectPattern": "heavy things always sink",
+      "correction": "It is density, not weight, that determines whether an object floats or sinks. A heavy steel ship floats because its average density is lower than water due to hollow air-filled spaces, while a tiny light pebble sinks because its density is higher than water.",
+      "recommendedActivityId": "density_act_ship_simulation"
+    },
+    {
+      "id": "misconception_size",
+      "incorrectPattern": "large things always sink",
+      "correction": "Size alone does not determine sinking. A giant log of wood is large but floats because wood's density is less than water, while a tiny iron pin is small but sinks because iron's density is greater than water.",
+      "recommendedActivityId": "density_act_block_tank"
+    }
+  ]
+}
