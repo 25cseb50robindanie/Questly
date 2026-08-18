@@ -38,6 +38,17 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
   }
 
   void _handleRouting() {
+    if (_activity!.type == 'discovery_curiosity' || _activity!.id == 'act_density_curiosity') {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Navigator.pushReplacementNamed(
+          context,
+          '/curiosity_discovery',
+          arguments: _activity,
+        );
+      });
+      return;
+    }
+
     if (_activity!.type == 'flameGame') {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Navigator.pushReplacementNamed(
@@ -439,7 +450,7 @@ class _QuestCompletionSequenceDialogState extends State<_QuestCompletionSequence
     // Pop star 1
     if (widget.earnedStars >= 1) {
       setState(() => _visibleStars = 1);
-      SoundService.playClick();
+      SoundService.playStarPop();
       await Future.delayed(const Duration(milliseconds: 320));
     }
 
@@ -447,7 +458,7 @@ class _QuestCompletionSequenceDialogState extends State<_QuestCompletionSequence
     if (!mounted) return;
     if (widget.earnedStars >= 2) {
       setState(() => _visibleStars = 2);
-      SoundService.playClick();
+      SoundService.playStarPop();
       await Future.delayed(const Duration(milliseconds: 320));
     }
 
@@ -455,14 +466,14 @@ class _QuestCompletionSequenceDialogState extends State<_QuestCompletionSequence
     if (!mounted) return;
     if (widget.earnedStars >= 3) {
       setState(() => _visibleStars = 3);
-      SoundService.playClick();
+      SoundService.playStarPop();
       await Future.delayed(const Duration(milliseconds: 320));
     }
 
-    // Reveal rewards panel
+    // Reveal rewards panel with 3-star level completion fanfare
     if (!mounted) return;
     setState(() => _rewardsVisible = true);
-    SoundService.playSwitch();
+    SoundService.playLevelComplete();
   }
 
   @override

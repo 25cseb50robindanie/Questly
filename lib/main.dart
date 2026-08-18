@@ -12,6 +12,7 @@ import 'screens/leaderboard_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/activity_renderer_screen.dart';
+import 'screens/curiosity_discovery_screen.dart';
 import 'screens/developer_settings_screen.dart';
 
 void main() async {
@@ -49,6 +50,7 @@ class QuestlyApp extends StatelessWidget {
         '/settings': (context) => const SettingsScreen(),
         '/notifications': (context) => const NotificationsScreen(),
         '/activity_renderer': (context) => const ActivityRendererScreen(),
+        '/curiosity_discovery': (context) => const CuriosityDiscoveryScreen(),
         '/dev_settings': (context) => const DeveloperSettingsScreen(),
       },
     );

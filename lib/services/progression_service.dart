@@ -5,8 +5,51 @@ import '../core/locator.dart';
 
 
 class ProgressionService {
+  // Checks if a specific lesson is completed by the student
+  bool isLessonCompleted(String studentId, String lessonId) {
+    final progressList = Locator.progressRepository.getProgressList(studentId);
+    final isDone = progressList.any((p) => p.lessonId == lessonId && p.status == 'completed');
+    if (isDone) return true;
+
+    // Check fallback direct storage key
+    final key = 'lesson_comp_${studentId}_$lessonId';
+    return Locator.storageService.getBool(key) ?? false;
+  }
+
+  // Checks if a specific lesson is unlocked for the student
+  bool isLessonUnlocked(String studentId, String lessonId) {
+    // Lesson 1 is always unlocked
+    if (lessonId == 'density_les1') return true;
+
+    // Lesson 2 requires Lesson 1 to be completed
+    if (lessonId == 'density_les2') {
+      return isLessonCompleted(studentId, 'density_les1');
+    }
+    // Lesson 3 requires Lesson 2
+    if (lessonId == 'density_les3') {
+      return isLessonCompleted(studentId, 'density_les2');
+    }
+    // Lesson 4 requires Lesson 3
+    if (lessonId == 'density_les4') {
+      return isLessonCompleted(studentId, 'density_les3');
+    }
+    // Lesson 5 requires Lesson 4
+    if (lessonId == 'density_les5') {
+      return isLessonCompleted(studentId, 'density_les4');
+    }
+
+    return false;
+  }
+
   // Checks if a specific RoadmapNode is completed by the student
   bool isNodeCompleted(String studentId, RoadmapNode node) {
+    // If node is level type with multiple lessons (e.g. Level 1 Discover Density)
+    if (node.levelId != null && node.levelId == 'density_lvl1') {
+      // Level 1 requires all 5 lessons to be completed before the whole level node is marked completed!
+      final lessons = ['density_les1', 'density_les2', 'density_les3', 'density_les4', 'density_les5'];
+      return lessons.every((lid) => isLessonCompleted(studentId, lid));
+    }
+
     final progressList = Locator.progressRepository.getProgressList(studentId);
 
     // If node is level/lesson type, check lesson progress
@@ -120,6 +163,13 @@ class ProgressionService {
 
   // Returns earned stars (0, 1, 2, or 3) for a roadmap node
   int getNodeStars(String studentId, RoadmapNode node) {
+    if (node.levelId == 'density_lvl1') {
+      if (isLessonCompleted(studentId, 'density_les5')) return 3;
+      if (isLessonCompleted(studentId, 'density_les3')) return 2;
+      if (isLessonCompleted(studentId, 'density_les1')) return 1;
+      return 0;
+    }
+
     if (!isNodeCompleted(studentId, node)) return 0;
 
     // Check lesson progress record

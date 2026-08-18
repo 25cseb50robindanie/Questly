@@ -58,16 +58,18 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
 
 
   // Programmatic coordinates generator (sine-wave curves + vertical branch shifts)
-  Map<String, Offset> _calculateCoordinates(List<RoadmapNode> nodes) {
+  Map<String, Offset> _calculateCoordinates(List<RoadmapNode> nodes, {double availableHeight = 280.0}) {
     final Map<String, Offset> coordinates = {};
     int mainIndex = 0;
+    final double centerY = (availableHeight / 2).clamp(90.0, 150.0);
+    final double amplitude = (centerY * 0.40).clamp(25.0, 55.0);
 
     for (var i = 0; i < nodes.length; i++) {
       final node = nodes[i];
       if (!node.isOptional) {
         // Main path node: sine wave coordinates horizontally
-        final double x = 90.0 + mainIndex * 210.0;
-        final double y = 145.0 + 65.0 * sin(mainIndex * 1.3);
+        final double x = 80.0 + mainIndex * 190.0;
+        final double y = centerY + amplitude * sin(mainIndex * 1.3);
         coordinates[node.id] = Offset(x, y);
         mainIndex++;
       }
@@ -81,16 +83,16 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
         if (node.prerequisiteNodeIds.isNotEmpty) {
           final parentCoord = coordinates[node.prerequisiteNodeIds.first];
           if (parentCoord != null) {
-            // Shift horizontally right by 105px and vertically up by 100px
-            final double x = parentCoord.dx + 105.0;
-            final double y = parentCoord.dy - 100.0; // branch vertically upwards
+            // Shift horizontally right by 95px and vertically up
+            final double x = parentCoord.dx + 95.0;
+            final double y = (parentCoord.dy - (centerY * 0.55)).clamp(30.0, availableHeight - 30.0);
             coordinates[node.id] = Offset(x, y);
             continue;
           }
         }
         // Fallback
-        final double x = 90.0 + i * 210.0;
-        final double y = 145.0;
+        final double x = 80.0 + i * 190.0;
+        final double y = centerY;
         coordinates[node.id] = Offset(x, y);
       }
     }
@@ -121,6 +123,8 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final Module module = ModalRoute.of(context)!.settings.arguments as Module;
+    final size = MediaQuery.of(context).size;
+    final isShort = size.height < 450;
 
     return ListenableBuilder(
       listenable: Locator.studentRepository,
@@ -132,14 +136,6 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
         _student = currentStudent;
 
         final nodes = Locator.roadmapRepository.getRoadmap(module.id);
-        _coordinates = _calculateCoordinates(nodes);
-
-        // Call scroll auto-centering once on load
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (_scrollController.hasClients && _scrollController.offset == 0.0) {
-            _centerOnCurrentNode(nodes);
-          }
-        });
 
         // Compute progress details
         int totalMainEdu = nodes.where((n) => !n.isOptional && (n.type == RoadmapNodeType.level || n.type == RoadmapNodeType.lesson)).length;
@@ -153,12 +149,12 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
               child: _masteryCelebrationActive
                   ? _buildMasteryCelebration(module, nodes)
                   : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: isShort ? 14 : 20, vertical: isShort ? 8 : 12),
                       child: Column(
                         children: [
                           // Top Row (Back button + Module Progress Summary)
                           _buildHeaderRow(module, progressFraction),
-                          const SizedBox(height: 12),
+                          SizedBox(height: isShort ? 8 : 12),
 
                           // Interactive Winding Viewport
                           Expanded(
@@ -170,36 +166,53 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
-                                child: SingleChildScrollView(
-                                  controller: _scrollController,
-                                  scrollDirection: Axis.horizontal,
-                                  child: Stack(
-                                    children: [
-                                      // Winding dashed connector paths CustomPainter
-                                      CustomPaint(
-                                        size: Size(180.0 + nodes.length * 210.0, 320),
-                                        painter: RoadmapPath(
-                                          nodes: nodes,
-                                          coordinates: _coordinates,
-                                          studentId: currentStudent.questlyId,
-                                        ),
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    final canvasHeight = constraints.maxHeight;
+                                    _coordinates = _calculateCoordinates(nodes, availableHeight: canvasHeight);
+
+                                    // Call scroll auto-centering once on load
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      if (_scrollController.hasClients && _scrollController.offset == 0.0) {
+                                        _centerOnCurrentNode(nodes);
+                                      }
+                                    });
+
+                                    final canvasWidth = 160.0 + nodes.length * 190.0;
+
+                                    return SingleChildScrollView(
+                                      controller: _scrollController,
+                                      scrollDirection: Axis.horizontal,
+                                      physics: const BouncingScrollPhysics(),
+                                      child: Stack(
+                                        children: [
+                                          // Winding dashed connector paths CustomPainter
+                                          CustomPaint(
+                                            size: Size(canvasWidth, canvasHeight),
+                                            painter: RoadmapPath(
+                                              nodes: nodes,
+                                              coordinates: _coordinates,
+                                              studentId: currentStudent.questlyId,
+                                            ),
+                                          ),
+
+                                          // Overlaid Node Buttons Widgets
+                                          ...nodes.map((node) {
+                                            final Offset? offset = _coordinates[node.id];
+                                            if (offset == null) return const SizedBox();
+
+                                            final status = Locator.progressionService.getNodeStatus(currentStudent.questlyId, node, nodes);
+
+                                            return Positioned(
+                                              left: offset.dx - 28,
+                                              top: offset.dy - 28,
+                                              child: _buildRoadmapNodeWidget(node, status, nodes),
+                                            );
+                                          }).toList(),
+                                        ],
                                       ),
-
-                                      // Overlaid Node Buttons Widgets
-                                      ...nodes.map((node) {
-                                        final Offset? offset = _coordinates[node.id];
-                                        if (offset == null) return const SizedBox();
-
-                                        final status = Locator.progressionService.getNodeStatus(currentStudent.questlyId, node, nodes);
-
-                                        return Positioned(
-                                          left: offset.dx - 28,
-                                          top: offset.dy - 28,
-                                          child: _buildRoadmapNodeWidget(node, status, nodes),
-                                        );
-                                      }).toList(),
-                                    ],
-                                  ),
+                                    );
+                                  },
                                 ),
                               ),
                             ),
@@ -216,45 +229,59 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
 
   // Header progress panel
   Widget _buildHeaderRow(Module module, double progressFraction) {
+    final size = MediaQuery.of(context).size;
+    final isShort = size.height < 450;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_rounded, color: ColorSystem.plum, size: 24),
-              onPressed: () => Navigator.pop(context),
-            ),
-            const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  module.title.toUpperCase(),
-                  style: const TextStyle(
-                    fontFamily: 'Fredoka',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                    color: ColorSystem.plum,
-                  ),
+        Flexible(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_rounded, color: ColorSystem.plum, size: 22),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => Navigator.pop(context),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      module.title.toUpperCase(),
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: isShort ? 13 : 15,
+                        fontWeight: FontWeight.w900,
+                        color: ColorSystem.plum,
+                      ),
+                    ),
+                    Text(
+                      '${(progressFraction * 100).toInt()}% ${l('completed').toLowerCase()}',
+                      style: TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: isShort ? 9.5 : 11,
+                        color: ColorSystem.plum.withOpacity(0.55),
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  '${(progressFraction * 100).toInt()}% ${l('completed').toLowerCase()}',
-                  style: TextStyle(
-                    fontFamily: 'Fredoka',
-                    fontSize: 11,
-                    color: ColorSystem.plum.withOpacity(0.55),
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
+
+        const SizedBox(width: 12),
 
         // Clean Progress Bar
         Container(
-          width: 160,
-          height: 10,
+          width: isShort ? 120 : 150,
+          height: isShort ? 8 : 10,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(5),

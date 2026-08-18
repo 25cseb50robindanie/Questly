@@ -46,7 +46,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
     );
 
     _animController.forward();
-    SoundService.playClick();
+    SoundService.playLevelUp();
   }
 
   @override
