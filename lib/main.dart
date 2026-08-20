@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'core/locator.dart';
@@ -26,11 +27,15 @@ void main() async {
   // Ensure Flutter engine hooks are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Enforce landscape orientation only
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
+  // Enforce landscape orientation on native mobile platforms
+  if (!kIsWeb) {
+    try {
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    } catch (_) {}
+  }
 
   // Guarantee all repositories & services are initialized before any route builds
   await Locator.setup();

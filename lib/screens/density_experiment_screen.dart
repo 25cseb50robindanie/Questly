@@ -182,7 +182,6 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen> {
                                   iframe.style.width = '100%';
                                   iframe.style.height = '100%';
                                   iframe.style.display = 'block';
-                                  iframe.setAttribute('allowfullscreen', 'true');
                                   iframe.setAttribute('allow', 'fullscreen; autoplay; clipboard-write');
                                 },
                               ),
