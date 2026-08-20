@@ -83,6 +83,39 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
       return;
     }
 
+    if (_activity!.type == 'apply' || _activity!.id == 'act_density_apply') {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Navigator.pushReplacementNamed(
+          context,
+          '/density_apply',
+          arguments: _activity,
+        );
+      });
+      return;
+    }
+
+    if (_activity!.type == 'challenge' || _activity!.id == 'act_density_challenge') {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Navigator.pushReplacementNamed(
+          context,
+          '/density_detective',
+          arguments: _activity,
+        );
+      });
+      return;
+    }
+
+    if (_activity!.type == 'teach_dendy' || _activity!.id == 'act_density_teach_dendy') {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Navigator.pushReplacementNamed(
+          context,
+          '/density_teach_back',
+          arguments: _activity,
+        );
+      });
+      return;
+    }
+
     if (_activity!.type == 'flameGame') {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Navigator.pushReplacementNamed(

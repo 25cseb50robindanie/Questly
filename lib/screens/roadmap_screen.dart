@@ -392,12 +392,39 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
           status: status,
           studentId: _student!.questlyId,
           onStartQuest: () async {
-            final String targetLessonId = node.lessonId ?? 'density_les1';
+            String targetLessonId = node.lessonId ?? 'density_les1';
+            if (node.levelId == 'density_lvl1') {
+              final lessons = ['density_les1', 'density_les2', 'density_les3', 'density_les4', 'density_les5'];
+              for (final lid in lessons) {
+                if (!Locator.progressionService.isLessonCompleted(_student!.questlyId, lid)) {
+                  targetLessonId = lid;
+                  break;
+                }
+              }
+            }
+
             final Lesson? targetLesson = Locator.moduleRepository.getLessonById(targetLessonId);
             if (targetLesson != null && targetLesson.activities.isNotEmpty) {
               final updatedStudent = _student!.copyWith(
                 currentModuleId: node.moduleId,
                 currentLessonId: targetLessonId,
+              );
+              await Locator.studentRepository.updateStudentProfile(updatedStudent);
+
+              if (!mounted) return;
+              await Navigator.pushNamed(
+                context,
+                '/activity_renderer',
+                arguments: targetLesson.activities.first,
+              );
+            }
+          },
+          onStartLesson: (String chosenLessonId) async {
+            final Lesson? targetLesson = Locator.moduleRepository.getLessonById(chosenLessonId);
+            if (targetLesson != null && targetLesson.activities.isNotEmpty) {
+              final updatedStudent = _student!.copyWith(
+                currentModuleId: node.moduleId,
+                currentLessonId: chosenLessonId,
               );
               await Locator.studentRepository.updateStudentProfile(updatedStudent);
 

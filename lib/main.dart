@@ -17,6 +17,9 @@ import 'screens/curiosity_discovery_screen.dart';
 import 'screens/virtual_lab_screen.dart';
 import 'screens/fraction_module_screen.dart';
 import 'screens/density_experiment_screen.dart';
+import 'screens/density_apply_screen.dart';
+import 'screens/density_detective_screen.dart';
+import 'screens/density_teach_back_screen.dart';
 import 'screens/developer_settings_screen.dart';
 
 void main() async {
@@ -59,6 +62,9 @@ class QuestlyApp extends StatelessWidget {
         '/activity_renderer': (context) => const ActivityRendererScreen(),
         '/curiosity_discovery': (context) => const CuriosityDiscoveryScreen(),
         '/density_experiment': (context) => const DensityExperimentScreen(),
+        '/density_apply': (context) => const DensityApplyScreen(),
+        '/density_detective': (context) => const DensityDetectiveScreen(),
+        '/density_teach_back': (context) => const DensityTeachBackScreen(),
         '/virtual_lab': (context) => const VirtualLabScreen(),
         '/fraction_module': (context) => const FractionModuleScreen(),
         '/dev_settings': (context) => const DeveloperSettingsScreen(),

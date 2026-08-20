@@ -13,6 +13,7 @@ class QuestBriefModal extends StatelessWidget {
   final RoadmapNodeStatus status;
   final String studentId;
   final VoidCallback onStartQuest;
+  final void Function(String lessonId)? onStartLesson;
 
   const QuestBriefModal({
     Key? key,
@@ -20,6 +21,7 @@ class QuestBriefModal extends StatelessWidget {
     required this.status,
     required this.studentId,
     required this.onStartQuest,
+    this.onStartLesson,
   }) : super(key: key);
 
   @override
@@ -367,7 +369,11 @@ class QuestBriefModal extends StatelessWidget {
           ? () {
               SoundService.playClick();
               Navigator.pop(context);
-              onStartQuest();
+              if (onStartLesson != null) {
+                onStartLesson!(lessonId);
+              } else {
+                onStartQuest();
+              }
             }
           : null,
       child: Container(
