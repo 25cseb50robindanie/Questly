@@ -1308,7 +1308,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                     const SizedBox(width: 8),
                     Expanded(
                       child: CustomButton(
-                        text: 'CONTINUE TO LESSON 2',
+                        text: 'CONTINUE TO ROADMAP',
                         backgroundColor: ColorSystem.purple,
                         textColor: Colors.white,
                         height: isShort ? 36 : 40,
