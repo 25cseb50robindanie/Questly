@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/theme/color_system.dart';
+import '../services/localization_service.dart';
 import '../services/sound_service.dart';
 import 'custom_button.dart';
 import 'vector_asset_helper.dart';
@@ -124,7 +125,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
 
                       // Title
                       Text(
-                        'LEVEL UP!',
+                        l('level_up'),
                         style: TextStyle(
                           fontFamily: 'Fredoka',
                           fontSize: isShort ? 18 : 22,
@@ -142,7 +143,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'YOU REACHED LEVEL ${widget.newLevel}!',
+                          l('reached_level', args: {'level': '${widget.newLevel}'}),
                           style: const TextStyle(
                             fontFamily: 'Fredoka',
                             fontSize: 10.5,
@@ -161,21 +162,21 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                           _buildLevelUpRewardItem(
                             VectorAssetHelper.questCoinIcon(size: isShort ? 18 : 22),
                             '+100',
-                            'Quest Coins',
+                            l('quest_coins'),
                             isShort,
                           ),
                           SizedBox(width: isShort ? 8 : 12),
                           _buildLevelUpRewardItem(
                             VectorAssetHelper.xpStarIcon(size: isShort ? 18 : 22),
                             '+50',
-                            'Bonus XP',
+                            l('bonus_xp'),
                             isShort,
                           ),
                           SizedBox(width: isShort ? 8 : 12),
                           _buildLevelUpRewardItem(
                             VectorAssetHelper.badgeIcon('Explorer', size: isShort ? 18 : 22),
                             'RANK',
-                            'Promoted',
+                            l('rank_promoted'),
                             isShort,
                           ),
                         ],
@@ -183,7 +184,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                       SizedBox(height: isShort ? 12 : 16),
 
                       CustomButton(
-                        text: 'CONTINUE ADVENTURE',
+                        text: l('continue_adventure'),
                         backgroundColor: ColorSystem.purple,
                         textColor: Colors.white,
                         height: isShort ? 34 : 40,

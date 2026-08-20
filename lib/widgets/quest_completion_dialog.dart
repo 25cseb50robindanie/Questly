@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
+import '../services/localization_service.dart';
 import '../services/sound_service.dart';
 import 'custom_button.dart';
 import 'dendy_speak_button.dart';
@@ -222,7 +223,7 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
                     children: [
                       Flexible(
                         child: Text(
-                          widget.title.toUpperCase(),
+                          l(widget.title).toUpperCase(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'Fredoka',
@@ -235,7 +236,7 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
                       ),
                       const SizedBox(width: 6),
                       DendySpeakButton(
-                        textToSpeak: '${widget.title}. ${widget.message}',
+                        textToSpeak: '${l(widget.title)}. ${l(widget.message)}',
                         size: 24,
                       ),
                     ],
@@ -244,7 +245,7 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
 
                   // Description Text
                   Text(
-                    widget.message,
+                    l(widget.message),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Fredoka',
@@ -336,7 +337,7 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
 
                     // Action Button
                     CustomButton(
-                      text: widget.buttonText ?? 'CONTINUE TO NEXT LESSON',
+                      text: widget.buttonText != null ? l(widget.buttonText!) : l('continue_next_lesson'),
                       backgroundColor: ColorSystem.green,
                       textColor: Colors.white,
                       height: isShort ? 36 : 42,

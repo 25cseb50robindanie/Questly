@@ -4,6 +4,7 @@ import '../core/locator.dart';
 import '../core/theme/color_system.dart';
 import '../models/student.dart';
 import '../services/daily_reward_service.dart';
+import '../services/localization_service.dart';
 import '../services/sound_service.dart';
 import 'custom_button.dart';
 import 'vector_asset_helper.dart';
@@ -100,20 +101,17 @@ class _DailyRewardOverlayState extends State<DailyRewardOverlay> with TickerProv
   }
 
   Future<void> _handleClaim() async {
-    if (_isClaimed) return;
-
     SoundService.playStarPop();
     _shakeController.stop();
+    _burstController.forward();
 
-    final reward = await Locator.dailyRewardService.claimTodayReward(widget.student.questlyId);
-    if (!mounted) return;
+    final reward = await Locator.dailyRewardService.claimDailyReward(widget.student.questlyId);
 
     setState(() {
       _isClaimed = true;
       _claimedReward = reward;
     });
 
-    _burstController.forward();
     SoundService.playLevelComplete();
   }
 
@@ -121,15 +119,12 @@ class _DailyRewardOverlayState extends State<DailyRewardOverlay> with TickerProv
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isShort = size.height < 450;
-    final currentStreak = Locator.dailyRewardService.getCurrentStreakDay(widget.student.questlyId);
-    final todayReward = Locator.dailyRewardService.getRewardForDay(currentStreak);
+    final currentStreak = Locator.dailyRewardService.getCurrentStreak(widget.student.questlyId);
+    final todayReward = Locator.dailyRewardService.getTodayReward(widget.student.questlyId);
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: isShort ? 20 : 40,
-        vertical: isShort ? 8 : 16,
-      ),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Center(
         child: AnimatedBuilder(
           animation: _dropAnim,
@@ -140,11 +135,9 @@ class _DailyRewardOverlayState extends State<DailyRewardOverlay> with TickerProv
             );
           },
           child: Container(
-            width: isShort ? 440 : 480,
-            padding: EdgeInsets.symmetric(
-              horizontal: isShort ? 16 : 22,
-              vertical: isShort ? 12 : 18,
-            ),
+            width: isShort ? 390 : 440,
+            constraints: BoxConstraints(maxHeight: size.height * 0.95),
+            padding: EdgeInsets.all(isShort ? 14 : 20),
             decoration: BoxDecoration(
               color: ColorSystem.cream,
               borderRadius: BorderRadius.circular(22),
@@ -165,7 +158,7 @@ class _DailyRewardOverlayState extends State<DailyRewardOverlay> with TickerProv
                 children: [
                   // Title Banner
                   Text(
-                    _isClaimed ? 'REWARD CLAIMED!' : 'DAILY LOGIN REWARD!',
+                    _isClaimed ? l('reward_claimed') : l('daily_login_reward'),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Fredoka',
@@ -178,8 +171,8 @@ class _DailyRewardOverlayState extends State<DailyRewardOverlay> with TickerProv
                   const SizedBox(height: 2),
                   Text(
                     _isClaimed
-                        ? 'Your Quest Coins & XP have been added to your vault!'
-                        : 'Welcome back, Explorer! Log in daily to build your streak.',
+                      ? (currentStreak >= 7 ? l('streak_complete') : l('come_back_tomorrow', args: {'day': '${(currentStreak % 7) + 1}'}))
+                      : l('day_streak', args: {'day': '$currentStreak'}),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Fredoka',
@@ -296,7 +289,7 @@ class _DailyRewardOverlayState extends State<DailyRewardOverlay> with TickerProv
                   // Action Button
                   if (!_isClaimed)
                     CustomButton(
-                      text: 'CLAIM REWARD! 🎁',
+                      text: '${l('claim_reward')}! 🎁',
                       backgroundColor: ColorSystem.green,
                       textColor: Colors.white,
                       height: isShort ? 36 : 42,
@@ -304,7 +297,7 @@ class _DailyRewardOverlayState extends State<DailyRewardOverlay> with TickerProv
                     )
                   else
                     CustomButton(
-                      text: "AWESOME, LET'S PLAY! 🚀",
+                      text: "${l('continue_adventure')}! 🚀",
                       backgroundColor: ColorSystem.purple,
                       textColor: Colors.white,
                       height: isShort ? 36 : 42,
@@ -359,7 +352,7 @@ class _DailyRewardOverlayState extends State<DailyRewardOverlay> with TickerProv
       child: Column(
         children: [
           Text(
-            'DAY $day',
+            l('streak_day', args: {'day': '$day'}),
             style: TextStyle(
               fontFamily: 'Fredoka',
               fontSize: isShort ? 8 : 9,

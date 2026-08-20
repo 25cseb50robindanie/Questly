@@ -1,6 +1,7 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'package:flutter/foundation.dart';
+import 'localization_service.dart';
 
 class ReadAloudService extends ChangeNotifier {
   static final ReadAloudService _instance = ReadAloudService._internal();
@@ -16,10 +17,12 @@ class ReadAloudService extends ChangeNotifier {
   /// Speaks the provided text in the student's selected language
   void speak(
     String text, {
-    String languageCode = 'en',
+    String? languageCode,
     double rate = 0.95,
     double pitch = 1.1,
   }) {
+    final activeLang = languageCode ?? LocalizationService.currentLanguage;
+
     // If already speaking this exact text, pressing it again stops playback
     if (_isSpeaking && _currentlySpeakingText == text) {
       stop();
@@ -31,17 +34,20 @@ class ReadAloudService extends ChangeNotifier {
 
     if (text.trim().isEmpty) return;
 
+    // Translate English keys/phrases into the student's chosen language (Tamil, Hindi, or English)
+    final spokenText = LocalizationService.translate(text, targetLanguage: activeLang);
+
     if (kIsWeb) {
       try {
         final synth = html.window.speechSynthesis;
         if (synth != null) {
-          final utterance = html.SpeechSynthesisUtterance(text);
+          final utterance = html.SpeechSynthesisUtterance(spokenText);
           utterance.rate = rate; // 0.95 is ideal for learning comprehension
           utterance.pitch = pitch; // 1.1 gives Dendy a friendly tone
           utterance.volume = 1.0;
 
           // Map Questly language codes to standard BCP-47 locale tags
-          switch (languageCode.toLowerCase()) {
+          switch (activeLang.toLowerCase()) {
             case 'ta':
               utterance.lang = 'ta-IN';
               break;

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
 import '../services/dendy_nlp_service.dart';
+import '../services/localization_service.dart';
 import '../services/sound_service.dart';
 import 'dendy_mascot.dart';
 import 'dendy_speak_button.dart';
@@ -41,12 +42,11 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
   dynamic _speechRecognition;
 
   final List<String> _quickPrompts = [
-    'What is density?',
-    'Why does wood float?',
-    'Explain buoyancy',
-    'How do steel ships float?',
-    'What is titration?',
-    'What are fractions?',
+    'what_is_density',
+    'why_wood_float',
+    'how_steel_ships_float',
+    'why_ice_float',
+    'what_is_titration',
   ];
 
   @override
@@ -55,7 +55,7 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
     // Initial welcome message from Dendy
     _messages.add(
       DendyChatMessage(
-        text: "Hi! I'm Dendy, your science quest companion. Ask me anything about density, buoyancy, fractions, or physics experiments!",
+        text: l('ask_me_anything'),
         isUser: false,
       ),
     );
@@ -81,34 +81,33 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
     });
   }
 
-  void _sendMessage([String? textToSend]) {
-    final query = (textToSend ?? _textController.text).trim();
-    if (query.isEmpty) return;
+  void _sendMessage([String? customText]) {
+    final text = (customText ?? _textController.text).trim();
+    if (text.isEmpty) return;
 
     SoundService.playClick();
-    _stopListening();
 
     setState(() {
-      _messages.add(DendyChatMessage(text: query, isUser: true));
-      _textController.clear();
+      _messages.add(DendyChatMessage(text: text, isUser: true));
+      if (customText == null) {
+        _textController.clear();
+      }
     });
 
     _scrollToBottom();
 
-    // Generate rule-based NLP response
+    // Query Dendy NLP service and translate response to active language
     Future.delayed(const Duration(milliseconds: 400), () {
       if (!mounted) return;
-      final responseText = DendyNlpService().getResponse(query);
+      final rawAnswer = DendyNlpService.answer(text);
+      final answer = LocalizationService.translate(rawAnswer);
+
       setState(() {
-        _messages.add(DendyChatMessage(text: responseText, isUser: false));
+        _messages.add(DendyChatMessage(text: answer, isUser: false));
       });
+
       SoundService.playStarPop();
       _scrollToBottom();
-
-      // Automatically speak answer if read aloud is desired or user can click speak button
-      final student = Locator.studentRepository.getCurrentStudent();
-      final lang = student?.language ?? 'en';
-      Locator.readAloudService.speak(responseText, languageCode: lang);
     });
   }
 
@@ -125,8 +124,7 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
 
     try {
       if (html.SpeechRecognition.supported) {
-        final student = Locator.studentRepository.getCurrentStudent();
-        final lang = student?.language ?? 'en';
+        final lang = LocalizationService.currentLanguage;
         final langCode = lang == 'ta' ? 'ta-IN' : (lang == 'hi' ? 'hi-IN' : 'en-US');
 
         final recognition = html.SpeechRecognition();
@@ -235,9 +233,9 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'ASK DENDY',
-                        style: TextStyle(
+                      Text(
+                        l('ask_dendy'),
+                        style: const TextStyle(
                           fontFamily: 'Fredoka',
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
@@ -257,7 +255,7 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Offline Science Companion',
+                            l('dendy_companion'),
                             style: TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: 9.5,
@@ -293,9 +291,9 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
               itemCount: _quickPrompts.length,
               separatorBuilder: (_, __) => const SizedBox(width: 6),
               itemBuilder: (context, index) {
-                final prompt = _quickPrompts[index];
+                final promptKey = _quickPrompts[index];
                 return GestureDetector(
-                  onTap: () => _sendMessage(prompt),
+                  onTap: () => _sendMessage(l(promptKey)),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
@@ -305,7 +303,7 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
                     ),
                     child: Center(
                       child: Text(
-                        prompt,
+                        l(promptKey),
                         style: const TextStyle(
                           fontFamily: 'Fredoka',
                           fontSize: 9.5,
@@ -395,7 +393,7 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
                         fontWeight: FontWeight.w600,
                       ),
                       decoration: InputDecoration(
-                        hintText: _isListening ? 'Listening...' : 'Ask Dendy a question...',
+                        hintText: _isListening ? l('listening') : l('type_question'),
                         hintStyle: TextStyle(
                           fontFamily: 'Fredoka',
                           fontSize: 11,

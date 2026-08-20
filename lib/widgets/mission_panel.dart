@@ -3,6 +3,7 @@ import '../core/locator.dart';
 import '../core/theme/color_system.dart';
 import '../models/mission.dart';
 import '../models/student.dart';
+import '../services/localization_service.dart';
 import '../services/sound_service.dart';
 import 'custom_button.dart';
 import 'vector_asset_helper.dart';
@@ -57,9 +58,9 @@ class _MissionPanelState extends State<MissionPanel> {
                     children: [
                       VectorAssetHelper.badgeIcon('Explorer', size: 20),
                       const SizedBox(width: 8),
-                      const Text(
-                        'QUEST MISSIONS',
-                        style: TextStyle(
+                      Text(
+                        _selectedTab == MissionType.daily ? l('daily_missions') : l('weekly_missions'),
+                        style: const TextStyle(
                           fontFamily: 'Fredoka',
                           fontSize: 13,
                           fontWeight: FontWeight.w900,
@@ -81,8 +82,8 @@ class _MissionPanelState extends State<MissionPanel> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildTabPill('DAILY', MissionType.daily),
-                        _buildTabPill('WEEKLY', MissionType.weekly),
+                        _buildTabPill(l('daily'), MissionType.daily),
+                        _buildTabPill(l('weekly'), MissionType.weekly),
                       ],
                     ),
                   ),
@@ -167,7 +168,7 @@ class _MissionPanelState extends State<MissionPanel> {
             children: [
               Expanded(
                 child: Text(
-                  mission.title,
+                  l(mission.title),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -263,14 +264,14 @@ class _MissionPanelState extends State<MissionPanel> {
                 color: ColorSystem.green.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.check_circle_rounded, color: ColorSystem.green, size: 12),
-                  SizedBox(width: 4),
+                  const Icon(Icons.check_circle_rounded, color: ColorSystem.green, size: 12),
+                  const SizedBox(width: 4),
                   Text(
-                    'CLAIMED',
-                    style: TextStyle(
+                    l('claimed_btn'),
+                    style: const TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
@@ -303,10 +304,10 @@ class _MissionPanelState extends State<MissionPanel> {
                     ),
                   ],
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'CLAIM REWARD! 🎉',
-                    style: TextStyle(
+                    '${l('claim_reward_btn')} 🎉',
+                    style: const TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: 9.5,
                       fontWeight: FontWeight.w900,
@@ -327,7 +328,7 @@ class _MissionPanelState extends State<MissionPanel> {
               ),
               child: Center(
                 child: Text(
-                  'IN PROGRESS',
+                  '${mission.current} / ${mission.target}',
                   style: TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 8.5,
