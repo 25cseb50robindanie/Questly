@@ -194,9 +194,11 @@ class ProfileScreen extends StatelessWidget {
                     ),
             ),
           ),
-        );
-      },
+        ],
+      ),
     );
+  },
+);
   }
 
   Widget _buildStatCard(String label, String value, Widget iconWidget) {
