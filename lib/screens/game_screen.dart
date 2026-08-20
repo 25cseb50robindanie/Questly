@@ -160,8 +160,12 @@ class _GameScreenState extends State<GameScreen> {
 
     if (!mounted) return;
     
-    // Close simulation view
-    Navigator.pop(context);
+    // Close simulation view and return to roadmap
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else {
+      Navigator.pushReplacementNamed(context, '/roadmap');
+    }
   }
 
   double get _currentDensity => _mass / _volume;

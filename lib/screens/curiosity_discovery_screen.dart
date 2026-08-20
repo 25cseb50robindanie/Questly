@@ -1295,17 +1295,27 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                         backgroundColor: ColorSystem.cream,
                         textColor: ColorSystem.plum,
                         height: isShort ? 36 : 40,
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          SoundService.playClick();
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          } else {
+                            Navigator.pushReplacementNamed(context, '/roadmap');
+                          }
+                        },
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: CustomButton(
-                        text: 'CONTINUE',
+                        text: 'CONTINUE TO LESSON 2',
                         backgroundColor: ColorSystem.purple,
                         textColor: Colors.white,
                         height: isShort ? 36 : 40,
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          SoundService.playClick();
+                          Navigator.pushReplacementNamed(context, '/roadmap');
+                        },
                       ),
                     ),
                   ],

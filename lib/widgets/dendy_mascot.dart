@@ -62,9 +62,13 @@ class _DendyMascotState extends State<DendyMascot> with SingleTickerProviderStat
               // Floating Theme-Colored Fox Mascot
               SizedBox(
                 width: widget.size,
-                height: widget.size + 15,
-                child: CustomPaint(
-                  painter: _DendyPainter(state: widget.state),
+                height: widget.size + 4,
+                child: Image.asset(
+                  'assets/images/dendy_the_fox.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => CustomPaint(
+                    painter: _DendyPainter(state: widget.state),
+                  ),
                 ),
               ),
               // Speech Bubble

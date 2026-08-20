@@ -11,6 +11,7 @@ import '../services/sound_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/dendy_mascot.dart';
 import '../widgets/questly_background.dart';
+import '../widgets/quest_completion_dialog.dart';
 import '../widgets/vector_asset_helper.dart';
 
 class VirtualLabScreen extends StatefulWidget {
@@ -512,139 +513,15 @@ class _VirtualLabScreenState extends State<VirtualLabScreen> {
   // 3. COMPLETION CELEBRATION MODAL
   // ==========================================
   void _showCompletionDialog() {
-    showDialog(
+    QuestCompletionDialog.show(
       context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 480),
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: ColorSystem.plum, width: 2.2),
-              boxShadow: [
-                BoxShadow(
-                  color: ColorSystem.plum.withOpacity(0.18),
-                  offset: const Offset(0, 8),
-                  blurRadius: 18,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 3 Gold Stars
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    VectorAssetHelper.xpStarIcon(size: 38, color: ColorSystem.gold),
-                    const SizedBox(width: 6),
-                    VectorAssetHelper.xpStarIcon(size: 48, color: ColorSystem.gold),
-                    const SizedBox(width: 6),
-                    VectorAssetHelper.xpStarIcon(size: 38, color: ColorSystem.gold),
-                  ],
-                ),
-                const SizedBox(height: 10),
-
-                const Text(
-                  'LAB COMPLETED!',
-                  style: TextStyle(
-                    fontFamily: 'Fredoka',
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    color: ColorSystem.plum,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 6),
-
-                const Text(
-                  'You successfully mastered the Acid-Base Titration experiment in the Virtual Chemistry Lab!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Fredoka',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: ColorSystem.purple,
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 14),
-
-                // Reward Badges
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: ColorSystem.lavender,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: ColorSystem.purple.withOpacity(0.3)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          VectorAssetHelper.xpStarIcon(size: 16),
-                          const SizedBox(width: 6),
-                          const Text(
-                            '+60 XP',
-                            style: TextStyle(
-                              fontFamily: 'Fredoka',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w900,
-                              color: ColorSystem.purple,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: ColorSystem.cream,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: ColorSystem.gold.withOpacity(0.5)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          VectorAssetHelper.questCoinIcon(size: 16),
-                          const SizedBox(width: 6),
-                          const Text(
-                            '+15 COINS',
-                            style: TextStyle(
-                              fontFamily: 'Fredoka',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w900,
-                              color: ColorSystem.gold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-
-                CustomButton(
-                  text: 'RETURN TO ROADMAP',
-                  backgroundColor: ColorSystem.green,
-                  textColor: Colors.white,
-                  height: 40,
-                  onPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop(); // Close dialog
-                    _handleReturnToRoadmap(); // Return to roadmap / home
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
+      xpReward: 60,
+      goldReward: 15,
+      earnedStars: 3,
+      title: 'VIRTUAL LAB COMPLETE!',
+      message: 'You successfully mastered the Acid-Base Titration experiment in the Virtual Chemistry Lab!',
+      onContinue: () {
+        _handleReturnToRoadmap();
       },
     );
   }

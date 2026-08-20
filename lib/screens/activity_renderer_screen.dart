@@ -13,6 +13,7 @@ import '../widgets/questly_background.dart';
 import '../widgets/vector_asset_helper.dart';
 import '../widgets/level_up_dialog.dart';
 import '../widgets/reward_claim_overlay.dart';
+import '../widgets/quest_completion_dialog.dart';
 import '../services/sound_service.dart';
 
 class ActivityRendererScreen extends StatefulWidget {
@@ -148,35 +149,20 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
 
     if (!mounted) return;
 
-    // Show Sequential Quest Completion Dialog
-    showDialog(
+    // Show Sequential Quest Completion Dialog with 3-Star Popping Animation
+    QuestCompletionDialog.show(
       context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return _QuestCompletionSequenceDialog(
-          xpReward: _activity!.xpReward,
-          goldReward: _activity!.goldReward,
-          earnedStars: 3,
-          onClaimed: () {
-            Navigator.pop(context); // Close completion dialog
-
-            if (didLevelUp) {
-              // Trigger Level-Up Celebration modal
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) => LevelUpDialog(
-                  newLevel: finalLevel,
-                  onDismissed: () {
-                    if (mounted) Navigator.pop(context); // Return to Roadmap
-                  },
-                ),
-              );
-            } else {
-              if (mounted) Navigator.pop(context); // Return to Roadmap
-            }
-          },
-        );
+      xpReward: _activity!.xpReward,
+      goldReward: _activity!.goldReward,
+      earnedStars: 3,
+      title: 'QUEST COMPLETE!',
+      message: 'Outstanding job! You mastered this challenge and earned rewards.',
+      onContinue: () {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.pushReplacementNamed(context, '/roadmap');
+        }
       },
     );
   }
@@ -440,197 +426,6 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
             fontSize: 12,
             fontWeight: FontWeight.bold,
             color: ColorSystem.plum,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Sequential 3-Star Quest Completion Dialog
-class _QuestCompletionSequenceDialog extends StatefulWidget {
-  final int xpReward;
-  final int goldReward;
-  final int earnedStars;
-  final VoidCallback onClaimed;
-
-  const _QuestCompletionSequenceDialog({
-    Key? key,
-    required this.xpReward,
-    required this.goldReward,
-    required this.earnedStars,
-    required this.onClaimed,
-  }) : super(key: key);
-
-  @override
-  _QuestCompletionSequenceDialogState createState() => _QuestCompletionSequenceDialogState();
-}
-
-class _QuestCompletionSequenceDialogState extends State<_QuestCompletionSequenceDialog> {
-  int _visibleStars = 0;
-  bool _rewardsVisible = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _startSequence();
-  }
-
-  Future<void> _startSequence() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    if (!mounted) return;
-
-    // Pop star 1
-    if (widget.earnedStars >= 1) {
-      setState(() => _visibleStars = 1);
-      SoundService.playStarPop();
-      await Future.delayed(const Duration(milliseconds: 320));
-    }
-
-    // Pop star 2
-    if (!mounted) return;
-    if (widget.earnedStars >= 2) {
-      setState(() => _visibleStars = 2);
-      SoundService.playStarPop();
-      await Future.delayed(const Duration(milliseconds: 320));
-    }
-
-    // Pop star 3
-    if (!mounted) return;
-    if (widget.earnedStars >= 3) {
-      setState(() => _visibleStars = 3);
-      SoundService.playStarPop();
-      await Future.delayed(const Duration(milliseconds: 320));
-    }
-
-    // Reveal rewards panel with 3-star level completion fanfare
-    if (!mounted) return;
-    setState(() => _rewardsVisible = true);
-    SoundService.playLevelComplete();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-      child: Center(
-        child: Container(
-          width: 420,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: ColorSystem.cream,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: ColorSystem.plum, width: 2.5),
-            boxShadow: [
-              BoxShadow(
-                color: ColorSystem.plum.withOpacity(0.2),
-                offset: const Offset(0, 8),
-                blurRadius: 16,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Title Banner
-              const Text(
-                'QUEST COMPLETE',
-                style: TextStyle(
-                  fontFamily: 'Fredoka',
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  color: ColorSystem.purple,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 3 Stars Row (Animates 1 by 1)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (int i = 1; i <= 3; i++) ...[
-                    AnimatedScale(
-                      scale: i <= _visibleStars ? 1.25 : 0.85,
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.elasticOut,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6),
-                        child: VectorAssetHelper.xpStarIcon(
-                          size: 42,
-                          isFilled: i <= _visibleStars,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 18),
-
-              // Prominent Rewards Panel
-              AnimatedOpacity(
-                opacity: _rewardsVisible ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 300),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: ColorSystem.plum.withOpacity(0.15), width: 1.2),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            children: [
-                              VectorAssetHelper.xpStarIcon(size: 20),
-                              const SizedBox(width: 6),
-                              Text(
-                                '+${widget.xpReward} XP',
-                                style: const TextStyle(
-                                  fontFamily: 'Fredoka',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  color: ColorSystem.purple,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 24),
-                          Row(
-                            children: [
-                              VectorAssetHelper.questCoinIcon(size: 20),
-                              const SizedBox(width: 6),
-                              Text(
-                                '+${widget.goldReward} Quest Coins',
-                                style: const TextStyle(
-                                  fontFamily: 'Fredoka',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  color: ColorSystem.plum,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    CustomButton(
-                      text: 'CLAIM REWARD',
-                      backgroundColor: ColorSystem.purple,
-                      textColor: Colors.white,
-                      height: 42,
-                      onPressed: _rewardsVisible ? widget.onClaimed : () {},
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ),
         ),
       ),
