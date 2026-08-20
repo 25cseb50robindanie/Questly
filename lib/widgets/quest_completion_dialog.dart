@@ -37,6 +37,13 @@ class QuestCompletionDialog extends StatefulWidget {
     String? buttonText,
     VoidCallback? onContinue,
   }) async {
+    // Automatically advance Daily & Weekly mission progress
+    final student = Locator.studentRepository.getCurrentStudent();
+    if (student != null) {
+      await Locator.missionService.onLessonCompleted(student.questlyId);
+      await Locator.missionService.onXpEarned(student.questlyId, xpReward);
+    }
+
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,

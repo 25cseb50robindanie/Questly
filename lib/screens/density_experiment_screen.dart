@@ -11,6 +11,7 @@ import '../models/student.dart';
 import '../services/sound_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/dendy_mascot.dart';
+import '../widgets/dendy_speak_button.dart';
 import '../widgets/questly_background.dart';
 import '../widgets/quest_completion_dialog.dart';
 import '../widgets/vector_asset_helper.dart';
@@ -395,15 +396,27 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen> {
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: ColorSystem.purple.withOpacity(0.2)),
                     ),
-                    child: Text(
-                      mission['instruction'] as String,
-                      style: TextStyle(
-                        fontFamily: 'Fredoka',
-                        fontSize: isShort ? 10 : 11,
-                        fontWeight: FontWeight.w600,
-                        color: ColorSystem.plum,
-                        height: 1.35,
-                      ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            mission['instruction'] as String,
+                            style: TextStyle(
+                              fontFamily: 'Fredoka',
+                              fontSize: isShort ? 10 : 11,
+                              fontWeight: FontWeight.w600,
+                              color: ColorSystem.plum,
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        DendySpeakButton(
+                          textToSpeak: mission['instruction'] as String,
+                          size: 24,
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 8),

@@ -4,6 +4,7 @@ import '../models/module.dart';
 import '../models/lesson.dart';
 import '../services/localization_service.dart';
 import 'dendy_mascot.dart';
+import 'dendy_speak_button.dart';
 import 'custom_button.dart';
 
 class CurrentLearningCard extends StatelessWidget {
@@ -200,14 +201,25 @@ class CurrentLearningCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // Right side: floating Dendy fox
+          // Right side: floating Dendy fox + Read Aloud button
           Expanded(
             flex: 8,
-            child: Center(
-              child: DendyMascot(
-                state: progressPercent >= 100 ? DendyState.success : DendyState.idle,
-                size: 78,
-              ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                DendyMascot(
+                  state: progressPercent >= 100 ? DendyState.success : DendyState.idle,
+                  size: 78,
+                ),
+                Positioned(
+                  top: 2,
+                  right: 8,
+                  child: DendySpeakButton(
+                    textToSpeak: mascotMessage,
+                    size: 26,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

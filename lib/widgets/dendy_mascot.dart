@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../core/theme/color_system.dart';
+import 'dendy_speak_button.dart';
 
 enum DendyState {
   idle,
@@ -9,14 +10,25 @@ enum DendyState {
   confused,
 }
 
+enum DendyMood {
+  happy,
+  explaining,
+  thinking,
+  idle,
+  success,
+  confused,
+}
+
 class DendyMascot extends StatefulWidget {
   final DendyState state;
+  final DendyMood? mood;
   final String? message;
   final double size;
 
   const DendyMascot({
     Key? key,
     this.state = DendyState.idle,
+    this.mood,
     this.message,
     this.size = 90.0,
   }) : super(key: key);
@@ -48,6 +60,25 @@ class _DendyMascotState extends State<DendyMascot> with SingleTickerProviderStat
     super.dispose();
   }
 
+  DendyState get _effectiveState {
+    if (widget.mood != null) {
+      switch (widget.mood!) {
+        case DendyMood.thinking:
+        case DendyMood.explaining:
+          return DendyState.thinking;
+        case DendyMood.happy:
+        case DendyMood.success:
+          return DendyState.success;
+        case DendyMood.confused:
+          return DendyState.confused;
+        case DendyMood.idle:
+        default:
+          return DendyState.idle;
+      }
+    }
+    return widget.state;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -64,7 +95,7 @@ class _DendyMascotState extends State<DendyMascot> with SingleTickerProviderStat
                 width: widget.size,
                 height: widget.size,
                 child: CustomPaint(
-                  painter: _DendyPainter(state: widget.state),
+                  painter: _DendyPainter(state: _effectiveState),
                 ),
               ),
               // Speech Bubble
@@ -89,14 +120,27 @@ class _DendyMascotState extends State<DendyMascot> with SingleTickerProviderStat
                             )
                           ],
                         ),
-                        child: Text(
-                          widget.message!,
-                          style: const TextStyle(
-                            fontFamily: 'Fredoka',
-                            color: ColorSystem.plum,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                widget.message!,
+                                style: const TextStyle(
+                                  fontFamily: 'Fredoka',
+                                  color: ColorSystem.plum,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            DendySpeakButton(
+                              textToSpeak: widget.message!,
+                              size: 24,
+                            ),
+                          ],
                         ),
                       ),
                       // Speech Bubble Pointer

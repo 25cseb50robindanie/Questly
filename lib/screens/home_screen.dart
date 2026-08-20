@@ -18,6 +18,10 @@ import '../services/localization_service.dart';
 import '../services/sound_service.dart';
 
 import '../widgets/vector_asset_helper.dart';
+import '../widgets/daily_reward_overlay.dart';
+import '../widgets/mission_panel.dart';
+import '../widgets/dendy_chat_panel.dart';
+import '../widgets/dendy_mascot.dart';
 
 // View Imports
 import 'modules_screen.dart';
@@ -35,11 +39,20 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Student? _student;
   int _currentTabIndex = 0;
+  bool _isAskDendyOpen = false;
 
   @override
   void initState() {
     super.initState();
     _loadState();
+
+    // Check & trigger Daily Login Reward overlay if available today
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final s = Locator.studentRepository.getCurrentStudent();
+      if (s != null && mounted) {
+        DailyRewardOverlay.showIfNeeded(context, s);
+      }
+    });
   }
 
   void _loadState() {
@@ -106,64 +119,121 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return Scaffold(
           backgroundColor: ColorSystem.cream,
-          body: QuestlyBackground(
-            child: Column(
-              children: [
-                // 1. Persistent Top Header
-                QuestlyHeader(
-                  student: currentStudent,
-                  onSettingsPressed: () async {
-                    await Navigator.pushNamed(context, '/settings');
-                    _loadState();
-                  },
-                  onNotificationsPressed: () async {
-                    await Navigator.pushNamed(context, '/notifications');
-                    _loadState();
-                  },
-                  onProfilePressed: () {
+          floatingActionButton: _isAskDendyOpen
+              ? null
+              : FloatingActionButton.extended(
+                  backgroundColor: ColorSystem.purple,
+                  elevation: 6,
+                  icon: const DendyMascot(size: 26, mood: DendyMood.happy),
+                  label: const Text(
+                    'ASK DENDY',
+                    style: TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  onPressed: () {
+                    SoundService.playClick();
                     setState(() {
-                      _currentTabIndex = 4; // Switch to Profile tab
+                      _isAskDendyOpen = true;
                     });
                   },
                 ),
+          body: QuestlyBackground(
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    // 1. Persistent Top Header
+                    QuestlyHeader(
+                      student: currentStudent,
+                      onSettingsPressed: () async {
+                        await Navigator.pushNamed(context, '/settings');
+                        _loadState();
+                      },
+                      onNotificationsPressed: () async {
+                        await Navigator.pushNamed(context, '/notifications');
+                        _loadState();
+                      },
+                      onProfilePressed: () {
+                        setState(() {
+                          _currentTabIndex = 4; // Switch to Profile tab
+                        });
+                      },
+                    ),
 
-                // 2. Body: Left Navigation Sidebar + Right Content Views
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      QuestlyNavigation(
-                        currentIndex: _currentTabIndex,
-                        onTabSelected: _onTabSelected,
-                      ),
-                      Expanded(
-                        child: IndexedStack(
-                          index: _currentTabIndex,
-                          children: [
-                            // Index 0: Home Dashboard View
-                            _HomeDashboardView(
-                              student: currentStudent,
-                              activeModule: _getActiveModule(),
-                              activeLesson: _getActiveLesson(),
-                              completedLessons: _getCompletedLessonsCount(_getActiveModule()),
-                              totalLessons: _getTotalLessonsCount(_getActiveModule()),
-                              onTabSelected: _onTabSelected,
-                              onStateRefresh: _loadState,
+                    // 2. Body: Left Navigation Sidebar + Right Content Views
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          QuestlyNavigation(
+                            currentIndex: _currentTabIndex,
+                            onTabSelected: _onTabSelected,
+                          ),
+                          Expanded(
+                            child: IndexedStack(
+                              index: _currentTabIndex,
+                              children: [
+                                // Index 0: Home Dashboard View
+                                _HomeDashboardView(
+                                  student: currentStudent,
+                                  activeModule: _getActiveModule(),
+                                  activeLesson: _getActiveLesson(),
+                                  completedLessons: _getCompletedLessonsCount(_getActiveModule()),
+                                  totalLessons: _getTotalLessonsCount(_getActiveModule()),
+                                  onTabSelected: _onTabSelected,
+                                  onStateRefresh: _loadState,
+                                ),
+                                // Index 1: Modules library listing
+                                const ModulesScreen(),
+                                // Index 2: Leaderboard rankings
+                                const LeaderboardScreen(isTab: true),
+                                // Index 3: Collection rewards & shop
+                                const CollectionScreen(),
+                                // Index 4: Profile stats
+                                const ProfileScreen(),
+                              ],
                             ),
-                            // Index 1: Modules library listing
-                            const ModulesScreen(),
-                            // Index 2: Leaderboard rankings
-                            const LeaderboardScreen(isTab: true),
-                            // Index 3: Collection rewards & shop
-                            const CollectionScreen(),
-                            // Index 4: Profile stats
-                            const ProfileScreen(),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+
+                // 3. Ask Dendy Sliding Right Side Panel
+                if (_isAskDendyOpen) ...[
+                  // Dimmed backdrop detector
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isAskDendyOpen = false;
+                        });
+                      },
+                      child: Container(
+                        color: Colors.black.withOpacity(0.35),
+                      ),
+                    ),
+                  ),
+                  // Sliding Drawer
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    child: DendyChatPanel(
+                      onClose: () {
+                        setState(() {
+                          _isAskDendyOpen = false;
+                        });
+                      },
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -295,7 +365,12 @@ class _HomeDashboardView extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // 2. Badges & Achievements Section (Live reflection of Level Ups & Badges)
+          // 2. Daily & Weekly Missions System Panel
+          MissionPanel(student: student),
+
+          const SizedBox(height: 16),
+
+          // 3. Badges & Achievements Section (Live reflection of Level Ups & Badges)
           ListenableBuilder(
             listenable: Locator.collectionRepository,
             builder: (context, _) {

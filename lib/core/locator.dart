@@ -16,6 +16,9 @@ import '../services/speech_service.dart';
 import '../services/ai_tutor_service.dart';
 import '../services/ollama_ai_provider.dart';
 import '../services/retriever.dart';
+import '../services/daily_reward_service.dart';
+import '../services/mission_service.dart';
+import '../services/read_aloud_service.dart';
 
 class Locator {
   static late final StorageService storageService;
@@ -39,6 +42,11 @@ class Locator {
   static late final TextToSpeechProvider textToSpeechProvider;
   static late final AITutorService aiTutorService;
 
+  // New Game App Services
+  static late final DailyRewardService dailyRewardService;
+  static late final MissionService missionService;
+  static late final ReadAloudService readAloudService;
+
   static bool _initialized = false;
 
   static Future<void> setup() async {
@@ -51,13 +59,13 @@ class Locator {
     collectionRepository = CollectionRepository(storageService);
     notificationRepository = NotificationRepository(storageService);
     
-    // Instantiate new V0.3 services
+    // Instantiate progression services
     roadmapRepository = RoadmapRepository();
     progressionService = ProgressionService();
     rewardService = RewardService();
     pendingRewardService = PendingRewardService();
     
-    // Instantiate V0.4 AI Tutor services
+    // Instantiate AI Tutor services
     knowledgeRepository = KnowledgeRepository();
     doubtRepository = DoubtRepository();
     speechToTextProvider = MockSpeechToTextProvider();
@@ -66,6 +74,11 @@ class Locator {
     final aiProvider = OllamaAIProvider();
     final retriever = KeywordRetriever();
     aiTutorService = AITutorService(aiProvider, retriever);
+
+    // Instantiate New Game App Services
+    dailyRewardService = DailyRewardService(storageService);
+    missionService = MissionService(storageService);
+    readAloudService = ReadAloudService();
     
     // Seed and hook auth
     authService = MockAuthService(
