@@ -67,6 +67,7 @@ flutter:
   assets:
     - assets/images/
     - assets/audio/
+    - assets/fonts/
     - assets/knowledge/
     - assets/vector_ui/
     - assets/vector_ui/icons/
@@ -77,6 +78,11 @@ flutter:
     - assets/vector_ui/emoji/
     - assets/vector_ui/blue set/
     - assets/vector_ui/bt/
+
+  fonts:
+    - family: Fredoka
+      fonts:
+        - asset: assets/fonts/Fredoka.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -62,13 +62,9 @@ class _DendyMascotState extends State<DendyMascot> with SingleTickerProviderStat
               // Floating Theme-Colored Fox Mascot
               SizedBox(
                 width: widget.size,
-                height: widget.size + 4,
-                child: Image.asset(
-                  'assets/images/dendy_the_fox.png',
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => CustomPaint(
-                    painter: _DendyPainter(state: widget.state),
-                  ),
+                height: widget.size,
+                child: CustomPaint(
+                  painter: _DendyPainter(state: widget.state),
                 ),
               ),
               // Speech Bubble
@@ -96,6 +92,7 @@ class _DendyMascotState extends State<DendyMascot> with SingleTickerProviderStat
                         child: Text(
                           widget.message!,
                           style: const TextStyle(
+                            fontFamily: 'Fredoka',
                             color: ColorSystem.plum,
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
@@ -130,9 +127,10 @@ class _DendyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final centerX = size.width / 2;
-    final centerY = size.height * 0.54;
+    final centerY = size.height * 0.52;
     final headWidth = size.width * 0.82;
-    final headHeight = size.height * 0.58;
+    final headHeight = headWidth * 0.72;
+    final strokeW = (headWidth * 0.034).clamp(1.4, 3.2);
 
     // Theme palette coloring for the Fox: Twilight Purple and Lavender/Cream
     final furPaint = Paint()..color = ColorSystem.purple..style = PaintingStyle.fill;
@@ -144,7 +142,7 @@ class _DendyPainter extends CustomPainter {
     final borderPaint = Paint()
       ..color = ColorSystem.plum
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2
+      ..strokeWidth = strokeW
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
@@ -153,7 +151,11 @@ class _DendyPainter extends CustomPainter {
     // 1. Shadow (flat bottom ellipse)
     final shadowPaint = Paint()..color = ColorSystem.plum.withOpacity(0.12);
     canvas.drawOval(
-      Rect.fromLTWH(size.width * 0.15, size.height * 0.90, size.width * 0.7, 6),
+      Rect.fromCenter(
+        center: Offset(centerX, centerY + headHeight * 0.56),
+        width: headWidth * 0.78,
+        height: headHeight * 0.12,
+      ),
       shadowPaint,
     );
 
@@ -220,7 +222,7 @@ class _DendyPainter extends CustomPainter {
     final muzzleBorderPaint = Paint()
       ..color = ColorSystem.plum
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2
+      ..strokeWidth = strokeW
       ..strokeCap = StrokeCap.round;
     
     final wavePath = Path()
@@ -263,17 +265,19 @@ class _DendyPainter extends CustomPainter {
         canvas.drawCircle(Offset(leftEyeX, eyeY), eyeRadius, plumPaint);
         canvas.drawCircle(Offset(rightEyeX, eyeY), eyeRadius, plumPaint);
         // Double sparkles
-        canvas.drawCircle(Offset(leftEyeX - 2.5, eyeY - 2.5), 2.2, whiteHighlightPaint..color = Colors.white);
-        canvas.drawCircle(Offset(leftEyeX + 2.5, eyeY + 2.5), 1.0, whiteHighlightPaint);
-        canvas.drawCircle(Offset(rightEyeX - 2.5, eyeY - 2.5), 2.2, whiteHighlightPaint);
-        canvas.drawCircle(Offset(rightEyeX + 2.5, eyeY + 2.5), 1.0, whiteHighlightPaint);
+        final sparkleL = (eyeRadius * 0.32).clamp(1.5, 3.5);
+        final sparkleS = (eyeRadius * 0.16).clamp(0.8, 1.8);
+        canvas.drawCircle(Offset(leftEyeX - eyeRadius * 0.3, eyeY - eyeRadius * 0.3), sparkleL, whiteHighlightPaint..color = Colors.white);
+        canvas.drawCircle(Offset(leftEyeX + eyeRadius * 0.3, eyeY + eyeRadius * 0.3), sparkleS, whiteHighlightPaint);
+        canvas.drawCircle(Offset(rightEyeX - eyeRadius * 0.3, eyeY - eyeRadius * 0.3), sparkleL, whiteHighlightPaint);
+        canvas.drawCircle(Offset(rightEyeX + eyeRadius * 0.3, eyeY + eyeRadius * 0.3), sparkleS, whiteHighlightPaint);
 
         // Gold question mark if thinking
         if (state == DendyState.thinking) {
           final qPaint = Paint()
             ..color = ColorSystem.gold
             ..style = PaintingStyle.stroke
-            ..strokeWidth = 2.5
+            ..strokeWidth = (strokeW * 1.1).clamp(1.8, 3.5)
             ..strokeCap = StrokeCap.round;
           final qPath = Path()
             ..moveTo(centerX + headWidth * 0.44, centerY - headHeight * 0.6)
@@ -282,7 +286,7 @@ class _DendyPainter extends CustomPainter {
             ..moveTo(centerX + headWidth * 0.42, centerY - headHeight * 0.68)
             ..lineTo(centerX + headWidth * 0.42, centerY - headHeight * 0.62);
           canvas.drawPath(qPath, qPaint);
-          canvas.drawCircle(Offset(centerX + headWidth * 0.42, centerY - headHeight * 0.56), 1.2, Paint()..color = ColorSystem.gold);
+          canvas.drawCircle(Offset(centerX + headWidth * 0.42, centerY - headHeight * 0.56), strokeW * 0.6, Paint()..color = ColorSystem.gold);
         }
         break;
 
@@ -291,14 +295,15 @@ class _DendyPainter extends CustomPainter {
         final successPaint = Paint()
           ..color = ColorSystem.plum
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 3.5
+          ..strokeWidth = (strokeW * 1.3).clamp(2.0, 4.0)
           ..strokeCap = StrokeCap.round;
+        final archW = eyeRadius * 0.85;
         final pathL = Path()
-          ..moveTo(leftEyeX - 5.5, eyeY + 2)
-          ..quadraticBezierTo(leftEyeX, eyeY - 3.5, leftEyeX + 5.5, eyeY + 2);
+          ..moveTo(leftEyeX - archW, eyeY + eyeRadius * 0.3)
+          ..quadraticBezierTo(leftEyeX, eyeY - eyeRadius * 0.5, leftEyeX + archW, eyeY + eyeRadius * 0.3);
         final pathR = Path()
-          ..moveTo(rightEyeX - 5.5, eyeY + 2)
-          ..quadraticBezierTo(rightEyeX, eyeY - 3.5, rightEyeX + 5.5, eyeY + 2);
+          ..moveTo(rightEyeX - archW, eyeY + eyeRadius * 0.3)
+          ..quadraticBezierTo(rightEyeX, eyeY - eyeRadius * 0.5, rightEyeX + archW, eyeY + eyeRadius * 0.3);
         canvas.drawPath(pathL, successPaint);
         canvas.drawPath(pathR, successPaint);
         break;
@@ -308,12 +313,13 @@ class _DendyPainter extends CustomPainter {
         final dizzyPaint = Paint()
           ..color = ColorSystem.plum
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5
+          ..strokeWidth = strokeW
           ..strokeCap = StrokeCap.round;
-        canvas.drawLine(Offset(leftEyeX - 4.5, eyeY - 4.5), Offset(leftEyeX + 4.5, eyeY + 4.5), dizzyPaint);
-        canvas.drawLine(Offset(leftEyeX + 4.5, eyeY - 4.5), Offset(leftEyeX - 4.5, eyeY + 4.5), dizzyPaint);
-        canvas.drawLine(Offset(rightEyeX - 4.5, eyeY - 4.5), Offset(rightEyeX + 4.5, eyeY + 4.5), dizzyPaint);
-        canvas.drawLine(Offset(rightEyeX + 4.5, eyeY - 4.5), Offset(rightEyeX - 4.5, eyeY + 4.5), dizzyPaint);
+        final dOff = eyeRadius * 0.65;
+        canvas.drawLine(Offset(leftEyeX - dOff, eyeY - dOff), Offset(leftEyeX + dOff, eyeY + dOff), dizzyPaint);
+        canvas.drawLine(Offset(leftEyeX + dOff, eyeY - dOff), Offset(leftEyeX - dOff, eyeY + dOff), dizzyPaint);
+        canvas.drawLine(Offset(rightEyeX - dOff, eyeY - dOff), Offset(rightEyeX + dOff, eyeY + dOff), dizzyPaint);
+        canvas.drawLine(Offset(rightEyeX + dOff, eyeY - dOff), Offset(rightEyeX - dOff, eyeY + dOff), dizzyPaint);
         break;
     }
 
@@ -321,7 +327,7 @@ class _DendyPainter extends CustomPainter {
     final double noseX = centerX;
     final double noseY = centerY + headHeight * 0.08;
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(noseX, noseY), width: 10, height: 7.5),
+      Rect.fromCenter(center: Offset(noseX, noseY), width: headWidth * 0.14, height: headHeight * 0.14),
       plumPaint,
     );
 
@@ -329,26 +335,26 @@ class _DendyPainter extends CustomPainter {
     final mouthPaint = Paint()
       ..color = ColorSystem.plum
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2
+      ..strokeWidth = strokeW
       ..strokeCap = StrokeCap.round;
 
-    final double mouthY = noseY + 3.2;
+    final double mouthY = noseY + headHeight * 0.06;
 
     if (state == DendyState.success) {
       final mouthPath = Path()
-        ..moveTo(centerX - 6.5, mouthY)
-        ..quadraticBezierTo(centerX, mouthY + 8.0, centerX + 6.5, mouthY)
+        ..moveTo(centerX - headWidth * 0.09, mouthY)
+        ..quadraticBezierTo(centerX, mouthY + headHeight * 0.16, centerX + headWidth * 0.09, mouthY)
         ..close();
       canvas.drawPath(mouthPath, Paint()..color = const Color(0xFFFF9E9E)..style = PaintingStyle.fill);
       canvas.drawPath(mouthPath, mouthPaint);
     } else {
       // Classic cute double-loop w shape
       final pathL = Path()
-        ..moveTo(centerX - 5.0, mouthY + 1.2)
-        ..quadraticBezierTo(centerX - 2.5, mouthY + 4.0, centerX, mouthY + 0.8);
+        ..moveTo(centerX - headWidth * 0.07, mouthY + headHeight * 0.02)
+        ..quadraticBezierTo(centerX - headWidth * 0.035, mouthY + headHeight * 0.08, centerX, mouthY + headHeight * 0.015);
       final pathR = Path()
-        ..moveTo(centerX, mouthY + 0.8)
-        ..quadraticBezierTo(centerX + 2.5, mouthY + 4.0, centerX + 5.0, mouthY + 1.2);
+        ..moveTo(centerX, mouthY + headHeight * 0.015)
+        ..quadraticBezierTo(centerX + headWidth * 0.035, mouthY + headHeight * 0.08, centerX + headWidth * 0.07, mouthY + headHeight * 0.02);
       canvas.drawPath(pathL, mouthPaint);
       canvas.drawPath(pathR, mouthPaint);
     }

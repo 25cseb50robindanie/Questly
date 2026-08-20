@@ -6,6 +6,7 @@ class QuestlyTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Fredoka',
       scaffoldBackgroundColor: ColorSystem.cream,
       primaryColor: ColorSystem.purple,
       colorScheme: const ColorScheme.light(
