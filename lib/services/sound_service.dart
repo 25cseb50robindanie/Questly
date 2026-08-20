@@ -59,6 +59,17 @@ class SoundService {
     AudioHelper.playSound('audio/47313572-ui-pop-sound-316482.mp3');
   }
 
+  // 7. General Feedback Sounds
+  static Future<void> playSuccess() async {
+    if (!soundEnabled) return;
+    AudioHelper.playSound('audio/cartoon_music-correct-game-show-alert-499485.mp3');
+  }
+
+  static Future<void> playDrop() async {
+    if (!soundEnabled) return;
+    AudioHelper.playSound('audio/47313572-ui-pop-sound-316482.mp3');
+  }
+
   static Future<void> playCoinFly() async {
     if (!soundEnabled) return;
   }

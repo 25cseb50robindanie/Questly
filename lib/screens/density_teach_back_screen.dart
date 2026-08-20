@@ -52,14 +52,7 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
 
   void _initWebSpeechRecognition() {
     try {
-      // Check for WebkitSpeechRecognition or standard SpeechRecognition
-      final speechClass = html.window.hasProperty('SpeechRecognition')
-          ? html.window.getProperty('SpeechRecognition')
-          : (html.window.hasProperty('webkitSpeechRecognition')
-              ? html.window.getProperty('webkitSpeechRecognition')
-              : null);
-
-      if (speechClass != null) {
+      if (html.SpeechRecognition.supported) {
         _speechRecognition = html.SpeechRecognition();
         _speechRecognition.continuous = true;
         _speechRecognition.interimResults = true;

@@ -24,4 +24,5 @@ class ColorSystem {
   static const Color green = Color(0xFF06D6A0);          // Forest success green
   static const Color lightGreen = Color(0xFF5BA864);     // Forest Leaf Green
   static const Color gold = Color(0xFFFFD166);           // Warm Gold Reward Stars
+  static const Color coral = Color(0xFFFF6B6B);          // Warm Coral Accent
 }
