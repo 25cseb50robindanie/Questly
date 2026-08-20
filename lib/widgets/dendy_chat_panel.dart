@@ -1,9 +1,9 @@
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
-import '../models/student.dart';
 import '../services/dendy_nlp_service.dart';
 import '../services/sound_service.dart';
 import 'dendy_mascot.dart';
@@ -140,14 +140,23 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
 
         recognition.onResult.listen((event) {
           try {
-            final results = event.results;
-            if (results != null && results.length > 0) {
-              final item = results[results.length - 1];
-              final transcript = item[0]?.transcript;
-              if (transcript != null && transcript.toString().trim().isNotEmpty) {
-                if (mounted) {
+            final dynamic results = event.results;
+            if (results != null) {
+              final int? length = results.length as int?;
+              if (length != null && length > 0) {
+                String fullTranscript = '';
+                for (var i = 0; i < length; i++) {
+                  final dynamic item = results[i];
+                  if (item != null) {
+                    final dynamic alt = item[0] ?? (item is html.SpeechRecognitionResult ? item.item(0) : null);
+                    if (alt != null) {
+                      fullTranscript += (alt.transcript?.toString() ?? '');
+                    }
+                  }
+                }
+                if (mounted && fullTranscript.trim().isNotEmpty) {
                   setState(() {
-                    _textController.text = transcript.toString();
+                    _textController.text = fullTranscript.trim();
                   });
                 }
               }
