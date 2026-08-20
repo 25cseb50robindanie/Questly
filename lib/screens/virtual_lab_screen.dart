@@ -10,6 +10,7 @@ import '../models/student.dart';
 import '../services/sound_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/dendy_mascot.dart';
+import '../widgets/dendy_speak_button.dart';
 import '../widgets/questly_background.dart';
 import '../widgets/quest_completion_dialog.dart';
 import '../widgets/vector_asset_helper.dart';
@@ -439,6 +440,11 @@ class _VirtualLabScreenState extends State<VirtualLabScreen> {
                       height: 1.25,
                     ),
                   ),
+                ),
+                const SizedBox(width: 6),
+                DendySpeakButton(
+                  textToSpeak: message,
+                  size: 22,
                 ),
               ],
             ),

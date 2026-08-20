@@ -71,9 +71,22 @@ class CurrentLearningCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            const DendyMascot(
-              state: DendyState.idle,
-              size: 76,
+            Stack(
+              alignment: Alignment.center,
+              children: const [
+                DendyMascot(
+                  state: DendyState.idle,
+                  size: 76,
+                ),
+                Positioned(
+                  top: 2,
+                  right: 4,
+                  child: DendySpeakButton(
+                    textToSpeak: "Start your first quest! Let's find something new to explore!",
+                    size: 24,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

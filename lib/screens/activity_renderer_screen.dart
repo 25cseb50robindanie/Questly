@@ -9,6 +9,7 @@ import '../models/student.dart';
 import '../models/roadmap_enums.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/dendy_mascot.dart';
+import '../widgets/dendy_speak_button.dart';
 import '../widgets/questly_background.dart';
 import '../widgets/vector_asset_helper.dart';
 import '../widgets/level_up_dialog.dart';
@@ -267,15 +268,24 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'LAB DESCRIPTION',
-                                    style: TextStyle(
-                                      fontFamily: 'Fredoka',
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: ColorSystem.plum.withOpacity(0.55),
-                                      letterSpacing: 0.5,
-                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'LAB DESCRIPTION',
+                                        style: TextStyle(
+                                          fontFamily: 'Fredoka',
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: ColorSystem.plum.withOpacity(0.55),
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                      DendySpeakButton(
+                                        textToSpeak: _activity!.instruction,
+                                        size: 22,
+                                      ),
+                                    ],
                                   ),
                                   const SizedBox(height: 8),
                                   Text(

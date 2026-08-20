@@ -4,6 +4,7 @@ import '../core/locator.dart';
 import '../core/theme/color_system.dart';
 import '../services/sound_service.dart';
 import 'custom_button.dart';
+import 'dendy_speak_button.dart';
 import 'level_up_dialog.dart';
 import 'vector_asset_helper.dart';
 
@@ -44,6 +45,8 @@ class QuestCompletionDialog extends StatefulWidget {
       await Locator.missionService.onXpEarned(student.questlyId, xpReward);
     }
 
+    if (!context.mounted) return;
+
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -61,6 +64,15 @@ class QuestCompletionDialog extends StatefulWidget {
       if (onContinue != null) {
         onContinue();
       } else if (context.mounted) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.pushReplacementNamed(context, '/roadmap');
+        }
+      }
+    } else {
+      // User tapped X close button: exit safely so student is never stuck!
+      if (context.mounted) {
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         } else {
@@ -183,51 +195,66 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Center(
-        child: Container(
-          width: isShort ? 380 : 440,
-          padding: EdgeInsets.all(isShort ? 16 : 22),
-          decoration: BoxDecoration(
-            color: ColorSystem.cream,
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: ColorSystem.plum, width: 2.5),
-            boxShadow: [
-              BoxShadow(
-                color: ColorSystem.plum.withOpacity(0.22),
-                offset: const Offset(0, 8),
-                blurRadius: 18,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: isShort ? 380 : 440,
+              padding: EdgeInsets.all(isShort ? 16 : 22),
+              decoration: BoxDecoration(
+                color: ColorSystem.cream,
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: ColorSystem.plum, width: 2.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: ColorSystem.plum.withOpacity(0.22),
+                    offset: const Offset(0, 8),
+                    blurRadius: 18,
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Title Banner
-              Text(
-                widget.title.toUpperCase(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Fredoka',
-                  fontSize: isShort ? 18 : 22,
-                  fontWeight: FontWeight.w900,
-                  color: ColorSystem.plum,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              SizedBox(height: isShort ? 4 : 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Title Banner + Read Aloud
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          widget.title.toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Fredoka',
+                            fontSize: isShort ? 18 : 22,
+                            fontWeight: FontWeight.w900,
+                            color: ColorSystem.plum,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      DendySpeakButton(
+                        textToSpeak: '${widget.title}. ${widget.message}',
+                        size: 24,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: isShort ? 4 : 8),
 
-              // Description Text
-              Text(
-                widget.message,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Fredoka',
-                  fontSize: isShort ? 10.5 : 12,
-                  fontWeight: FontWeight.w600,
-                  color: ColorSystem.purple,
-                  height: 1.3,
-                ),
-              ),
-              SizedBox(height: isShort ? 10 : 16),
+                  // Description Text
+                  Text(
+                    widget.message,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: isShort ? 10.5 : 12,
+                      fontWeight: FontWeight.w600,
+                      color: ColorSystem.purple,
+                      height: 1.3,
+                    ),
+                  ),
+                  SizedBox(height: isShort ? 10 : 16),
 
               // 3 Stars Animated Popping Row
               Row(
@@ -321,7 +348,39 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
             ],
           ),
         ),
-      ),
-    );
+        // Top-Right X Close Button
+        Positioned(
+          top: isShort ? 6 : 10,
+          right: isShort ? 6 : 10,
+          child: GestureDetector(
+            onTap: () {
+              SoundService.playClick();
+              Navigator.of(context).pop(false);
+            },
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: ColorSystem.plum, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: ColorSystem.plum.withOpacity(0.18),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: Icon(Icons.close_rounded, color: ColorSystem.plum, size: 18),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+);
   }
 }
