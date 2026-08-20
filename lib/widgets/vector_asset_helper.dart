@@ -143,7 +143,7 @@ class VectorAssetHelper {
   static Widget shopRewardIcon(String id, {double size = 32}) {
     switch (id) {
       case 'reward_hat':
-        return getVectorIcon(path: 'icons/potion_purple.svg', size: size);
+        return getVectorIcon(path: 'icons/potionpurple.svg', size: size);
       case 'reward_frame':
         return getVectorIcon(path: 'frames/frame0.svg', size: size);
       case 'reward_bg':

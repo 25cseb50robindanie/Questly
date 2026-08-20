@@ -17,6 +17,8 @@ import '../widgets/leaderboard_preview.dart';
 import '../services/localization_service.dart';
 import '../services/sound_service.dart';
 
+import '../widgets/vector_asset_helper.dart';
+
 // View Imports
 import 'modules_screen.dart';
 import 'leaderboard_screen.dart';
@@ -120,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   onProfilePressed: () {
                     setState(() {
-                      _currentTabIndex = 3; // Switch to Profile tab
+                      _currentTabIndex = 4; // Switch to Profile tab
                     });
                   },
                 ),
@@ -291,9 +293,138 @@ class _HomeDashboardView extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
-          // 2. Bottom Section: My Modules (Full Width)
+          // 2. Badges & Achievements Section (Live reflection of Level Ups & Badges)
+          ListenableBuilder(
+            listenable: Locator.collectionRepository,
+            builder: (context, _) {
+              final studentId = student.questlyId.toLowerCase();
+              final unlockedBadges = Locator.collectionRepository.getUnlockedBadges(studentId);
+              final allBadges = Locator.collectionRepository.getAvailableBadges();
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          VectorAssetHelper.badgeIcon('Explorer', size: 18),
+                          const SizedBox(width: 6),
+                          Text(
+                            'EARNED BADGES (${unlockedBadges.length}/${allBadges.length})',
+                            style: const TextStyle(
+                              fontFamily: 'Fredoka',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                              color: ColorSystem.purple,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      TextButton(
+                        onPressed: () => onTabSelected(3), // Switch to Collection & Badges tab
+                        child: Row(
+                          children: [
+                            Text(
+                              l('collection').toUpperCase(),
+                              style: const TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: ColorSystem.purple,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.arrow_forward_rounded, size: 14, color: ColorSystem.purple),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    height: 72,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: allBadges.length,
+                      separatorBuilder: (context, index) => const SizedBox(width: 10),
+                      itemBuilder: (context, index) {
+                        final badge = allBadges[index];
+                        final isUnlocked = unlockedBadges.contains(badge);
+
+                        return GestureDetector(
+                          onTap: () => onTabSelected(3),
+                          child: Container(
+                            width: 140,
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isUnlocked ? Colors.white : Colors.white.withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isUnlocked ? ColorSystem.gold : ColorSystem.plum.withOpacity(0.15),
+                                width: isUnlocked ? 1.5 : 1.0,
+                              ),
+                              boxShadow: [
+                                if (isUnlocked)
+                                  BoxShadow(
+                                    color: ColorSystem.gold.withOpacity(0.15),
+                                    offset: const Offset(0, 2),
+                                    blurRadius: 4,
+                                  ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                VectorAssetHelper.badgeIcon(badge, size: 28, isUnlocked: isUnlocked),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        badge,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontFamily: 'Fredoka',
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: isUnlocked ? ColorSystem.plum : ColorSystem.plum.withOpacity(0.4),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        isUnlocked ? 'UNLOCKED' : 'LOCKED',
+                                        style: TextStyle(
+                                          fontFamily: 'Fredoka',
+                                          fontSize: 8.5,
+                                          fontWeight: FontWeight.w900,
+                                          color: isUnlocked ? ColorSystem.green : Colors.grey.shade500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // 3. Bottom Section: My Modules (Full Width)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

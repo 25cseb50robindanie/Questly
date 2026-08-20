@@ -467,8 +467,10 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen> {
       earnedStars: 3,
       title: 'EXPERIMENT COMPLETED!',
       message: 'You discovered the fundamental law of density and buoyancy through the PhET Interactive Lab!',
+      buttonText: 'CONTINUE TO NEXT LESSON',
       onContinue: () {
-        _handleReturn();
+        SoundService.playClick();
+        Navigator.pushReplacementNamed(context, '/density_apply');
       },
     );
   }

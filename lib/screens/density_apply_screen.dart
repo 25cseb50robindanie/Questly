@@ -205,8 +205,10 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
         earnedStars: 3,
         title: 'APPLY LESSON COMPLETE!',
         message: 'You discovered how density explains giant floating ships, icebergs, and liquid layers in the real world!',
+        buttonText: 'CONTINUE TO NEXT LESSON',
         onContinue: () {
-          _handleReturn();
+          SoundService.playClick();
+          Navigator.pushReplacementNamed(context, '/density_detective');
         },
       );
     }

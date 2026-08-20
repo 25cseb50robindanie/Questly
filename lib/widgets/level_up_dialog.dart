@@ -57,9 +57,15 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isShort = size.height < 450;
+
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isShort ? 20 : 40,
+        vertical: isShort ? 10 : 20,
+      ),
       child: Center(
         child: AnimatedBuilder(
           animation: _animController,
@@ -73,8 +79,14 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
             );
           },
           child: Container(
-            width: 420,
-            padding: const EdgeInsets.all(24),
+            width: isShort ? 380 : 420,
+            constraints: BoxConstraints(
+              maxHeight: size.height * 0.92,
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: isShort ? 16 : 24,
+              vertical: isShort ? 12 : 20,
+            ),
             decoration: BoxDecoration(
               color: ColorSystem.cream,
               borderRadius: BorderRadius.circular(20),
@@ -87,92 +99,98 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                 ),
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Top Badge Shield Visual
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: ColorSystem.purple.withOpacity(0.12),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: ColorSystem.purple, width: 2),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Top Badge Shield Visual
+                  Container(
+                    padding: EdgeInsets.all(isShort ? 8 : 14),
+                    decoration: BoxDecoration(
+                      color: ColorSystem.purple.withOpacity(0.12),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: ColorSystem.purple, width: 1.5),
+                    ),
+                    child: VectorAssetHelper.levelRankIcon(
+                      widget.newLevel,
+                      size: isShort ? 42 : 56,
+                    ),
                   ),
-                  child: VectorAssetHelper.levelRankIcon(
-                    widget.newLevel,
-                    size: 64,
-                  ),
-                ),
-                const SizedBox(height: 14),
+                  SizedBox(height: isShort ? 6 : 10),
 
-                // Title
-                const Text(
-                  'LEVEL UP!',
-                  style: TextStyle(
-                    fontFamily: 'Fredoka',
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    color: ColorSystem.purple,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-                const SizedBox(height: 4),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: ColorSystem.gold,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    'LEVEL ${widget.newLevel}',
-                    style: const TextStyle(
+                  // Title
+                  Text(
+                    'LEVEL UP!',
+                    style: TextStyle(
                       fontFamily: 'Fredoka',
-                      fontSize: 14,
+                      fontSize: isShort ? 18 : 22,
                       fontWeight: FontWeight.w900,
-                      color: ColorSystem.plum,
+                      color: ColorSystem.purple,
+                      letterSpacing: 1.0,
                     ),
                   ),
-                ),
-                const SizedBox(height: 18),
+                  const SizedBox(height: 3),
 
-                // Level Up Payout Cards (Production Vector Assets)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildLevelUpRewardItem(
-                      VectorAssetHelper.questCoinIcon(size: 24),
-                      '+100',
-                      'Quest Coins',
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: ColorSystem.gold,
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    const SizedBox(width: 12),
-                    _buildLevelUpRewardItem(
-                      VectorAssetHelper.xpStarIcon(size: 24),
-                      '+50',
-                      'Bonus XP',
+                    child: Text(
+                      'LEVEL ${widget.newLevel}',
+                      style: TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: isShort ? 11 : 13,
+                        fontWeight: FontWeight.w900,
+                        color: ColorSystem.plum,
+                      ),
                     ),
-                    const SizedBox(width: 12),
-                    _buildLevelUpRewardItem(
-                      VectorAssetHelper.badgeIcon('Explorer', size: 24),
-                      'RANK',
-                      'Promoted',
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
+                  ),
+                  SizedBox(height: isShort ? 10 : 14),
 
-                CustomButton(
-                  text: 'CONTINUE ADVENTURE',
-                  backgroundColor: ColorSystem.purple,
-                  textColor: Colors.white,
-                  height: 42,
-                  onPressed: () {
-                    SoundService.playSwitch();
-                    Navigator.pop(context);
-                    widget.onDismissed();
-                  },
-                ),
-              ],
+                  // Level Up Payout Cards (Production Vector Assets)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildLevelUpRewardItem(
+                        VectorAssetHelper.questCoinIcon(size: isShort ? 18 : 22),
+                        '+100',
+                        'Quest Coins',
+                        isShort,
+                      ),
+                      SizedBox(width: isShort ? 8 : 12),
+                      _buildLevelUpRewardItem(
+                        VectorAssetHelper.xpStarIcon(size: isShort ? 18 : 22),
+                        '+50',
+                        'Bonus XP',
+                        isShort,
+                      ),
+                      SizedBox(width: isShort ? 8 : 12),
+                      _buildLevelUpRewardItem(
+                        VectorAssetHelper.badgeIcon('Explorer', size: isShort ? 18 : 22),
+                        'RANK',
+                        'Promoted',
+                        isShort,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: isShort ? 12 : 16),
+
+                  CustomButton(
+                    text: 'CONTINUE ADVENTURE',
+                    backgroundColor: ColorSystem.purple,
+                    textColor: Colors.white,
+                    height: isShort ? 34 : 40,
+                    onPressed: () {
+                      SoundService.playSwitch();
+                      Navigator.pop(context);
+                      widget.onDismissed();
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -180,24 +198,27 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
     );
   }
 
-  Widget _buildLevelUpRewardItem(Widget iconWidget, String amount, String label) {
+  Widget _buildLevelUpRewardItem(Widget iconWidget, String amount, String label, bool isShort) {
     return Container(
-      width: 100,
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+      width: isShort ? 85 : 95,
+      padding: EdgeInsets.symmetric(
+        vertical: isShort ? 6 : 8,
+        horizontal: isShort ? 4 : 6,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: ColorSystem.plum.withOpacity(0.15), width: 1.2),
       ),
       child: Column(
         children: [
           iconWidget,
-          const SizedBox(height: 6),
+          SizedBox(height: isShort ? 3 : 5),
           Text(
             amount,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Fredoka',
-              fontSize: 12,
+              fontSize: isShort ? 10 : 11,
               fontWeight: FontWeight.w900,
               color: ColorSystem.purple,
             ),
@@ -207,7 +228,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Fredoka',
-              fontSize: 8.5,
+              fontSize: isShort ? 7.5 : 8.5,
               fontWeight: FontWeight.bold,
               color: ColorSystem.plum.withOpacity(0.6),
             ),

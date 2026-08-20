@@ -59,22 +59,30 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
         _speechRecognition.lang = 'en-US';
 
         _speechRecognition.onResult.listen((event) {
-          final results = event.results;
-          if (results != null && results.isNotEmpty) {
-            String fullTranscript = '';
-            for (var i = 0; i < results.length; i++) {
-              final item = results[i];
-              if (item.length > 0) {
-                fullTranscript += item[0].transcript ?? '';
+          try {
+            final dynamic results = event.results;
+            if (results != null) {
+              final int? length = results.length as int?;
+              if (length != null && length > 0) {
+                String fullTranscript = '';
+                for (var i = 0; i < length; i++) {
+                  final dynamic item = results[i];
+                  if (item != null) {
+                    final dynamic alt = item[0];
+                    if (alt != null) {
+                      fullTranscript += (alt.transcript?.toString() ?? '');
+                    }
+                  }
+                }
+                if (mounted && fullTranscript.trim().isNotEmpty) {
+                  setState(() {
+                    _transcribedText = fullTranscript.trim();
+                    _textController.text = _transcribedText;
+                  });
+                }
               }
             }
-            if (mounted) {
-              setState(() {
-                _transcribedText = fullTranscript.trim();
-                _textController.text = _transcribedText;
-              });
-            }
-          }
+          } catch (_) {}
         });
 
         _speechRecognition.onError.listen((event) {

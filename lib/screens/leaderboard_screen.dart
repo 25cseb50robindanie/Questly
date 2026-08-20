@@ -29,12 +29,15 @@ class LeaderboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Student? student = Locator.studentRepository.getCurrentStudent();
-    if (student == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
+    return ListenableBuilder(
+      listenable: Locator.studentRepository,
+      builder: (context, _) {
+        final Student? student = Locator.studentRepository.getCurrentStudent();
+        if (student == null) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
 
-    final entries = _getLeaderboardEntries(student);
+        final entries = _getLeaderboardEntries(student);
 
     final Widget listContent = Container(
       width: double.infinity,
@@ -172,65 +175,66 @@ class LeaderboardScreen extends StatelessWidget {
       ),
     );
 
-    if (isTab) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l('leaderboard').toUpperCase(),
-              style: const TextStyle(
-                fontFamily: 'Fredoka',
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                color: ColorSystem.purple,
-                letterSpacing: 0.5,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Expanded(child: listContent),
-          ],
-        ),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: ColorSystem.cream,
-      body: QuestlyBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header (Back button + title)
-                Row(
+            if (isTab) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_rounded, color: ColorSystem.plum, size: 24),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(width: 8),
                     Text(
-                      l('leaderboard'),
+                      l('leaderboard').toUpperCase(),
                       style: const TextStyle(
                         fontFamily: 'Fredoka',
-                        fontSize: 20,
+                        fontSize: 16,
                         fontWeight: FontWeight.w900,
-                        color: ColorSystem.plum,
+                        color: ColorSystem.purple,
+                        letterSpacing: 0.5,
                       ),
                     ),
+                    const SizedBox(height: 10),
+                    Expanded(child: listContent),
                   ],
                 ),
-                const SizedBox(height: 16),
-                Expanded(child: listContent),
-              ],
-            ),
-          ),
-        ),
-      ),
+              );
+            }
+
+            return Scaffold(
+              backgroundColor: ColorSystem.cream,
+              body: QuestlyBackground(
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header (Back button + title)
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back_rounded, color: ColorSystem.plum, size: 24),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              l('leaderboard'),
+                              style: const TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                                color: ColorSystem.plum,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Expanded(child: listContent),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+      },
     );
   }
 }
-

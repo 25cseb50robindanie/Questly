@@ -145,7 +145,7 @@ class _CollectionScreenState extends State<CollectionScreen> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Locator.studentRepository,
+      listenable: Listenable.merge([Locator.studentRepository, Locator.collectionRepository]),
       builder: (context, _) {
         final currentStudent = Locator.studentRepository.getCurrentStudent();
         if (currentStudent == null) {

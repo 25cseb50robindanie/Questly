@@ -33,15 +33,18 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Student? student = Locator.studentRepository.getCurrentStudent();
-    if (student == null) return const SizedBox();
+    return ListenableBuilder(
+      listenable: Listenable.merge([Locator.studentRepository, Locator.collectionRepository]),
+      builder: (context, _) {
+        final Student? student = Locator.studentRepository.getCurrentStudent();
+        if (student == null) return const SizedBox();
 
-    final completedModules = _getCompletedModulesCount(student.questlyId);
-    final badgesCount = Locator.collectionRepository.getUnlockedBadges(student.questlyId.toLowerCase()).length;
-    final collectiblesCount = Locator.collectionRepository.getCollectibles(student.questlyId.toLowerCase()).where((i) => i.isUnlocked).length;
+        final completedModules = _getCompletedModulesCount(student.questlyId);
+        final badgesCount = Locator.collectionRepository.getUnlockedBadges(student.questlyId.toLowerCase()).length;
+        final collectiblesCount = Locator.collectionRepository.getCollectibles(student.questlyId.toLowerCase()).where((i) => i.isUnlocked).length;
 
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final bool isCompact = screenHeight < 360;
+        final double screenHeight = MediaQuery.of(context).size.height;
+        final bool isCompact = screenHeight < 360;
 
     // Avatar column child
     final Widget avatarColumn = Column(
@@ -191,8 +194,8 @@ class ProfileScreen extends StatelessWidget {
                     ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

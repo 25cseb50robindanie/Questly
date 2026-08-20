@@ -1308,13 +1308,13 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                     const SizedBox(width: 8),
                     Expanded(
                       child: CustomButton(
-                        text: 'CONTINUE TO ROADMAP',
+                        text: 'CONTINUE TO NEXT LESSON',
                         backgroundColor: ColorSystem.purple,
                         textColor: Colors.white,
                         height: isShort ? 36 : 40,
                         onPressed: () {
                           SoundService.playClick();
-                          Navigator.pushReplacementNamed(context, '/roadmap');
+                          Navigator.pushReplacementNamed(context, '/density_experiment');
                         },
                       ),
                     ),

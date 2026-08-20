@@ -1,9 +1,9 @@
-import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import '../models/collectible.dart';
 import '../models/reward.dart';
 import 'storage_service.dart';
 
-class CollectionRepository {
+class CollectionRepository extends ChangeNotifier {
   final StorageService _storage;
 
   CollectionRepository(this._storage);
@@ -24,6 +24,7 @@ class CollectionRepository {
     if (!list.contains(badgeId)) {
       list.add(badgeId);
       await _storage.saveUnlockedBadgesRaw(studentId, list);
+      notifyListeners();
     }
   }
 
@@ -87,6 +88,7 @@ class CollectionRepository {
     if (!unlocked.contains(collectibleId)) {
       unlocked.add(collectibleId);
       await _storage.saveUnlockedCollectiblesRaw(studentId, unlocked);
+      notifyListeners();
     }
   }
 
@@ -130,6 +132,7 @@ class CollectionRepository {
     if (!purchased.contains(rewardId)) {
       purchased.add(rewardId);
       await _storage.savePurchasedRewardsRaw(studentId, purchased);
+      notifyListeners();
       return true;
     }
     return false;

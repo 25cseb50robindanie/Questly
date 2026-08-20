@@ -14,6 +14,7 @@ class QuestCompletionDialog extends StatefulWidget {
   final int earnedStars;
   final String title;
   final String message;
+  final String? buttonText;
   final VoidCallback? onContinue;
 
   const QuestCompletionDialog({
@@ -23,6 +24,7 @@ class QuestCompletionDialog extends StatefulWidget {
     this.earnedStars = 3,
     this.title = 'QUEST COMPLETE!',
     this.message = 'Fantastic job! You mastered this challenge and earned rewards.',
+    this.buttonText,
     this.onContinue,
   }) : super(key: key);
 
@@ -33,6 +35,7 @@ class QuestCompletionDialog extends StatefulWidget {
     int earnedStars = 3,
     String title = 'QUEST COMPLETE!',
     String message = 'Fantastic job! You mastered this challenge and earned rewards.',
+    String? buttonText,
     VoidCallback? onContinue,
   }) {
     return showDialog(
@@ -44,6 +47,7 @@ class QuestCompletionDialog extends StatefulWidget {
         earnedStars: earnedStars,
         title: title,
         message: message,
+        buttonText: buttonText,
         onContinue: onContinue,
       ),
     );
@@ -103,12 +107,35 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
     final student = Locator.studentRepository.getCurrentStudent();
     int? finalLevel;
     if (student != null) {
-      final nextLevelXp = student.level * 200;
-      if (student.xp >= nextLevelXp) {
-        finalLevel = student.level + 1;
-        await Locator.studentRepository.updateStudentProfile(
-          student.copyWith(level: finalLevel, xp: student.xp - nextLevelXp),
+      final calculatedLevel = 1 + (student.xp ~/ 200);
+      if (calculatedLevel > student.level) {
+        finalLevel = calculatedLevel;
+        // Award bonus coins and XP for leveling up without wiping lifetime XP!
+        final updatedStudent = student.copyWith(
+          level: finalLevel,
+          gold: student.gold + 100,
+          xp: student.xp + 50,
         );
+        await Locator.studentRepository.updateStudentProfile(updatedStudent);
+
+        // Unlock badges in collection based on new level
+        final sId = student.questlyId.toLowerCase();
+        if (finalLevel >= 2) {
+          await Locator.collectionRepository.unlockBadge(sId, 'Explorer');
+          await Locator.collectionRepository.unlockCollectible(sId, 'coll_badge');
+        }
+        if (finalLevel >= 3) {
+          await Locator.collectionRepository.unlockBadge(sId, 'Scientist');
+          await Locator.collectionRepository.unlockCollectible(sId, 'coll_token');
+        }
+        if (finalLevel >= 4) {
+          await Locator.collectionRepository.unlockBadge(sId, 'Float Master');
+          await Locator.collectionRepository.unlockCollectible(sId, 'coll_water');
+        }
+        if (finalLevel >= 5) {
+          await Locator.collectionRepository.unlockBadge(sId, 'Density Master');
+          await Locator.collectionRepository.unlockCollectible(sId, 'coll_crystal');
+        }
       }
     }
 
@@ -122,16 +149,16 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
         builder: (context) => LevelUpDialog(
           newLevel: finalLevel!,
           onDismissed: () {
-            _navigateToRoadmap();
+            _navigateToNext();
           },
         ),
       );
     } else {
-      _navigateToRoadmap();
+      _navigateToNext();
     }
   }
 
-  void _navigateToRoadmap() {
+  void _navigateToNext() {
     if (widget.onContinue != null) {
       widget.onContinue!();
     } else if (mounted) {
@@ -276,9 +303,9 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
                     ),
                     SizedBox(height: isShort ? 12 : 18),
 
-                    // CONTINUE TO ROADMAP Button
+                    // Action Button
                     CustomButton(
-                      text: 'CONTINUE TO ROADMAP',
+                      text: widget.buttonText ?? 'CONTINUE TO NEXT LESSON',
                       backgroundColor: ColorSystem.green,
                       textColor: Colors.white,
                       height: isShort ? 36 : 42,

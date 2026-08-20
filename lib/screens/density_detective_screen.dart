@@ -238,8 +238,10 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
         earnedStars: 3,
         title: 'CASE CLOSED!',
         message: 'You used evidence from mass, volume, and buoyancy to solve every mystery case!',
+        buttonText: 'CONTINUE TO NEXT LESSON',
         onContinue: () {
-          _handleReturn();
+          SoundService.playClick();
+          Navigator.pushReplacementNamed(context, '/density_teach_back');
         },
       );
     }
