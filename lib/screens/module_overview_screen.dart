@@ -25,7 +25,11 @@ class ModuleOverviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Module module = ModalRoute.of(context)!.settings.arguments as Module;
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final Module module = (args is Module)
+        ? args
+        : (args is String ? Locator.moduleRepository.getModuleById(args) : null) ??
+            Locator.moduleRepository.getAllModules().first;
     final Student? student = Locator.studentRepository.getCurrentStudent();
 
     if (student == null) {

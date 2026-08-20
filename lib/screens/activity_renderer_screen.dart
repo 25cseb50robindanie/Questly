@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
 import '../models/activity.dart';
+import '../models/lesson.dart';
 import '../models/progress.dart';
 import '../models/student.dart';
 import '../models/roadmap_enums.dart';
@@ -31,7 +32,28 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_activity == null) {
-      _activity = ModalRoute.of(context)!.settings.arguments as Activity;
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is Activity) {
+        _activity = args;
+      } else if (args is Lesson && args.activities.isNotEmpty) {
+        _activity = args.activities.first;
+      } else if (args is String) {
+        // Look up by activity id
+        _activity = Locator.moduleRepository.getActivityById(args);
+      }
+      
+      // Fallback if null
+      _activity ??= Activity(
+        id: 'act_fallback',
+        title: 'Learning Challenge',
+        instruction: 'Complete this learning activity to earn rewards.',
+        type: 'info',
+        targetDensity: 0.0,
+        targetCondition: '',
+        xpReward: 20,
+        goldReward: 5,
+      );
+
       _student = Locator.studentRepository.getCurrentStudent();
       _handleRouting();
     }
@@ -43,6 +65,17 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
         await Navigator.pushReplacementNamed(
           context,
           '/curiosity_discovery',
+          arguments: _activity,
+        );
+      });
+      return;
+    }
+
+    if (_activity!.type == 'experiment' || _activity!.id == 'act_density_experiment') {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Navigator.pushReplacementNamed(
+          context,
+          '/density_experiment',
           arguments: _activity,
         );
       });

@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>Zuno Virtual Chemistry Lab</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         TOP BAR
+    ====================================================== -->
+
+    <header class="top-bar">
+
+        <div>
+
+            <h1>🧪 Zuno Virtual Lab</h1>
+
+            <p>Chemistry Experiment</p>
+
+        </div>
+
+
+        <div class="progress-box">
+
+            <span>Step</span>
+
+            <strong id="stepNumber">
+                1 / 4
+            </strong>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         EXPERIMENT HEADER
+    ====================================================== -->
+
+    <section class="experiment-header">
+
+        <h2>
+            Acid–Base Titration
+        </h2>
+
+        <p>
+            Select all the apparatus required for this experiment.
+        </p>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         REQUIRED APPARATUS
+    ====================================================== -->
+
+    <section class="required-section">
+
+        <h3>
+            Required Apparatus
+        </h3>
+
+
+        <div
+            id="requiredList"
+            class="required-list"
+        >
+
+            <!--
+                JavaScript will create:
+                Conical Flask
+                Pipette
+                Burette
+                Beaker
+            -->
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         FEEDBACK
+    ====================================================== -->
+
+    <div
+        id="feedback"
+        class="feedback hidden"
+    >
+        Feedback
+    </div>
+
+
+
+    <!-- =====================================================
+         STAGE 1 LAB TABLE
+    ====================================================== -->
+
+    <main class="lab-area">
+
+        <div class="lab-table">
+
+
+            <div class="table-title">
+
+                🔬 Laboratory Equipment
+
+            </div>
+
+
+            <div
+                id="apparatusContainer"
+                class="apparatus-container"
+            >
+
+                <!--
+                    JavaScript creates
+                    all apparatus cards here.
+                -->
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         STAGE 1 NEXT BUTTON
+    ====================================================== -->
+
+    <section class="bottom-section">
+
+        <button
+            id="nextButton"
+            class="next-button disabled"
+            disabled
+        >
+
+            NEXT →
+
+        </button>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         STAGE 1 SUCCESS POPUP
+    ====================================================== -->
+
+    <div
+        id="successPopup"
+        class="popup-overlay hidden"
+    >
+
+        <div class="popup">
+
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+
+            <h2>
+                Excellent!
+            </h2>
+
+
+            <p>
+                You selected all the correct apparatus.
+            </p>
+
+
+            <button
+                id="continueButton"
+            >
+
+                Continue to Step 2
+
+            </button>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         STAGE 2
+         CHEMICAL CUPBOARD
+    ====================================================== -->
+
+    <section
+        id="stage2-section"
+        class="hidden"
+    >
+
+
+        <section class="experiment-header">
+
+            <h2>
+                Laboratory Chemical Cupboard
+            </h2>
+
+            <p>
+                Select the required titration reagents
+                from the laboratory shelf.
+            </p>
+
+        </section>
+
+
+
+        <!-- =================================================
+             CHEMICAL CABINET
+        ================================================== -->
+
+        <div class="lab-cabinet-wrapper">
+
+
+            <!-- =============================================
+                 SHELF 1 — ACIDS
+            ============================================== -->
+
+            <div class="cabinet-shelf">
+
+
+                <!-- REQUIRED: HCl -->
+
+                <div
+                    class="lab-glass-bottle"
+                    draggable="false"
+                    id="acid-bottle"
+                >
+
+                    <div
+                        class="chemical-liquid liquid-clear"
+                    ></div>
+
+
+                    <div class="bottle-label">
+
+                        HCl
+                        <br>
+
+                        <small>
+                            Acid
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- WRONG: Acetic Acid -->
+
+                <div
+                    class="lab-glass-bottle"
+                    draggable="false"
+                    id="acetic-bottle"
+                >
+
+                    <div
+                        class="chemical-liquid liquid-clear"
+                    ></div>
+
+
+                    <div class="bottle-label">
+
+                        CH₃COOH
+                        <br>
+
+                        <small>
+                            Acetic
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- WRONG: Sulfuric Acid -->
+
+                <div
+                    class="lab-glass-bottle"
+                    draggable="false"
+                    id="sulfuric-bottle"
+                >
+
+                    <div
+                        class="chemical-liquid liquid-amber"
+                    ></div>
+
+
+                    <div class="bottle-label">
+
+                        H₂SO₄
+                        <br>
+
+                        <small>
+                            Sulfuric
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =============================================
+                 SHELF 2 — BASES
+            ============================================== -->
+
+            <div class="cabinet-shelf">
+
+
+                <!-- REQUIRED: NaOH -->
+
+                <div
+                    class="lab-glass-bottle"
+                    draggable="false"
+                    id="base-bottle"
+                >
+
+                    <div
+                        class="chemical-liquid liquid-clear"
+                    ></div>
+
+
+                    <div class="bottle-label">
+
+                        NaOH
+                        <br>
+
+                        <small>
+                            Base
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- WRONG: Ammonia -->
+
+                <div
+                    class="lab-glass-bottle"
+                    draggable="false"
+                    id="ammonia-bottle"
+                >
+
+                    <div
+                        class="chemical-liquid liquid-blue"
+                    ></div>
+
+
+                    <div class="bottle-label">
+
+                        NH₃
+                        <br>
+
+                        <small>
+                            Ammonia
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- WRONG: Distilled Water -->
+
+                <div
+                    class="lab-glass-bottle"
+                    draggable="false"
+                    id="wrong-bottle"
+                >
+
+                    <div
+                        class="chemical-liquid liquid-clear"
+                    ></div>
+
+
+                    <div class="bottle-label">
+
+                        H₂O
+                        <br>
+
+                        <small>
+                            Dist. Water
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =============================================
+                 SHELF 3 — INDICATORS
+            ============================================== -->
+
+            <div class="cabinet-shelf">
+
+
+                <!-- REQUIRED: Phenolphthalein -->
+
+                <div
+                    class="lab-glass-bottle"
+                    draggable="false"
+                    id="indicator-bottle"
+                >
+
+                    <div
+                        class="chemical-liquid liquid-clear"
+                    ></div>
+
+
+                    <div class="bottle-label">
+
+                        Phenol-
+                        <br>
+                        phthalein
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- WRONG: Methyl Orange -->
+
+                <div
+                    class="lab-glass-bottle"
+                    draggable="false"
+                    id="methyl-bottle"
+                >
+
+                    <div
+                        class="chemical-liquid liquid-pink"
+                    ></div>
+
+
+                    <div class="bottle-label">
+
+                        Methyl
+                        <br>
+                        Orange
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             STAGE 2 PREPARATION TABLE
+        ================================================== -->
+
+        <div id="table-drop-zone">
+
+            Select the required chemicals
+            from the cupboard.
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         STAGE 3
+         MEASURING & PIPETTE SETUP
+    ====================================================== -->
+
+    <section
+        id="stage3-section"
+        class="hidden"
+    >
+
+
+        <section class="experiment-header">
+
+            <h2>
+                Stage 3: Measuring & Pipette Setup
+            </h2>
+
+            <p>
+                Prepare the selected solution using
+                the correct measuring equipment.
+            </p>
+
+        </section>
+
+
+        <div class="lab-area">
+
+            <div class="lab-table">
+
+                <div class="table-title">
+
+                    🧪 Stage 3 Preparation Area
+
+                </div>
+
+
+                <div
+                    style="
+                        background:white;
+                        border-radius:15px;
+                        padding:30px;
+                        text-align:center;
+                    "
+                >
+
+                    <div
+                        style="
+                            font-size:50px;
+                            margin-bottom:15px;
+                        "
+                    >
+                        🧪
+                    </div>
+
+
+                    <h3
+                        style="
+                            color:#173b57;
+                            margin-bottom:10px;
+                        "
+                    >
+                        Measuring & Pipette Setup
+                    </h3>
+
+
+                    <p
+                        style="
+                            color:#657386;
+                            line-height:1.5;
+                        "
+                    >
+                        Stage 3 is ready.
+                        The measuring and pipette
+                        interaction can be added here.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="script.js"></script>
+<!-- =====================================================
+     STAGE 4: ACID-BASE TITRATION
+===================================================== -->
+
+<section id="stage4-section" class="hidden">
+
+    <div class="stage4-header">
+
+        <h2>🧪 Stage 4: Acid–Base Titration</h2>
+
+        <p>
+            Perform the titration carefully and identify
+            the endpoint by observing the colour change.
+        </p>
+
+    </div>
+
+
+    <!-- INSTRUCTION -->
+
+    <div class="stage4-instruction">
+
+        <h3>🎯 Your Task</h3>
+
+        <p>
+            Add the solution from the burette into the
+            conical flask drop by drop.
+            Stop when the indicator changes colour.
+        </p>
+
+    </div>
+
+
+    <!-- TITRATION LAB -->
+
+    <div class="titration-lab">
+
+
+        <!-- BURETTE -->
+
+        <div class="burette-area">
+
+            <h3>Burette</h3>
+
+            <div class="burette">
+
+                <div class="burette-liquid"></div>
+
+                <div class="burette-scale">
+
+                    <span>0</span>
+                    <span>10</span>
+                    <span>20</span>
+                    <span>30</span>
+                    <span>40</span>
+                    <span>50</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- TAP -->
+
+            <button
+                id="burette-tap"
+                class="burette-tap"
+            >
+                🔘
+            </button>
+
+
+            <!-- FALLING DROP -->
+
+            <div
+                id="solution-drop"
+                class="solution-drop hidden"
+            >
+                💧
+            </div>
+
+        </div>
+
+
+
+        <!-- CONICAL FLASK -->
+
+        <div class="flask-area">
+
+            <h3>Conical Flask</h3>
+
+            <div
+                id="titration-flask"
+                class="titration-flask"
+            >
+
+                <div
+                    id="flask-liquid"
+                    class="flask-liquid"
+                ></div>
+
+            </div>
+
+
+            <div
+                id="indicator-status"
+                class="indicator-status"
+            >
+                Indicator: Ready
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- DROP COUNTER -->
+
+    <div class="drop-counter">
+
+        <span>
+            Solution Added
+        </span>
+
+        <strong id="drop-count">
+            0 / 8
+        </strong>
+
+    </div>
+
+
+
+    <!-- FEEDBACK -->
+
+    <div
+        id="stage4-feedback"
+        class="stage4-feedback hidden"
+    >
+    </div>
+
+
+
+    <!-- ACTION AREA -->
+
+    <div
+        id="stage4-action-area"
+        class="stage4-action-area"
+    >
+
+        <button
+            id="start-titration-btn"
+            class="stage4-button"
+        >
+            ▶ Start Titration
+        </button>
+
+    </div>
+
+</section>
+<!-- =====================================================
+     STAGE 5 : FINAL RESULT
+===================================================== -->
+
+<section
+    id="stage5-section"
+    class="stage5-section hidden"
+>
+
+    <div class="stage5-container">
+
+        <div class="stage5-trophy">
+            🏆
+        </div>
+
+        <h1>
+            Experiment Complete!
+        </h1>
+
+        <p class="stage5-subtitle">
+            Congratulations! You successfully completed
+            the virtual acid-base titration experiment.
+        </p>
+
+
+        <!-- SCORE -->
+
+        <div class="stage5-score-card">
+
+            <div class="stage5-score-title">
+                Your Score
+            </div>
+
+            <div
+                id="stage5-score"
+                class="stage5-score"
+            >
+                100%
+            </div>
+
+            <div class="stage5-stars">
+                ⭐ ⭐ ⭐ ⭐ ⭐
+            </div>
+
+            <p>
+                Excellent Laboratory Work!
+            </p>
+
+        </div>
+
+
+        <!-- EXPERIMENT SUMMARY -->
+
+        <div class="stage5-summary-card">
+
+            <h2>
+                🧪 Experiment Summary
+            </h2>
+
+            <div class="stage5-summary-list">
+
+                <div class="stage5-summary-item">
+                    <span>Experiment</span>
+                    <strong>
+                        Acid-Base Titration
+                    </strong>
+                </div>
+
+
+                <div class="stage5-summary-item">
+                    <span>Apparatus</span>
+                    <strong>
+                        ✓ Selected
+                    </strong>
+                </div>
+
+
+                <div class="stage5-summary-item">
+                    <span>Solutions</span>
+                    <strong>
+                        ✓ Selected
+                    </strong>
+                </div>
+
+
+                <div class="stage5-summary-item">
+                    <span>Measured Volume</span>
+                    <strong>
+                        10 mL
+                    </strong>
+                </div>
+
+
+                <div class="stage5-summary-item">
+                    <span>Titration</span>
+                    <strong>
+                        ✓ Completed
+                    </strong>
+                </div>
+
+
+                <div class="stage5-summary-item">
+                    <span>Endpoint</span>
+                    <strong>
+                        ✓ Reached
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- WHAT YOU LEARNED -->
+
+        <div class="stage5-learning-card">
+
+            <h2>
+                📚 What You Learned
+            </h2>
+
+            <div class="learning-point">
+                <span>✓</span>
+                <p>
+                    Identified the correct laboratory apparatus.
+                </p>
+            </div>
+
+
+            <div class="learning-point">
+                <span>✓</span>
+                <p>
+                    Identified the required chemical solutions.
+                </p>
+            </div>
+
+
+            <div class="learning-point">
+                <span>✓</span>
+                <p>
+                    Used a pipette to measure the required volume.
+                </p>
+            </div>
+
+
+            <div class="learning-point">
+                <span>✓</span>
+                <p>
+                    Performed an acid-base titration.
+                </p>
+            </div>
+
+
+            <div class="learning-point">
+                <span>✓</span>
+                <p>
+                    Observed the indicator colour change at the endpoint.
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- FINAL MESSAGE -->
+
+        <div class="stage5-message">
+
+            🌟 Great Job, Young Scientist! 🌟
+
+            <p>
+                You successfully completed the
+                virtual chemistry experiment.
+            </p>
+
+        </div>
+
+
+        <!-- BUTTONS -->
+
+        <div class="stage5-buttons">
+
+            <button
+                id="stage5-restart-btn"
+                class="stage5-button"
+            >
+                🔄 Restart Experiment
+            </button>
+
+            <button
+                id="stage5-roadmap-btn"
+                class="stage5-button"
+                style="background: #6C5CE7; color: white;"
+            >
+                🗺️ Return to Roadmap
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+</body>
+
+</html>

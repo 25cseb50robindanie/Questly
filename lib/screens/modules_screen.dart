@@ -63,64 +63,129 @@ class ModulesScreen extends StatelessWidget {
               const SizedBox(height: 10),
               Expanded(
                 child: ListView(
-                  children: grouped.keys.map((subject) {
-                    final modules = grouped[subject]!;
-                    return Column(
+                  children: [
+                    ...grouped.keys.map((subject) {
+                      final modules = grouped[subject]!;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Category Header Line
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  subject,
+                                  style: const TextStyle(
+                                    fontFamily: 'Fredoka',
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w900,
+                                    color: ColorSystem.plum,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Divider(
+                                    color: ColorSystem.plum.withOpacity(0.15),
+                                    thickness: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Modules list in this category
+                          SizedBox(
+                            height: 112,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: modules.length,
+                              separatorBuilder: (context, index) => const SizedBox(width: 14),
+                              itemBuilder: (context, index) {
+                                final module = modules[index];
+                                return ModuleCard(
+                                  subject: module.subject,
+                                  title: module.title,
+                                  progressFraction: _getModuleProgress(student.questlyId, module),
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/module_overview',
+                                      arguments: module,
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      );
+                    }).toList(),
+
+                    // Virtual Labs section
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Category Header Line
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Row(
                             children: [
-                              Text(
-                                subject,
-                                style: const TextStyle(
+                              const Text(
+                                '🧪 VIRTUAL LABS (SIMULATIONS)',
+                                style: TextStyle(
                                   fontFamily: 'Fredoka',
                                   fontSize: 11,
                                   fontWeight: FontWeight.w900,
-                                  color: ColorSystem.plum,
+                                  color: ColorSystem.purple,
                                   letterSpacing: 0.5,
                                 ),
                               ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Divider(
-                                  color: ColorSystem.plum.withOpacity(0.15),
+                                  color: ColorSystem.purple.withOpacity(0.2),
                                   thickness: 1.5,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        // Modules list in this category
                         SizedBox(
                           height: 112,
-                          child: ListView.separated(
+                          child: ListView(
                             scrollDirection: Axis.horizontal,
-                            itemCount: modules.length,
-                            separatorBuilder: (context, index) => const SizedBox(width: 14),
-                            itemBuilder: (context, index) {
-                              final module = modules[index];
-                              return ModuleCard(
-                                subject: module.subject,
-                                title: module.title,
-                                progressFraction: _getModuleProgress(student.questlyId, module),
+                            children: [
+                              ModuleCard(
+                                subject: 'Chemistry',
+                                title: 'Acid–Base Titration (Virtual Lab)',
+                                progressFraction: Locator.progressionService.isLessonCompleted(student.questlyId, 'lab_titration_1') ? 1.0 : 0.0,
                                 onTap: () {
                                   Navigator.pushNamed(
                                     context,
-                                    '/module_overview',
-                                    arguments: module,
+                                    '/virtual_lab',
                                   );
                                 },
-                              );
-                            },
+                              ),
+                              const SizedBox(width: 14),
+                              ModuleCard(
+                                subject: 'Mathematics',
+                                title: 'Fractions & Ratios (Canyon Crossings)',
+                                progressFraction: Locator.progressionService.isLessonCompleted(student.questlyId, 'math_fractions_1') ? 1.0 : 0.0,
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/fraction_module',
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 12),
                       ],
-                    );
-                  }).toList(),
+                    ),
+                  ],
                 ),
               ),
             ],

@@ -3,6 +3,7 @@ import 'package:flame/game.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
 import '../models/activity.dart';
+import '../models/lesson.dart';
 import '../models/progress.dart';
 import '../games/questly_game.dart';
 import '../widgets/custom_button.dart';
@@ -33,7 +34,26 @@ class _GameScreenState extends State<GameScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_activity == null) {
-      _activity = ModalRoute.of(context)!.settings.arguments as Activity;
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is Activity) {
+        _activity = args;
+      } else if (args is Lesson && args.activities.isNotEmpty) {
+        _activity = args.activities.first;
+      } else if (args is String) {
+        _activity = Locator.moduleRepository.getActivityById(args);
+      }
+      
+      _activity ??= Activity(
+        id: 'act_density_game',
+        title: 'Density Simulation',
+        instruction: 'Adjust mass and volume to achieve target buoyancy.',
+        type: 'flameGame',
+        targetDensity: 0.6,
+        targetCondition: 'float',
+        xpReward: 25,
+        goldReward: 5,
+      );
+
       _initializeGame();
     }
   }

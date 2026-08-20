@@ -39,7 +39,11 @@ class Locator {
   static late final TextToSpeechProvider textToSpeechProvider;
   static late final AITutorService aiTutorService;
 
+  static bool _initialized = false;
+
   static Future<void> setup() async {
+    if (_initialized) return;
+    _initialized = true;
     storageService = await StorageService.init();
     studentRepository = StudentRepository(storageService);
     moduleRepository = ModuleRepository();

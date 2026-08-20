@@ -55,7 +55,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     if (!mounted) return;
 
     // Check if user is already logged in
-    final currentStudent = Locator.authService.getCurrentStudent();
+    var currentStudent = Locator.authService.getCurrentStudent();
+    if (currentStudent == null) {
+      // Auto-login or create default student for seamless web sessions
+      final creds = Locator.storageService.getUserCredentials('explorer');
+      if (creds == null) {
+        await Locator.authService.register('explorer', '1234', 'Explorer');
+      }
+      currentStudent = await Locator.authService.login('explorer', '1234');
+    }
+
     if (currentStudent != null) {
       Navigator.pushReplacementNamed(context, '/home');
     } else {

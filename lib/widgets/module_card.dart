@@ -23,6 +23,9 @@ class ModuleCard extends StatelessWidget {
         return const Color(0xFFD6E4FF); // Soft Questly Blue
       case 'PHYSICS':
         return const Color(0xFFFFF0D6); // Soft Questly Gold
+      case 'CHEMISTRY':
+      case 'VIRTUAL LAB':
+        return const Color(0xFFD1F2E6); // Soft Mint Green
       default:
         return const Color(0xFFE8E0F2);
     }

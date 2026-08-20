@@ -273,24 +273,15 @@ class _HomeDashboardView extends StatelessWidget {
                       Navigator.pushNamed(
                         context,
                         '/activity_renderer',
-                        arguments: Lesson(
-                          id: 'rev_density_les',
-                          levelId: 'rev_lvl',
-                          title: 'Revision',
-                          order: 1,
-                          activityType: 'flashcard',
-                          activities: [
-                            Activity(
-                              id: 'act_density_revision',
-                              title: 'Revision: Density Basics',
-                              instruction: 'Revision challenge: Solve matching formulas and displacement scenarios to reinforce buoyancy. Density = Mass / Volume.',
-                              type: 'flashcard',
-                              targetDensity: 0.0,
-                              targetCondition: '',
-                              xpReward: 15,
-                              goldReward: 2,
-                            ),
-                          ],
+                        arguments: Activity(
+                          id: 'act_density_revision',
+                          title: 'Revision: Density Basics',
+                          instruction: 'Revision challenge: Solve matching formulas and displacement scenarios to reinforce buoyancy. Density = Mass / Volume.',
+                          type: 'flashcard',
+                          targetDensity: 0.0,
+                          targetCondition: '',
+                          xpReward: 15,
+                          goldReward: 2,
                         ),
                       );
                     },
@@ -338,19 +329,49 @@ class _HomeDashboardView extends StatelessWidget {
                 height: 120,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  itemCount: allModules.length,
+                  itemCount: allModules.length + 2,
                   separatorBuilder: (context, index) => const SizedBox(width: 14),
                   itemBuilder: (context, index) {
-                    final module = allModules[index];
+                    if (index < allModules.length) {
+                      final module = allModules[index];
+                      return ModuleCard(
+                        subject: module.subject,
+                        title: module.title,
+                        progressFraction: _getModuleProgress(module),
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/module_overview',
+                            arguments: module,
+                          );
+                        },
+                      );
+                    }
+                    if (index == allModules.length) {
+                      // Virtual Lab Card
+                      final isDone = Locator.progressionService.isLessonCompleted(student.questlyId, 'lab_titration_1');
+                      return ModuleCard(
+                        subject: 'Chemistry',
+                        title: 'Acid–Base Titration (Virtual Lab)',
+                        progressFraction: isDone ? 1.0 : 0.0,
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/virtual_lab',
+                          );
+                        },
+                      );
+                    }
+                    // Fractions Module Card
+                    final isDone = Locator.progressionService.isLessonCompleted(student.questlyId, 'math_fractions_1');
                     return ModuleCard(
-                      subject: module.subject,
-                      title: module.title,
-                      progressFraction: _getModuleProgress(module),
+                      subject: 'Mathematics',
+                      title: 'Fractions & Ratios (Canyon Crossings)',
+                      progressFraction: isDone ? 1.0 : 0.0,
                       onTap: () {
                         Navigator.pushNamed(
                           context,
-                          '/module_overview',
-                          arguments: module,
+                          '/fraction_module',
                         );
                       },
                     );

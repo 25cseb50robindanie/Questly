@@ -122,7 +122,11 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final Module module = ModalRoute.of(context)!.settings.arguments as Module;
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final Module module = (args is Module)
+        ? args
+        : (args is String ? Locator.moduleRepository.getModuleById(args) : null) ??
+            Locator.moduleRepository.getAllModules().first;
     final size = MediaQuery.of(context).size;
     final isShort = size.height < 450;
 

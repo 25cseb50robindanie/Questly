@@ -411,6 +411,8 @@ class ModuleRepository {
     ];
   }
 
+  List<Module> getAllModules() => getModules();
+
   Module? getModuleById(String id) {
     for (var m in getModules()) {
       if (m.id == id) return m;
@@ -423,6 +425,19 @@ class ModuleRepository {
       for (var lvl in m.levels) {
         for (var les in lvl.lessons) {
           if (les.id == id) return les;
+        }
+      }
+    }
+    return null;
+  }
+
+  Activity? getActivityById(String id) {
+    for (var m in getModules()) {
+      for (var lvl in m.levels) {
+        for (var les in lvl.lessons) {
+          for (var act in les.activities) {
+            if (act.id == id) return act;
+          }
         }
       }
     }

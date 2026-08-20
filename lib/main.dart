@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'core/locator.dart';
 import 'core/theme/theme.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
@@ -13,6 +14,9 @@ import 'screens/settings_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/activity_renderer_screen.dart';
 import 'screens/curiosity_discovery_screen.dart';
+import 'screens/virtual_lab_screen.dart';
+import 'screens/fraction_module_screen.dart';
+import 'screens/density_experiment_screen.dart';
 import 'screens/developer_settings_screen.dart';
 
 void main() async {
@@ -24,6 +28,9 @@ void main() async {
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
+
+  // Guarantee all repositories & services are initialized before any route builds
+  await Locator.setup();
 
   runApp(const QuestlyApp());
 }
@@ -51,6 +58,9 @@ class QuestlyApp extends StatelessWidget {
         '/notifications': (context) => const NotificationsScreen(),
         '/activity_renderer': (context) => const ActivityRendererScreen(),
         '/curiosity_discovery': (context) => const CuriosityDiscoveryScreen(),
+        '/density_experiment': (context) => const DensityExperimentScreen(),
+        '/virtual_lab': (context) => const VirtualLabScreen(),
+        '/fraction_module': (context) => const FractionModuleScreen(),
         '/dev_settings': (context) => const DeveloperSettingsScreen(),
       },
     );
