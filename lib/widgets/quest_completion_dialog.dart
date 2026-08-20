@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
-import '../models/student.dart';
 import '../services/sound_service.dart';
 import 'custom_button.dart';
 import 'level_up_dialog.dart';
@@ -37,8 +36,8 @@ class QuestCompletionDialog extends StatefulWidget {
     String message = 'Fantastic job! You mastered this challenge and earned rewards.',
     String? buttonText,
     VoidCallback? onContinue,
-  }) {
-    return showDialog(
+  }) async {
+    final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => QuestCompletionDialog(
@@ -48,9 +47,20 @@ class QuestCompletionDialog extends StatefulWidget {
         title: title,
         message: message,
         buttonText: buttonText,
-        onContinue: onContinue,
       ),
     );
+
+    if (result == true) {
+      if (onContinue != null) {
+        onContinue();
+      } else if (context.mounted) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.pushReplacementNamed(context, '/roadmap');
+        }
+      }
+    }
   }
 
   @override
@@ -140,33 +150,20 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
     }
 
     if (!mounted) return;
-    Navigator.of(context, rootNavigator: true).pop(); // Dismiss completion dialog
 
-    if (finalLevel != null && mounted) {
+    if (finalLevel != null) {
       await showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) => LevelUpDialog(
           newLevel: finalLevel!,
-          onDismissed: () {
-            _navigateToNext();
-          },
+          onDismissed: () {},
         ),
       );
-    } else {
-      _navigateToNext();
     }
-  }
 
-  void _navigateToNext() {
-    if (widget.onContinue != null) {
-      widget.onContinue!();
-    } else if (mounted) {
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      } else {
-        Navigator.pushReplacementNamed(context, '/roadmap');
-      }
+    if (mounted) {
+      Navigator.of(context).pop(true);
     }
   }
 
