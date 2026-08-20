@@ -105,7 +105,7 @@ class _DailyRewardOverlayState extends State<DailyRewardOverlay> with TickerProv
     _shakeController.stop();
     _burstController.forward();
 
-    final reward = await Locator.dailyRewardService.claimDailyReward(widget.student.questlyId);
+    final reward = await Locator.dailyRewardService.claimTodayReward(widget.student.questlyId);
 
     setState(() {
       _isClaimed = true;
@@ -119,8 +119,8 @@ class _DailyRewardOverlayState extends State<DailyRewardOverlay> with TickerProv
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isShort = size.height < 450;
-    final currentStreak = Locator.dailyRewardService.getCurrentStreak(widget.student.questlyId);
-    final todayReward = Locator.dailyRewardService.getTodayReward(widget.student.questlyId);
+    final currentStreak = Locator.dailyRewardService.getCurrentStreakDay(widget.student.questlyId);
+    final todayReward = Locator.dailyRewardService.getRewardForDay(currentStreak);
 
     return Dialog(
       backgroundColor: Colors.transparent,

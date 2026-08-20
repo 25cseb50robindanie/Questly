@@ -3,6 +3,9 @@ class DendyNlpService {
   factory DendyNlpService() => _instance;
   DendyNlpService._internal();
 
+  /// Static helper for quick answering
+  static String answer(String userQuery) => _instance.getResponse(userQuery);
+
   /// Evaluates student query using real offline rule-based knowledge matching
   String getResponse(String userQuery) {
     final query = userQuery.toLowerCase().trim();
