@@ -1,7 +1,5 @@
-// ignore: avoid_web_libraries_in_flutter
 import 'dart:async';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import '../widgets/interactive_sim_view.dart';
 import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
@@ -60,14 +58,7 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen> {
     _student = Locator.studentRepository.getCurrentStudent() ?? Locator.authService.getCurrentStudent();
   }
 
-  String _getSimulationUrl() {
-    try {
-      final origin = html.window.location.origin;
-      return '$origin/phet_density/index.html';
-    } catch (_) {
-      return '/phet_density/index.html';
-    }
-  }
+
 
   void _onNextStep() {
     SoundService.playClick();
@@ -173,18 +164,9 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(14),
                             child: SizedBox.expand(
-                              child: HtmlElementView.fromTagName(
-                                key: const ValueKey('phet_density_sim'),
-                                tagName: 'iframe',
-                                onElementCreated: (Object element) {
-                                  final iframe = element as html.IFrameElement;
-                                  iframe.src = _getSimulationUrl();
-                                  iframe.style.border = 'none';
-                                  iframe.style.width = '100%';
-                                  iframe.style.height = '100%';
-                                  iframe.style.display = 'block';
-                                  iframe.setAttribute('allow', 'fullscreen; autoplay; clipboard-write');
-                                },
+                              child: InteractiveSimView(
+                                viewKey: 'phet_density_sim',
+                                simulationPath: '/phet_density/index.html',
                               ),
                             ),
                           ),

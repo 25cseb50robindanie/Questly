@@ -1,7 +1,3 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:async';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
@@ -14,6 +10,7 @@ import '../widgets/dendy_speak_button.dart';
 import '../widgets/questly_background.dart';
 import '../widgets/quest_completion_dialog.dart';
 import '../widgets/vector_asset_helper.dart';
+import '../widgets/interactive_sim_view.dart';
 
 class VirtualLabScreen extends StatefulWidget {
   const VirtualLabScreen({Key? key}) : super(key: key);
@@ -26,13 +23,11 @@ class _VirtualLabScreenState extends State<VirtualLabScreen> {
   Student? _student;
   int _currentStage = 1;
   bool _isCompleted = false;
-  StreamSubscription<html.MessageEvent>? _messageSubscription;
 
   @override
   void initState() {
     super.initState();
     _loadStudent();
-    _listenToLabEvents();
   }
 
   void _loadStudent() {
@@ -41,28 +36,23 @@ class _VirtualLabScreenState extends State<VirtualLabScreen> {
     });
   }
 
-  void _listenToLabEvents() {
-    try {
-      _messageSubscription = html.window.onMessage.listen((event) {
-        final data = event.data;
-        if (data is Map && data['type'] == 'QUESTLY_LAB_EVENT') {
-          final eventType = data['event'];
-          if (eventType == 'stage_complete') {
-            final stage = data['stage'] as int? ?? 1;
-            SoundService.playStarPop();
-            if (mounted) {
-              setState(() {
-                _currentStage = (stage + 1).clamp(1, 5);
-              });
-            }
-          } else if (eventType == 'lab_complete') {
-            _onLabCompleted();
-          } else if (eventType == 'navigate_back') {
-            _handleReturnToRoadmap();
-          }
+  void _onLabEventReceived(Map<String, dynamic> data) {
+    if (data['type'] == 'QUESTLY_LAB_EVENT') {
+      final eventType = data['event'];
+      if (eventType == 'stage_complete') {
+        final stage = data['stage'] as int? ?? 1;
+        SoundService.playStarPop();
+        if (mounted) {
+          setState(() {
+            _currentStage = (stage + 1).clamp(1, 5);
+          });
         }
-      });
-    } catch (_) {}
+      } else if (eventType == 'lab_complete') {
+        _onLabCompleted();
+      } else if (eventType == 'navigate_back') {
+        _handleReturnToRoadmap();
+      }
+    }
   }
 
   void _handleReturnToRoadmap() {
@@ -115,21 +105,6 @@ class _VirtualLabScreenState extends State<VirtualLabScreen> {
   }
 
   @override
-  void dispose() {
-    _messageSubscription?.cancel();
-    super.dispose();
-  }
-
-  String _getSimulationUrl() {
-    try {
-      final origin = html.window.location.origin;
-      return '$origin/virtual_lab/index.html';
-    } catch (_) {
-      return '/virtual_lab/index.html';
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isShort = size.height < 450;
@@ -172,19 +147,10 @@ class _VirtualLabScreenState extends State<VirtualLabScreen> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(14),
                             child: SizedBox.expand(
-                              child: HtmlElementView.fromTagName(
-                                key: const ValueKey('virtual_chemistry_lab'),
-                                tagName: 'iframe',
-                                onElementCreated: (Object element) {
-                                  final iframe = element as html.IFrameElement;
-                                  iframe.src = _getSimulationUrl();
-                                  iframe.style.border = 'none';
-                                  iframe.style.width = '100%';
-                                  iframe.style.height = '100%';
-                                  iframe.style.display = 'block';
-                                  iframe.setAttribute('allowfullscreen', 'true');
-                                  iframe.setAttribute('allow', 'fullscreen; autoplay; clipboard-write');
-                                },
+                              child: InteractiveSimView(
+                                viewKey: 'virtual_chemistry_lab',
+                                simulationPath: '/virtual_lab/index.html',
+                                onMessage: _onLabEventReceived,
                               ),
                             ),
                           ),

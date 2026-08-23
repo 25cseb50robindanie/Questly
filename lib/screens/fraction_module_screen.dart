@@ -1,7 +1,5 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:async';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
@@ -12,6 +10,7 @@ import '../widgets/custom_button.dart';
 import '../widgets/questly_background.dart';
 import '../widgets/quest_completion_dialog.dart';
 import '../widgets/vector_asset_helper.dart';
+import '../widgets/interactive_sim_view.dart';
 
 class FractionModuleScreen extends StatefulWidget {
   const FractionModuleScreen({Key? key}) : super(key: key);
@@ -25,13 +24,11 @@ class _FractionModuleScreenState extends State<FractionModuleScreen> {
   int _currentLevel = 1;
   int _score = 0;
   bool _isCompleted = false;
-  StreamSubscription<html.MessageEvent>? _messageSubscription;
 
   @override
   void initState() {
     super.initState();
     _loadStudent();
-    _listenToQuestlyEvents();
   }
 
   void _loadStudent() {
@@ -40,34 +37,27 @@ class _FractionModuleScreenState extends State<FractionModuleScreen> {
     });
   }
 
-  void _listenToQuestlyEvents() {
-    try {
-      _messageSubscription = html.window.onMessage.listen((event) {
-        final data = event.data;
-        if (data is Map) {
-          final type = data['type'];
-          if (type == 'QUESTLY_GAME_START') {
-            // Game started
-          } else if (type == 'QUESTLY_GAME_PROGRESS') {
-            final level = data['levelCompleted'] as int? ?? 1;
-            final sc = data['score'] as int? ?? 0;
-            SoundService.playStarPop();
-            if (mounted) {
-              setState(() {
-                _currentLevel = (level + 1).clamp(1, 10);
-                _score = sc;
-              });
-            }
-          } else if (type == 'QUESTLY_GAME_COMPLETE') {
-            final sc = data['score'] as int? ?? 100;
-            final stars = data['stars'] as int? ?? 3;
-            _onModuleCompleted(sc, stars);
-          } else if (type == 'QUESTLY_NAVIGATE_BACK') {
-            _handleReturn();
-          }
-        }
-      });
-    } catch (_) {}
+  void _onQuestlyEventReceived(Map<String, dynamic> data) {
+    final type = data['type'];
+    if (type == 'QUESTLY_GAME_START') {
+      // Game started
+    } else if (type == 'QUESTLY_GAME_PROGRESS') {
+      final level = data['levelCompleted'] as int? ?? 1;
+      final sc = data['score'] as int? ?? 0;
+      SoundService.playStarPop();
+      if (mounted) {
+        setState(() {
+          _currentLevel = (level + 1).clamp(1, 10);
+          _score = sc;
+        });
+      }
+    } else if (type == 'QUESTLY_GAME_COMPLETE') {
+      final sc = data['score'] as int? ?? 100;
+      final stars = data['stars'] as int? ?? 3;
+      _onModuleCompleted(sc, stars);
+    } else if (type == 'QUESTLY_NAVIGATE_BACK') {
+      _handleReturn();
+    }
   }
 
   void _handleReturn() {
@@ -120,21 +110,6 @@ class _FractionModuleScreenState extends State<FractionModuleScreen> {
   }
 
   @override
-  void dispose() {
-    _messageSubscription?.cancel();
-    super.dispose();
-  }
-
-  String _getSimulationUrl() {
-    try {
-      final origin = html.window.location.origin;
-      return '$origin/fraction_module/index.html';
-    } catch (_) {
-      return '/fraction_module/index.html';
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isShort = size.height < 450;
@@ -172,19 +147,10 @@ class _FractionModuleScreenState extends State<FractionModuleScreen> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(14),
                       child: SizedBox.expand(
-                        child: HtmlElementView.fromTagName(
-                          key: const ValueKey('fraction_module_game'),
-                          tagName: 'iframe',
-                          onElementCreated: (Object element) {
-                            final iframe = element as html.IFrameElement;
-                            iframe.src = _getSimulationUrl();
-                            iframe.style.border = 'none';
-                            iframe.style.width = '100%';
-                            iframe.style.height = '100%';
-                            iframe.style.display = 'block';
-                            iframe.setAttribute('allowfullscreen', 'true');
-                            iframe.setAttribute('allow', 'fullscreen; autoplay; clipboard-write');
-                          },
+                        child: InteractiveSimView(
+                          viewKey: 'fraction_module_game',
+                          simulationPath: '/fraction_module/index.html',
+                          onMessage: _onQuestlyEventReceived,
                         ),
                       ),
                     ),

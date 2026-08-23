@@ -1,5 +1,4 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import '../services/speech_recognition_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../core/locator.dart';
@@ -120,63 +119,43 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
   }
 
   void _startListening() {
-    if (!kIsWeb) return;
+    if (!SpeechRecognitionHelper.isSupported) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Speech recognition is not supported on this platform.')),
+      );
+      return;
+    }
 
     try {
-      if (html.SpeechRecognition.supported) {
-        final lang = LocalizationService.currentLanguage;
-        final langCode = lang == 'ta' ? 'ta-IN' : (lang == 'hi' ? 'hi-IN' : 'en-US');
+      final lang = LocalizationService.currentLanguage;
+      final langCode = lang == 'ta' ? 'ta-IN' : (lang == 'hi' ? 'hi-IN' : 'en-US');
 
-        final recognition = html.SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = true;
-        recognition.lang = langCode;
-
-        recognition.onStart.listen((_) {
-          if (mounted) setState(() => _isListening = true);
-        });
-
-        recognition.onResult.listen((event) {
-          try {
-            final dynamic results = event.results;
-            if (results != null) {
-              final int? length = results.length as int?;
-              if (length != null && length > 0) {
-                String fullTranscript = '';
-                for (var i = 0; i < length; i++) {
-                  final dynamic item = results[i];
-                  if (item != null) {
-                    final dynamic alt = item[0] ?? (item is html.SpeechRecognitionResult ? item.item(0) : null);
-                    if (alt != null) {
-                      fullTranscript += (alt.transcript?.toString() ?? '');
-                    }
-                  }
-                }
-                if (mounted && fullTranscript.trim().isNotEmpty) {
-                  setState(() {
-                    _textController.text = fullTranscript.trim();
-                  });
-                }
-              }
+      final recognition = SpeechRecognitionHelper.create();
+      if (recognition != null) {
+        recognition.start(
+          langCode: langCode,
+          continuous: false,
+          interimResults: true,
+          onStart: () {
+            if (mounted) setState(() => _isListening = true);
+          },
+          onResult: (transcript) {
+            if (mounted && transcript.trim().isNotEmpty) {
+              setState(() {
+                _textController.text = transcript.trim();
+              });
             }
-          } catch (_) {}
-        });
-
-        recognition.onEnd.listen((_) {
-          if (mounted) setState(() => _isListening = false);
-        });
-
-        recognition.onError.listen((_) {
-          if (mounted) setState(() => _isListening = false);
-        });
+          },
+          onError: () {
+            if (mounted) setState(() => _isListening = false);
+          },
+          onEnd: () {
+            if (mounted) setState(() => _isListening = false);
+          },
+        );
 
         _speechRecognition = recognition;
-        recognition.start();
         SoundService.playClick();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Speech recognition is not supported in this browser.')),
-        );
       }
     } catch (e) {
       debugPrint('[SpeechRecognition Error] $e');

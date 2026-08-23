@@ -1,7 +1,5 @@
-// ignore: avoid_web_libraries_in_flutter
 import 'dart:async';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import '../services/speech_recognition_helper.dart';
 import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
@@ -51,65 +49,10 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
   }
 
   void _initWebSpeechRecognition() {
-    try {
-      if (html.SpeechRecognition.supported) {
-        _speechRecognition = html.SpeechRecognition();
-        _speechRecognition.continuous = true;
-        _speechRecognition.interimResults = true;
-        _speechRecognition.lang = 'en-US';
-
-        _speechRecognition.onResult.listen((event) {
-          try {
-            final dynamic results = event.results;
-            if (results != null) {
-              final int? length = results.length as int?;
-              if (length != null && length > 0) {
-                String fullTranscript = '';
-                for (var i = 0; i < length; i++) {
-                  final dynamic item = results[i];
-                  if (item != null) {
-                    final dynamic alt = item[0];
-                    if (alt != null) {
-                      fullTranscript += (alt.transcript?.toString() ?? '');
-                    }
-                  }
-                }
-                if (mounted && fullTranscript.trim().isNotEmpty) {
-                  setState(() {
-                    _transcribedText = fullTranscript.trim();
-                    _textController.text = _transcribedText;
-                  });
-                }
-              }
-            }
-          } catch (_) {}
-        });
-
-        _speechRecognition.onError.listen((event) {
-          if (mounted) {
-            setState(() {
-              _isListening = false;
-              if (_transcribedText.isEmpty) {
-                _isManualTyping = true;
-              }
-            });
-          }
-        });
-
-        _speechRecognition.onEnd.listen((event) {
-          if (mounted) {
-            setState(() {
-              _isListening = false;
-            });
-          }
-        });
-      } else {
-        _isSpeechAvailable = false;
-        _isManualTyping = true;
-      }
-    } catch (_) {
+    if (!SpeechRecognitionHelper.isSupported) {
       _isSpeechAvailable = false;
       _isManualTyping = true;
+      return;
     }
   }
 
@@ -135,7 +78,7 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
 
   void _toggleListening() {
     SoundService.playClick();
-    if (!_isSpeechAvailable || _speechRecognition == null) {
+    if (!SpeechRecognitionHelper.isSupported) {
       setState(() {
         _isManualTyping = true;
       });
@@ -144,17 +87,47 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
 
     if (_isListening) {
       try {
-        _speechRecognition.stop();
+        _speechRecognition?.stop();
       } catch (_) {}
       setState(() {
         _isListening = false;
       });
     } else {
       try {
-        _speechRecognition.start();
-        setState(() {
-          _isListening = true;
-        });
+        _speechRecognition = SpeechRecognitionHelper.create();
+        if (_speechRecognition != null) {
+          _speechRecognition.start(
+            langCode: 'en-US',
+            continuous: true,
+            interimResults: true,
+            onStart: () {
+              if (mounted) setState(() => _isListening = true);
+            },
+            onResult: (transcript) {
+              if (mounted && transcript.trim().isNotEmpty) {
+                setState(() {
+                  _transcribedText = transcript.trim();
+                  _textController.text = _transcribedText;
+                });
+              }
+            },
+            onError: () {
+              if (mounted) {
+                setState(() {
+                  _isListening = false;
+                  if (_transcribedText.isEmpty) {
+                    _isManualTyping = true;
+                  }
+                });
+              }
+            },
+            onEnd: () {
+              if (mounted) {
+                setState(() => _isListening = false);
+              }
+            },
+          );
+        }
       } catch (_) {
         setState(() {
           _isListening = false;

@@ -41,6 +41,8 @@ dependencies:
   audioplayers: ^6.8.1
   http: ^1.2.0
   flutter_svg: ^2.0.10
+  webview_flutter: ^4.14.1
+  flutter_tts: ^4.2.5
 
 dev_dependencies:
   flutter_test:
@@ -78,6 +80,17 @@ flutter:
     - assets/vector_ui/emoji/
     - assets/vector_ui/blue set/
     - assets/vector_ui/bt/
+    - assets/simulations/fraction_module/
+    - assets/simulations/fraction_module/assets/
+    - assets/simulations/fraction_module/assets/fonts/
+    - assets/simulations/fraction_module/css/
+    - assets/simulations/fraction_module/js/
+    - assets/simulations/fraction_module/js/data/
+    - assets/simulations/fraction_module/js/engine/
+    - assets/simulations/fraction_module/js/math/
+    - assets/simulations/fraction_module/js/ui/
+    - assets/simulations/phet_density/
+    - assets/simulations/virtual_lab/
 
   fonts:
     - family: Fredoka

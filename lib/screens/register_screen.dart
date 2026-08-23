@@ -61,13 +61,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     if (success) {
+      await Locator.authService.login(
+        _idController.text.trim(),
+        _passwordController.text,
+      );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Account created! Sign in using your new credentials.'),
+        SnackBar(
+          content: Text('Welcome, ${_displayNameController.text.trim()}! Your quest begins now.'),
           backgroundColor: ColorSystem.green,
         ),
       );
-      Navigator.pop(context);
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
     } else {
       setState(() {
         _errorMessage = 'Questly ID already taken or registration details invalid.';

@@ -1,7 +1,6 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 import 'package:flutter/foundation.dart';
 import 'localization_service.dart';
+import 'read_aloud_stub.dart' if (dart.library.html) 'read_aloud_web.dart';
 
 class ReadAloudService extends ChangeNotifier {
   static final ReadAloudService _instance = ReadAloudService._internal();
@@ -37,64 +36,31 @@ class ReadAloudService extends ChangeNotifier {
     // Translate English keys/phrases into the student's chosen language (Tamil, Hindi, or English)
     final spokenText = LocalizationService.translate(text, targetLanguage: activeLang);
 
-    if (kIsWeb) {
-      try {
-        final synth = html.window.speechSynthesis;
-        if (synth != null) {
-          final utterance = html.SpeechSynthesisUtterance(spokenText);
-          utterance.rate = rate; // 0.95 is ideal for learning comprehension
-          utterance.pitch = pitch; // 1.1 gives Dendy a friendly tone
-          utterance.volume = 1.0;
-
-          // Map Questly language codes to standard BCP-47 locale tags
-          switch (activeLang.toLowerCase()) {
-            case 'ta':
-              utterance.lang = 'ta-IN';
-              break;
-            case 'hi':
-              utterance.lang = 'hi-IN';
-              break;
-            case 'en':
-            default:
-              utterance.lang = 'en-US';
-          }
-
-          utterance.onEnd.listen((_) {
-            _isSpeaking = false;
-            _currentlySpeakingText = null;
-            notifyListeners();
-          });
-
-          utterance.onError.listen((_) {
-            _isSpeaking = false;
-            _currentlySpeakingText = null;
-            notifyListeners();
-          });
-
-          _isSpeaking = true;
-          _currentlySpeakingText = text;
-          notifyListeners();
-
-          synth.speak(utterance);
-        }
-      } catch (e) {
-        debugPrint('[ReadAloudService Error] $e');
+    PlatformSpeechTts.speak(
+      text: spokenText,
+      languageCode: activeLang,
+      rate: rate,
+      pitch: pitch,
+      onStart: () {
+        _isSpeaking = true;
+        _currentlySpeakingText = text;
+        notifyListeners();
+      },
+      onEnd: () {
         _isSpeaking = false;
         _currentlySpeakingText = null;
         notifyListeners();
-      }
-    }
+      },
+      onError: () {
+        _isSpeaking = false;
+        _currentlySpeakingText = null;
+        notifyListeners();
+      },
+    );
   }
 
   void stop() {
-    if (kIsWeb) {
-      try {
-        final synth = html.window.speechSynthesis;
-        if (synth != null) {
-          synth.cancel();
-        }
-      } catch (_) {}
-    }
+    PlatformSpeechTts.stop();
     _isSpeaking = false;
     _currentlySpeakingText = null;
     notifyListeners();
