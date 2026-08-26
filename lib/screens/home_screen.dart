@@ -535,7 +535,7 @@ class _HomeDashboardView extends StatelessWidget {
                 height: 120,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  itemCount: allModules.length + 2,
+                  itemCount: allModules.length + 1,
                   separatorBuilder: (context, index) => const SizedBox(width: 14),
                   itemBuilder: (context, index) {
                     if (index < allModules.length) {
@@ -553,31 +553,16 @@ class _HomeDashboardView extends StatelessWidget {
                         },
                       );
                     }
-                    if (index == allModules.length) {
-                      // Virtual Lab Card
-                      final isDone = Locator.progressionService.isLessonCompleted(student.questlyId, 'lab_titration_1');
-                      return ModuleCard(
-                        subject: 'Chemistry',
-                        title: 'Acid–Base Titration (Virtual Lab)',
-                        progressFraction: isDone ? 1.0 : 0.0,
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/virtual_lab',
-                          );
-                        },
-                      );
-                    }
-                    // Fractions Module Card
-                    final isDone = Locator.progressionService.isLessonCompleted(student.questlyId, 'math_fractions_1');
+                    // Virtual Lab Card (Acid–Base Titration)
+                    final isDone = Locator.progressionService.isLessonCompleted(student.questlyId, 'lab_titration_1');
                     return ModuleCard(
-                      subject: 'Mathematics',
-                      title: 'Fractions & Ratios (Canyon Crossings)',
+                      subject: 'Chemistry',
+                      title: 'Acid–Base Titration (Virtual Lab)',
                       progressFraction: isDone ? 1.0 : 0.0,
                       onTap: () {
                         Navigator.pushNamed(
                           context,
-                          '/fraction_module',
+                          '/virtual_lab',
                         );
                       },
                     );

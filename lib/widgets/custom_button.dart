@@ -66,6 +66,7 @@ class _CustomButtonState extends State<CustomButton> with SingleTickerProviderSt
   }
 
   void _handleTapUp(TapUpDetails details) {
+    debugPrint("CustomButton: TapUp event received for button '${widget.text}'");
     _controller.reverse();
     SoundService.playClick();
     widget.onPressed();

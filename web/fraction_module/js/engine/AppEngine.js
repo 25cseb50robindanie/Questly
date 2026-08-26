@@ -28,6 +28,17 @@ export class AppEngine {
 
   init() {
     this.state.load();
+    
+    // Read stage parameter to determine if we are running as an embedded Questly lesson
+    const urlParams = new URLSearchParams(window.location.search);
+    const stageParam = urlParams.get('stage');
+    this.isEmbedded = !!stageParam;
+    this.embeddedStage = stageParam;
+
+    if (this.isEmbedded) {
+      document.body.classList.add("questly-embedded");
+    }
+
     this.state.setRoute("HOME");
     this.ui.init({
       go: (r) => this.go(r),
@@ -38,6 +49,10 @@ export class AppEngine {
         const goals = syncExploreGoalIds(this.state.state.exploreGoals, evaluateExploreGoals(this.state.state));
         if (goals.allComplete) {
           this.state.completeStage("explore");
+          if (this.isEmbedded) {
+            this.questly.sendGameComplete(100, 3, 0);
+            return;
+          }
           this.unlockStage("practice", "PRACTICE");
         }
       },
@@ -69,7 +84,24 @@ export class AppEngine {
     this.ui.renderChapters(this.state.state.completed);
     this.ui.renderJourney("concept", this.state.state.completedStages, this.state.state.currentStageUnlocked);
     this.setupFx();
-    this.go("HOME");
+
+    if (this.isEmbedded) {
+      if (this.embeddedStage === "concept") {
+        this.openConcept();
+      } else if (this.embeddedStage === "explore") {
+        this.openExplore(true);
+      } else if (this.embeddedStage === "practice") {
+        this.unlockStage("practice", "PRACTICE");
+      } else if (this.embeddedStage === "game") {
+        this.unlockStage("game", "GAME");
+      } else if (this.embeddedStage === "challenge") {
+        this.unlockStage("challenge", "CHALLENGE");
+      } else {
+        this.go("HOME");
+      }
+    } else {
+      this.go("HOME");
+    }
   }
 
   setupFx() {
@@ -191,6 +223,10 @@ export class AppEngine {
     this.state.unlockStage("explore");
     this.ui.setCompletedStages(this.state.state.completedStages);
     this.ui.setUnlockedStages(this.state.state.currentStageUnlocked);
+    if (this.isEmbedded) {
+      this.questly.sendGameComplete(100, 3, 0);
+      return;
+    }
     this.openExplore(true);
   }
 
@@ -652,6 +688,10 @@ export class AppEngine {
           this.state.addCoins(FINAL_CHALLENGE.coins);
           this.state.addScore(500);
           this.state.completeStage("challenge");
+          if (this.isEmbedded) {
+            this.questly.sendGameComplete(this.state.state.score, this.levels.starsFromMistakes(this.state.state.mistakes), this.state.state.mistakes);
+            return;
+          }
           setTimeout(() => this.openResults(), 900);
         }
       } else {
@@ -694,6 +734,10 @@ export class AppEngine {
       this.state.state.guidedIndex += 1;
       if (this.state.state.guidedIndex >= GUIDED_PUZZLES.length) {
         this.state.completeStage("practice");
+        if (this.isEmbedded) {
+          this.questly.sendGameComplete(100, 3, this.state.state.mistakes);
+          return;
+        }
         this.unlockStage("game", "GAME");
         return;
       }
@@ -702,6 +746,10 @@ export class AppEngine {
       this.state.state.gameIndex += 1;
       if (this.state.state.gameIndex >= GAME_LEVELS.length) {
         this.state.completeStage("game");
+        if (this.isEmbedded) {
+          this.questly.sendGameComplete(this.state.state.score, this.levels.starsFromMistakes(this.state.state.mistakes), this.state.state.mistakes);
+          return;
+        }
         this.unlockStage("challenge", "CHALLENGE");
         return;
       }

@@ -125,6 +125,22 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
           arguments: _activity,
         );
       });
+      return;
+    }
+
+    if (_activity!.type == 'fraction_concept' ||
+        _activity!.type == 'fraction_explore' ||
+        _activity!.type == 'fraction_practice' ||
+        _activity!.type == 'fraction_game' ||
+        _activity!.type == 'fraction_challenge') {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Navigator.pushReplacementNamed(
+          context,
+          '/fraction_module',
+          arguments: _activity,
+        );
+      });
+      return;
     }
   }
 

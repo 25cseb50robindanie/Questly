@@ -10,7 +10,7 @@ class CollectionRepository extends ChangeNotifier {
 
   // Available badges (earned by progress/levels)
   List<String> getAvailableBadges() {
-    return ['Explorer', 'Scientist', 'Float Master', 'Density Master'];
+    return ['Explorer', 'Scientist', 'Float Master', 'Density Master', 'Fractions Explorer'];
   }
 
   // Check which badges are unlocked for student

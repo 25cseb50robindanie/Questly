@@ -316,18 +316,18 @@ export const TIME_ATTACK_POOL = [
 ];
 
 export const PIECE_COLORS = {
-  "1/2": "#118AB2",
+  "1/2": "#8667C2",
   "1/3": "#06D6A0",
   "2/3": "#06D6A0",
   "1/4": "#FFD166",
   "2/4": "#FFD166",
   "3/4": "#FFD166",
-  "1/6": "#C7B9E5",
-  "2/6": "#C7B9E5",
-  "1/8": "#FF8B94",
-  "2/8": "#FF8B94",
-  "3/8": "#FF8B94",
-  "5/8": "#FF8B94",
-  "ratio-red": "#FF8B94",
-  "ratio-blue": "#118AB2"
+  "1/6": "#E2D8F3",
+  "2/6": "#E2D8F3",
+  "1/8": "#D69BAA",
+  "2/8": "#D69BAA",
+  "3/8": "#D69BAA",
+  "5/8": "#D69BAA",
+  "ratio-red": "#D69BAA",
+  "ratio-blue": "#8667C2"
 };

@@ -19,23 +19,35 @@ class ProgressionService {
   // Checks if a specific lesson is unlocked for the student
   bool isLessonUnlocked(String studentId, String lessonId) {
     // Lesson 1 is always unlocked
-    if (lessonId == 'density_les1') return true;
+    if (lessonId == 'density_les1' || lessonId == 'fractions_les1') return true;
 
     // Lesson 2 requires Lesson 1 to be completed
     if (lessonId == 'density_les2') {
       return isLessonCompleted(studentId, 'density_les1');
     }
+    if (lessonId == 'fractions_les2') {
+      return isLessonCompleted(studentId, 'fractions_les1');
+    }
     // Lesson 3 requires Lesson 2
     if (lessonId == 'density_les3') {
       return isLessonCompleted(studentId, 'density_les2');
+    }
+    if (lessonId == 'fractions_les3') {
+      return isLessonCompleted(studentId, 'fractions_les2');
     }
     // Lesson 4 requires Lesson 3
     if (lessonId == 'density_les4') {
       return isLessonCompleted(studentId, 'density_les3');
     }
+    if (lessonId == 'fractions_les4') {
+      return isLessonCompleted(studentId, 'fractions_les3');
+    }
     // Lesson 5 requires Lesson 4
     if (lessonId == 'density_les5') {
       return isLessonCompleted(studentId, 'density_les4');
+    }
+    if (lessonId == 'fractions_les5') {
+      return isLessonCompleted(studentId, 'fractions_les4');
     }
 
     return false;

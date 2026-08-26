@@ -113,6 +113,7 @@ export class UIManager {
     document.addEventListener("touchmove", (e) => this.onMove(e), { passive: false });
     document.addEventListener("mouseup", (e) => this.onUp(e));
     document.addEventListener("touchend", (e) => this.onUp(e));
+    document.addEventListener("touchcancel", (e) => this.onUp(e));
   }
 
   spawnStars() {

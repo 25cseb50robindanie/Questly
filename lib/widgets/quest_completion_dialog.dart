@@ -61,14 +61,22 @@ class QuestCompletionDialog extends StatefulWidget {
       ),
     );
 
+    final fallbackModuleId = student?.currentModuleId ?? 'mod_fractions';
+
     if (result == true) {
       if (onContinue != null) {
-        onContinue();
+        try {
+          onContinue();
+        } catch (e, s) {
+          debugPrint("QuestCompletionDialog: ERROR executing onContinue callback: $e");
+          debugPrintStack(stackTrace: s);
+          print("CONSOLE.ERROR: onContinue callback error: $e");
+        }
       } else if (context.mounted) {
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         } else {
-          Navigator.pushReplacementNamed(context, '/roadmap');
+          Navigator.pushReplacementNamed(context, '/roadmap', arguments: fallbackModuleId);
         }
       }
     } else {
@@ -77,7 +85,7 @@ class QuestCompletionDialog extends StatefulWidget {
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         } else {
-          Navigator.pushReplacementNamed(context, '/roadmap');
+          Navigator.pushReplacementNamed(context, '/roadmap', arguments: fallbackModuleId);
         }
       }
     }
@@ -98,92 +106,155 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
   }
 
   Future<void> _startPoppingSequence() async {
-    await Future.delayed(const Duration(milliseconds: 350));
-    if (!mounted) return;
-
-    // Pop Star 1
-    if (widget.earnedStars >= 1) {
-      setState(() => _visibleStars = 1);
-      SoundService.playStarPop();
+    debugPrint("QuestCompletionDialog: _startPoppingSequence started. earnedStars=${widget.earnedStars}");
+    try {
       await Future.delayed(const Duration(milliseconds: 350));
-    }
+      if (!mounted) return;
 
-    // Pop Star 2
-    if (!mounted) return;
-    if (widget.earnedStars >= 2) {
-      setState(() => _visibleStars = 2);
-      SoundService.playStarPop();
-      await Future.delayed(const Duration(milliseconds: 350));
-    }
+      // Pop Star 1
+      if (widget.earnedStars >= 1) {
+        debugPrint("QuestCompletionDialog: Popping star 1");
+        setState(() => _visibleStars = 1);
+        try {
+          SoundService.playStarPop();
+        } catch (e) {
+          debugPrint("QuestCompletionDialog: star 1 sound error: $e");
+        }
+        await Future.delayed(const Duration(milliseconds: 350));
+      }
 
-    // Pop Star 3
-    if (!mounted) return;
-    if (widget.earnedStars >= 3) {
-      setState(() => _visibleStars = 3);
-      SoundService.playStarPop();
-      await Future.delayed(const Duration(milliseconds: 350));
-    }
+      // Pop Star 2
+      if (!mounted) return;
+      if (widget.earnedStars >= 2) {
+        debugPrint("QuestCompletionDialog: Popping star 2");
+        setState(() => _visibleStars = 2);
+        try {
+          SoundService.playStarPop();
+        } catch (e) {
+          debugPrint("QuestCompletionDialog: star 2 sound error: $e");
+        }
+        await Future.delayed(const Duration(milliseconds: 350));
+      }
 
-    // Reveal rewards panel with full level-completion fanfare!
-    if (!mounted) return;
-    setState(() => _rewardsVisible = true);
-    SoundService.playLevelComplete();
+      // Pop Star 3
+      if (!mounted) return;
+      if (widget.earnedStars >= 3) {
+        debugPrint("QuestCompletionDialog: Popping star 3");
+        setState(() => _visibleStars = 3);
+        try {
+          SoundService.playStarPop();
+        } catch (e) {
+          debugPrint("QuestCompletionDialog: star 3 sound error: $e");
+        }
+        await Future.delayed(const Duration(milliseconds: 350));
+      }
+
+      // Reveal rewards panel with full level-completion fanfare!
+      if (!mounted) return;
+      debugPrint("QuestCompletionDialog: Setting rewards visible to true");
+      setState(() => _rewardsVisible = true);
+      try {
+        SoundService.playLevelComplete();
+      } catch (e) {
+        debugPrint("QuestCompletionDialog: level complete fanfare sound error: $e");
+      }
+      debugPrint("QuestCompletionDialog: Popping sequence complete. _rewardsVisible=$_rewardsVisible");
+    } catch (e, s) {
+      debugPrint("QuestCompletionDialog: ERROR in _startPoppingSequence: $e");
+      debugPrintStack(stackTrace: s);
+      // Fallback: make sure the rewards panel and continue button are accessible!
+      if (mounted) {
+        setState(() {
+          _rewardsVisible = true;
+        });
+      }
+    }
   }
 
   Future<void> _handleContinue() async {
-    SoundService.playClick();
+    debugPrint("QuestCompletionDialog: Continue button pressed!");
+    try {
+      SoundService.playClick();
+      debugPrint("QuestCompletionDialog: Click sound triggered");
+    } catch (e) {
+      debugPrint("QuestCompletionDialog: Click sound error: $e");
+    }
 
-    // Check level up from current student state
-    final student = Locator.studentRepository.getCurrentStudent();
     int? finalLevel;
-    if (student != null) {
-      final calculatedLevel = 1 + (student.xp ~/ 200);
-      if (calculatedLevel > student.level) {
-        finalLevel = calculatedLevel;
-        // Award bonus coins and XP for leveling up without wiping lifetime XP!
-        final updatedStudent = student.copyWith(
-          level: finalLevel,
-          gold: student.gold + 100,
-          xp: student.xp + 50,
-        );
-        await Locator.studentRepository.updateStudentProfile(updatedStudent);
+    try {
+      debugPrint("QuestCompletionDialog: Fetching current student profile...");
+      final student = Locator.studentRepository.getCurrentStudent();
+      debugPrint("QuestCompletionDialog: Current student profile is: $student");
+      
+      if (student != null) {
+        final calculatedLevel = 1 + (student.xp ~/ 200);
+        debugPrint("QuestCompletionDialog: calculatedLevel=$calculatedLevel, student.level=${student.level}");
+        if (calculatedLevel > student.level) {
+          finalLevel = calculatedLevel;
+          debugPrint("QuestCompletionDialog: Level up detected! New level: $finalLevel");
+          
+          final updatedStudent = student.copyWith(
+            level: finalLevel,
+            gold: student.gold + 100,
+            xp: student.xp + 50,
+          );
+          debugPrint("QuestCompletionDialog: Updating student profile...");
+          await Locator.studentRepository.updateStudentProfile(updatedStudent);
+          debugPrint("QuestCompletionDialog: Student profile updated.");
 
-        // Unlock badges in collection based on new level
-        final sId = student.questlyId.toLowerCase();
-        if (finalLevel >= 2) {
-          await Locator.collectionRepository.unlockBadge(sId, 'Explorer');
-          await Locator.collectionRepository.unlockCollectible(sId, 'coll_badge');
+          final sId = student.questlyId.toLowerCase();
+          debugPrint("QuestCompletionDialog: Unlocking collection rewards for student $sId...");
+          if (finalLevel >= 2) {
+            await Locator.collectionRepository.unlockBadge(sId, 'Explorer');
+            await Locator.collectionRepository.unlockCollectible(sId, 'coll_badge');
+          }
+          if (finalLevel >= 3) {
+            await Locator.collectionRepository.unlockBadge(sId, 'Scientist');
+            await Locator.collectionRepository.unlockCollectible(sId, 'coll_token');
+          }
+          if (finalLevel >= 4) {
+            await Locator.collectionRepository.unlockBadge(sId, 'Float Master');
+            await Locator.collectionRepository.unlockCollectible(sId, 'coll_water');
+          }
+          if (finalLevel >= 5) {
+            await Locator.collectionRepository.unlockBadge(sId, 'Density Master');
+            await Locator.collectionRepository.unlockCollectible(sId, 'coll_crystal');
+          }
+          debugPrint("QuestCompletionDialog: Collection rewards unlocked.");
         }
-        if (finalLevel >= 3) {
-          await Locator.collectionRepository.unlockBadge(sId, 'Scientist');
-          await Locator.collectionRepository.unlockCollectible(sId, 'coll_token');
-        }
-        if (finalLevel >= 4) {
-          await Locator.collectionRepository.unlockBadge(sId, 'Float Master');
-          await Locator.collectionRepository.unlockCollectible(sId, 'coll_water');
-        }
-        if (finalLevel >= 5) {
-          await Locator.collectionRepository.unlockBadge(sId, 'Density Master');
-          await Locator.collectionRepository.unlockCollectible(sId, 'coll_crystal');
-        }
+      }
+    } catch (e, s) {
+      debugPrint("QuestCompletionDialog ERROR: $e");
+      debugPrintStack(stackTrace: s);
+    }
+
+    if (!mounted) {
+      debugPrint("QuestCompletionDialog: Widget is no longer mounted, aborting pop.");
+      return;
+    }
+
+    if (finalLevel != null) {
+      try {
+        debugPrint("QuestCompletionDialog: Displaying LevelUpDialog...");
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => LevelUpDialog(
+            newLevel: finalLevel!,
+            onDismissed: () {},
+          ),
+        );
+        debugPrint("QuestCompletionDialog: LevelUpDialog dismissed.");
+      } catch (e) {
+        debugPrint("QuestCompletionDialog error showing LevelUpDialog: $e");
       }
     }
 
-    if (!mounted) return;
-
-    if (finalLevel != null) {
-      await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => LevelUpDialog(
-          newLevel: finalLevel!,
-          onDismissed: () {},
-        ),
-      );
-    }
-
     if (mounted) {
+      debugPrint("QuestCompletionDialog: Popping dialog with result true");
       Navigator.of(context).pop(true);
+    } else {
+      debugPrint("QuestCompletionDialog: Context no longer mounted before pop.");
     }
   }
 
@@ -341,7 +412,7 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
                       backgroundColor: ColorSystem.green,
                       textColor: Colors.white,
                       height: isShort ? 36 : 42,
-                      onPressed: _rewardsVisible ? _handleContinue : () {},
+                      onPressed: _handleContinue,
                     ),
                   ],
                 ),

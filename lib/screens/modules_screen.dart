@@ -167,18 +167,6 @@ class ModulesScreen extends StatelessWidget {
                                   );
                                 },
                               ),
-                              const SizedBox(width: 14),
-                              ModuleCard(
-                                subject: 'Mathematics',
-                                title: 'Fractions & Ratios (Canyon Crossings)',
-                                progressFraction: Locator.progressionService.isLessonCompleted(student.questlyId, 'math_fractions_1') ? 1.0 : 0.0,
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/fraction_module',
-                                  );
-                                },
-                              ),
                             ],
                           ),
                         ),
