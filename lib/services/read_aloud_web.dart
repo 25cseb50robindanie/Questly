@@ -27,6 +27,9 @@ class PlatformSpeechTts {
           case 'hi':
             utterance.lang = 'hi-IN';
             break;
+          case 'or':
+            utterance.lang = 'or-IN';
+            break;
           case 'en':
           default:
             utterance.lang = 'en-US';

@@ -214,6 +214,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               _buildLangButton('ta', 'தமிழ் (Tamil)'),
                               const SizedBox(height: 10),
                               _buildLangButton('hi', 'हिन्दी (Hindi)'),
+                              const SizedBox(height: 10),
+                              _buildLangButton('or', 'ଓଡ଼ିଆ (Odia)'),
                             ],
                           ),
                         ),

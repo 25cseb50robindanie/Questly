@@ -38,6 +38,9 @@ class PlatformSpeechTts {
         case 'hi':
           locale = 'hi-IN';
           break;
+        case 'or':
+          locale = 'or-IN';
+          break;
         case 'en':
         default:
           locale = 'en-US';

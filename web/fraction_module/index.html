@@ -176,11 +176,25 @@
                 <div class="bridge-slot" id="bridge-slot" data-drop="bridge"></div>
               </div>
               <div class="ratio-zone hidden" id="ratio-zone">
-                <div class="ratio-col" id="ratio-red" data-drop="ratio-red"></div>
-                <div class="ratio-mid">
-                  <div id="ratio-label">2 : 3</div>
+                <div class="beaker-container">
+                  <div class="beaker-header red-header">🔴 Red Tube</div>
+                  <div class="beaker glass-tube" id="ratio-red" data-drop="ratio-red">
+                    <div class="tube-ticks"><span></span><span></span><span></span><span></span></div>
+                    <div class="liquid-blocks-wrap" id="ratio-red-blocks"></div>
+                  </div>
                 </div>
-                <div class="ratio-col blue" id="ratio-blue" data-drop="ratio-blue"></div>
+                <div class="ratio-mid">
+                  <div class="ratio-scale-icon">⚖️</div>
+                  <div id="ratio-label">2 : 3</div>
+                  <div class="ratio-sub">Target Ratio</div>
+                </div>
+                <div class="beaker-container">
+                  <div class="beaker-header blue-header">🔵 Blue Tube</div>
+                  <div class="beaker glass-tube blue" id="ratio-blue" data-drop="ratio-blue">
+                    <div class="tube-ticks"><span></span><span></span><span></span><span></span></div>
+                    <div class="liquid-blocks-wrap" id="ratio-blue-blocks"></div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="island right"></div>

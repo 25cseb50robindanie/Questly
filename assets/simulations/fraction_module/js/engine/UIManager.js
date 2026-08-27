@@ -444,8 +444,20 @@ export class UIManager {
   }
 
   renderRatio(state) {
-    this.el.ratioRed.innerHTML = state.ratioRed.map(() => `<div class="ratio-block" style="background:#FF8B94"></div>`).join("");
-    this.el.ratioBlue.innerHTML = state.ratioBlue.map(() => `<div class="ratio-block" style="background:#118AB2"></div>`).join("");
+    const redBlocks = document.getElementById("ratio-red-blocks") || this.el.ratioRed;
+    const blueBlocks = document.getElementById("ratio-blue-blocks") || this.el.ratioBlue;
+    if (redBlocks) {
+      redBlocks.innerHTML = state.ratioRed.map((p, i) =>
+        `<div class="ratio-block red-block piece-on-board" data-id="${p.id || 'r'+i}" title="Red Unit">${p.label || '1'}</div>`
+      ).join("");
+      redBlocks.querySelectorAll(".piece-on-board").forEach((el) => this.bindPiece(el));
+    }
+    if (blueBlocks) {
+      blueBlocks.innerHTML = state.ratioBlue.map((p, i) =>
+        `<div class="ratio-block blue-block piece-on-board" data-id="${p.id || 'b'+i}" title="Blue Unit">${p.label || '1'}</div>`
+      ).join("");
+      blueBlocks.querySelectorAll(".piece-on-board").forEach((el) => this.bindPiece(el));
+    }
   }
 
   speakWb(text, mood = "neutral") {
