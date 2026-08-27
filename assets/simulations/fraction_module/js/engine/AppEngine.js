@@ -70,6 +70,7 @@ export class AppEngine {
       onNavigateStage: (stageId) => this.navigateToStage(stageId),
       getMergeBuffer: () => this.mergeBuffer,
       onBackToQuestly: () => this.questly.sendNavigateBack(),
+      onSpeak: (text) => this.questly.sendSpeakText(text),
       novaToast: (_where, msg) => {
         this.ui.setNova("nova-home", "worried");
         const p = document.querySelector("#screen-home .lede");

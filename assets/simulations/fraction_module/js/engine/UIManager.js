@@ -105,6 +105,22 @@ export class UIManager {
       btn.addEventListener("click", () => this.cb.onRevision(btn.getAttribute("data-rev")));
     });
 
+    // Delegate Read-Aloud / TTS triggers from speech buttons
+    document.addEventListener("click", (e) => {
+      const speakBtn = e.target.closest(".speech-speak-btn");
+      if (speakBtn) {
+        const speechBubble = speakBtn.closest(".speech");
+        if (speechBubble) {
+          const p = speechBubble.querySelector("p");
+          if (p && p.textContent && this.cb && this.cb.onSpeak) {
+            this.cb.onSpeak(p.textContent);
+            speakBtn.classList.add("speaking");
+            setTimeout(() => speakBtn.classList.remove("speaking"), 1500);
+          }
+        }
+      }
+    });
+
     this.renderHome();
     this.renderMath();
     this.spawnStars();
@@ -113,6 +129,7 @@ export class UIManager {
     document.addEventListener("touchmove", (e) => this.onMove(e), { passive: false });
     document.addEventListener("mouseup", (e) => this.onUp(e));
     document.addEventListener("touchend", (e) => this.onUp(e));
+    document.addEventListener("touchcancel", (e) => this.onUp(e));
   }
 
   spawnStars() {
@@ -162,7 +179,14 @@ export class UIManager {
 
   setNova(id, mood) {
     const svg = document.getElementById(id);
-    if (svg) svg.setAttribute("class", `nova-svg expression-${mood}`);
+    if (svg) {
+      let mappedMood = mood || "neutral";
+      if (mood === "idle") mappedMood = "neutral";
+      if (mood === "success") mappedMood = "happy";
+      if (mood === "confused") mappedMood = "worried";
+      if (mood === "celebrating") mappedMood = "ecstatic";
+      svg.setAttribute("class", `nova-svg dendy-svg expression-${mappedMood}`);
+    }
   }
 
   renderHome() {

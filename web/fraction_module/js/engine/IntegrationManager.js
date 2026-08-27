@@ -91,4 +91,36 @@ export class IntegrationManager {
       }, "*");
     }
   }
+
+  /**
+   * Dispatches a speech request to Questly's Flutter ReadAloudService.
+   */
+  sendSpeakText(text) {
+    if (!text || !text.trim()) return;
+    console.log("[Questly Integration] Speak Text Requested:", text);
+    
+    // 1. Dispatch to Flutter frame (Web & Mobile WebViews)
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: "QUESTLY_SPEAK_TEXT",
+        text: text.trim(),
+        gameId: this.gameId
+      }, "*");
+    } else if (window.QuestlyBridge) {
+      window.QuestlyBridge.postMessage(JSON.stringify({
+        type: "QUESTLY_SPEAK_TEXT",
+        text: text.trim(),
+        gameId: this.gameId
+      }));
+    } else if (window.speechSynthesis) {
+      // Direct Web Speech fallback when running standalone
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text.trim());
+        utter.rate = 0.95;
+        utter.pitch = 1.1;
+        window.speechSynthesis.speak(utter);
+      } catch (e) {}
+    }
+  }
 }

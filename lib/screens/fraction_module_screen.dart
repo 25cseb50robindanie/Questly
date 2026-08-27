@@ -57,6 +57,11 @@ class _FractionModuleScreenState extends State<FractionModuleScreen> {
       _onModuleCompleted(sc, stars);
     } else if (type == 'QUESTLY_NAVIGATE_BACK') {
       _handleReturn();
+    } else if (type == 'QUESTLY_SPEAK_TEXT') {
+      final text = data['text'] as String?;
+      if (text != null && text.trim().isNotEmpty) {
+        Locator.readAloudService.speak(text.trim());
+      }
     }
   }
 
