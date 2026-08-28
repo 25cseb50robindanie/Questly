@@ -133,7 +133,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                item.title,
+                                                l(item.title),
                                                 style: const TextStyle(
                                                   fontFamily: 'Fredoka',
                                                   fontSize: 13,
@@ -153,7 +153,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                           ),
                                           const SizedBox(height: 3),
                                           Text(
-                                            item.description,
+                                            l(item.description),
                                             style: TextStyle(
                                               fontFamily: 'Fredoka',
                                               fontSize: 11,

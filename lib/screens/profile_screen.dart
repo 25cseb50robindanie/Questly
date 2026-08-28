@@ -116,25 +116,25 @@ class ProfileScreen extends StatelessWidget {
       children: [
         Row(
           children: [
-            _buildStatCard('TOTAL XP', '${student.xp}', VectorAssetHelper.xpStarIcon(size: 16)),
+            _buildStatCard(l('TOTAL XP'), '${student.xp}', VectorAssetHelper.xpStarIcon(size: 16)),
             const SizedBox(width: 8),
-            _buildStatCard('COINS', '${student.gold}', VectorAssetHelper.questCoinIcon(size: 16)),
+            _buildStatCard(l('COINS'), '${student.gold}', VectorAssetHelper.questCoinIcon(size: 16)),
           ],
         ),
         const SizedBox(height: 8),
         Row(
           children: [
-            _buildStatCard('COMPLETED', '$completedModules Modules', const Icon(Icons.check_circle_rounded, color: ColorSystem.green, size: 16)),
+            _buildStatCard(l('COMPLETED'), '$completedModules ${l('modules')}', const Icon(Icons.check_circle_rounded, color: ColorSystem.green, size: 16)),
             const SizedBox(width: 8),
-            _buildStatCard('BADGES', '$badgesCount Earned', VectorAssetHelper.badgeIcon('Explorer', size: 16)),
+            _buildStatCard(l('BADGES'), '$badgesCount ${l('earned')}', VectorAssetHelper.badgeIcon('Explorer', size: 16)),
           ],
         ),
         const SizedBox(height: 8),
         Row(
           children: [
-            _buildStatCard('COLLECTIBLES', '$collectiblesCount Unlocked', VectorAssetHelper.collectibleIcon('diamond', size: 16)),
+            _buildStatCard(l('COLLECTIBLES'), '$collectiblesCount ${l('unlocked')}', VectorAssetHelper.collectibleIcon('diamond', size: 16)),
             const SizedBox(width: 8),
-            _buildStatCard('OFFLINE SYNC', 'Ready', const Icon(Icons.cloud_done_rounded, color: ColorSystem.purple, size: 16)),
+            _buildStatCard(l('OFFLINE SYNC'), l('ready'), const Icon(Icons.cloud_done_rounded, color: ColorSystem.purple, size: 16)),
           ],
         ),
       ],

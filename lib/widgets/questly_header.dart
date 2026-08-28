@@ -59,7 +59,7 @@ class QuestlyHeader extends StatelessWidget {
                   ),
                   const SizedBox(width: 16),
                   Text(
-                    '${l('change_language') == 'Change Language' ? 'Hi' : 'வணக்கம்'}, ${currentStudent.displayName}!',
+                    '${l('greeting_hi')}, ${currentStudent.displayName}!',
                     style: const TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: 16,

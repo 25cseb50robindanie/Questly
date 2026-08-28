@@ -75,7 +75,7 @@ class ModulesScreen extends StatelessWidget {
                             child: Row(
                               children: [
                                 Text(
-                                  subject,
+                                  l(subject),
                                   style: const TextStyle(
                                     fontFamily: 'Fredoka',
                                     fontSize: 11,

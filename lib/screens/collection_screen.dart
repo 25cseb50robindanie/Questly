@@ -281,7 +281,7 @@ class _CollectionScreenState extends State<CollectionScreen> with SingleTickerPr
               ),
               const SizedBox(height: 6),
               Text(
-                badgeName,
+                l(badgeName),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Fredoka',
@@ -368,7 +368,7 @@ class _CollectionScreenState extends State<CollectionScreen> with SingleTickerPr
                       children: [
                         Expanded(
                           child: Text(
-                            item.name,
+                            l(item.name),
                             style: TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: 13,
@@ -384,7 +384,7 @@ class _CollectionScreenState extends State<CollectionScreen> with SingleTickerPr
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            item.isUnlocked ? 'OWNED' : 'LOCKED',
+                            item.isUnlocked ? l('shop_owned') : l('locked').toUpperCase(),
                             style: TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: 7.5,
@@ -397,7 +397,7 @@ class _CollectionScreenState extends State<CollectionScreen> with SingleTickerPr
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      item.description,
+                      l(item.description),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -457,7 +457,7 @@ class _CollectionScreenState extends State<CollectionScreen> with SingleTickerPr
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      item.name,
+                      l(item.name),
                       style: const TextStyle(
                         fontFamily: 'Fredoka',
                         fontSize: 12.5,
@@ -485,7 +485,7 @@ class _CollectionScreenState extends State<CollectionScreen> with SingleTickerPr
                           ],
                         ),
                         CustomButton(
-                          text: item.isPurchased ? 'OWNED' : 'BUY',
+                          text: item.isPurchased ? l('shop_owned') : l('shop_buy'),
                           backgroundColor: item.isPurchased ? ColorSystem.cream : ColorSystem.purple,
                           textColor: item.isPurchased ? ColorSystem.plum : Colors.white,
                           width: 76,

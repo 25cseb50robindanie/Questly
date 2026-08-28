@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/theme/color_system.dart';
+import '../services/localization_service.dart';
 
 class ModuleCard extends StatelessWidget {
   final String subject;
@@ -65,7 +66,7 @@ class ModuleCard extends StatelessWidget {
                 border: Border.all(color: ColorSystem.plum.withOpacity(0.15), width: 1),
               ),
               child: Text(
-                subject.toUpperCase(),
+                l(subject).toUpperCase(),
                 style: const TextStyle(
                   fontFamily: 'Fredoka',
                   fontSize: 9,
@@ -79,7 +80,7 @@ class ModuleCard extends StatelessWidget {
             // Title
             Expanded(
               child: Text(
-                title,
+                l(title),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(

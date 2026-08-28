@@ -53,7 +53,7 @@ class RevisionCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            topicName,
+            l(topicName),
             style: const TextStyle(
               fontFamily: 'Fredoka',
               fontSize: 16,

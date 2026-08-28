@@ -139,7 +139,7 @@ class CurrentLearningCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  module!.title,
+                  l(module!.title),
                   style: const TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 20,
@@ -150,7 +150,7 @@ class CurrentLearningCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   lesson != null
-                      ? 'Level ${lesson!.order} • ${l('lesson_progress', args: {
+                      ? '${l('level')} ${lesson!.order} • ${l('lesson_progress', args: {
                           'current': '${completedCount + 1}',
                           'total': '$totalCount'
                         })}'

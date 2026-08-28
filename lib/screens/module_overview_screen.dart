@@ -81,7 +81,7 @@ class ModuleOverviewScreen extends StatelessWidget {
                         border: Border.all(color: ColorSystem.plum.withOpacity(0.15), width: 1),
                       ),
                       child: Text(
-                        module.subject.toUpperCase(),
+                        l(module.subject).toUpperCase(),
                         style: const TextStyle(
                           fontFamily: 'Fredoka',
                           fontSize: 10,
@@ -119,7 +119,7 @@ class ModuleOverviewScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    module.title,
+                                    l(module.title),
                                     style: const TextStyle(
                                       fontFamily: 'Fredoka',
                                       fontSize: 24,
@@ -129,7 +129,7 @@ class ModuleOverviewScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
-                                    module.description,
+                                    l(module.description),
                                     style: TextStyle(
                                       fontFamily: 'Fredoka',
                                       fontSize: 13,
@@ -142,11 +142,11 @@ class ModuleOverviewScreen extends StatelessWidget {
                               // Specs row
                               Row(
                                 children: [
-                                  _buildSpecItem(Icons.playlist_add_check_rounded, '$completedCount / $lessonsCount Lessons'),
+                                  _buildSpecItem(Icons.playlist_add_check_rounded, '$completedCount / $lessonsCount ${l('lessons')}'),
                                   const SizedBox(width: 24),
                                   _buildSpecItem(Icons.schedule_rounded, '${module.levels.length * 15} Mins Est.'),
                                   const SizedBox(width: 24),
-                                  _buildSpecItem(Icons.layers_outlined, '${module.levels.length} Levels'),
+                                  _buildSpecItem(Icons.layers_outlined, '${module.levels.length} ${l('levels')}'),
                                 ],
                               ),
                               // Learning objectives outline
@@ -154,7 +154,7 @@ class ModuleOverviewScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'OBJECTIVES:',
+                                    l('OBJECTIVES:'),
                                     style: TextStyle(
                                       fontFamily: 'Fredoka',
                                       fontSize: 10,
@@ -165,7 +165,7 @@ class ModuleOverviewScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '• Gain experimental understanding of physics basics.\n• Complete simulation problems in physical science laboratory setups.\n• Collect academic badges and rewards upon milestone achievements.',
+                                    l('• Gain experimental understanding of physics basics.\n• Complete simulation problems in physical science laboratory setups.\n• Collect academic badges and rewards upon milestone achievements.'),
                                     style: TextStyle(
                                       fontFamily: 'Fredoka',
                                       fontSize: 11,
