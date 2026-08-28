@@ -7,6 +7,7 @@ import '../models/activity.dart';
 import '../models/progress.dart';
 import '../models/student.dart';
 import '../services/sound_service.dart';
+import '../services/localization_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/dendy_mascot.dart';
 import '../widgets/dendy_speak_button.dart';
@@ -383,7 +384,7 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            mission['instruction'] as String,
+                            l(mission['instruction'] as String),
                             style: TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: isShort ? 10 : 11,
@@ -395,7 +396,7 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen> {
                         ),
                         const SizedBox(width: 6),
                         DendySpeakButton(
-                          textToSpeak: mission['instruction'] as String,
+                          textToSpeak: l(mission['instruction'] as String),
                           size: 24,
                         ),
                       ],
@@ -419,7 +420,7 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen> {
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            mission['hint'] as String,
+                            l(mission['hint'] as String),
                             style: TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: isShort ? 9.5 : 10.5,
@@ -440,7 +441,7 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen> {
 
           // Next Step / Complete Button
           CustomButton(
-            text: mission['actionText'] as String,
+            text: l(mission['actionText'] as String),
             backgroundColor: _currentStep == _missions.length - 1 ? ColorSystem.green : ColorSystem.purple,
             textColor: Colors.white,
             height: isShort ? 34 : 40,

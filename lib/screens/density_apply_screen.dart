@@ -6,6 +6,7 @@ import '../models/activity.dart';
 import '../models/progress.dart';
 import '../models/student.dart';
 import '../services/sound_service.dart';
+import '../services/localization_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/dendy_mascot.dart';
 import '../widgets/dendy_speak_button.dart';
@@ -499,7 +500,7 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
                 children: [
                   // Title & Question
                   Text(
-                    scenario['title'] as String,
+                    l(scenario['title'] as String),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: isShort ? 14 : 17,
@@ -509,7 +510,7 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    scenario['question'] as String,
+                    l(scenario['question'] as String),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: isShort ? 11 : 12.5,
@@ -520,9 +521,9 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
                   ),
                   SizedBox(height: isShort ? 8 : 12),
 
-                  const Text(
-                    'CHOOSE THE SCIENTIFIC EXPLANATION:',
-                    style: TextStyle(
+                  Text(
+                    l('CHOOSE THE SCIENTIFIC EXPLANATION:'),
+                    style: const TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: 9.5,
                       fontWeight: FontWeight.w900,
@@ -543,7 +544,7 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
                   // Bottom Action Button
                   if (!_hasSubmittedAnswer)
                     CustomButton(
-                      text: 'CHECK MY PREDICTION',
+                      text: l('CHECK MY PREDICTION'),
                       backgroundColor: _selectedOptionIndex != null ? ColorSystem.purple : Colors.grey.shade400,
                       textColor: Colors.white,
                       height: isShort ? 36 : 42,
@@ -564,7 +565,7 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              scenario['keyInsight'] as String,
+                              l(scenario['keyInsight'] as String),
                               style: const TextStyle(
                                 fontFamily: 'Fredoka',
                                 fontSize: 10.5,
@@ -579,8 +580,8 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
                     const SizedBox(height: 8),
                     CustomButton(
                       text: _currentScenarioIndex < _scenarios.length - 1
-                          ? 'CONTINUE TO NEXT SCENARIO'
-                          : 'SEE LESSON SUMMARY',
+                          ? l('CONTINUE TO NEXT SCENARIO')
+                          : l('SEE LESSON SUMMARY'),
                       backgroundColor: ColorSystem.green,
                       textColor: Colors.white,
                       height: isShort ? 36 : 42,

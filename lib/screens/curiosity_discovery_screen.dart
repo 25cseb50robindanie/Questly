@@ -10,6 +10,7 @@ import '../widgets/dendy_speak_button.dart';
 import '../widgets/questly_background.dart';
 import '../widgets/vector_asset_helper.dart';
 import '../services/sound_service.dart';
+import '../services/localization_service.dart';
 
 enum PredictionChoice { float, sink }
 
@@ -323,7 +324,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'LEVEL 1 • DISCOVER DENSITY',
+                    l('LEVEL 1 • DISCOVER DENSITY'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: isShort ? 11 : 13,
@@ -333,7 +334,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                     ),
                   ),
                   Text(
-                    'LESSON 1 OF 5',
+                    l('LESSON 1 OF 5'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: isShort ? 9 : 10,
@@ -356,15 +357,15 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildStepIndicator(0, 'CURIOSITY', isCurrent: true, isCompleted: _stage == LessonStage.completed),
+                  _buildStepIndicator(0, l('CURIOSITY'), isCurrent: true, isCompleted: _stage == LessonStage.completed),
                   _buildStepDivider(),
-                  _buildStepIndicator(1, 'EXPERIMENT', isCurrent: false, isCompleted: false),
+                  _buildStepIndicator(1, l('EXPERIMENT'), isCurrent: false, isCompleted: false),
                   _buildStepDivider(),
-                  _buildStepIndicator(2, 'APPLY', isCurrent: false, isCompleted: false),
+                  _buildStepIndicator(2, l('APPLY'), isCurrent: false, isCompleted: false),
                   _buildStepDivider(),
-                  _buildStepIndicator(3, 'CHALLENGE', isCurrent: false, isCompleted: false),
+                  _buildStepIndicator(3, l('CHALLENGE'), isCurrent: false, isCompleted: false),
                   _buildStepDivider(),
-                  _buildStepIndicator(4, 'TEACH DENDY', isCurrent: false, isCompleted: false),
+                  _buildStepIndicator(4, l('TEACH DENDY'), isCurrent: false, isCompleted: false),
                 ],
               ),
             ),
@@ -472,9 +473,9 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                       color: ColorSystem.lavender.withOpacity(0.4),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Text(
-                      'DISCOVERY LAB • STEP 1',
-                      style: TextStyle(
+                    child: Text(
+                      l('DISCOVERY LAB • STEP 1'),
+                      style: const TextStyle(
                         fontFamily: 'Fredoka',
                         fontSize: 9.5,
                         fontWeight: FontWeight.w900,
@@ -485,7 +486,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   ),
                   SizedBox(height: isShort ? 6 : 10),
                   Text(
-                    'DISCOVER DENSITY',
+                    l('DISCOVER DENSITY'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: isShort ? 22 : 26,
@@ -495,7 +496,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '"Why do some objects float while others sink?"',
+                    l('"Why do some objects float while others sink?"'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: isShort ? 13 : 15,
@@ -506,7 +507,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   ),
                   SizedBox(height: isShort ? 6 : 10),
                   Text(
-                    'Before testing, predict what will happen when different materials are placed in water. Observe the physical results and notice what happens.',
+                    l('Before testing, predict what will happen when different materials are placed in water. Observe the physical results and notice what happens.'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: isShort ? 11 : 12.5,
@@ -518,7 +519,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   SizedBox(
                     width: 200,
                     child: CustomButton(
-                      text: 'START DISCOVERY',
+                      text: l('START DISCOVERY'),
                       backgroundColor: ColorSystem.purple,
                       textColor: Colors.white,
                       height: isShort ? 38 : 42,
@@ -542,7 +543,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
               child: Center(
                 child: DendyMascot(
                   state: DendyState.thinking,
-                  message: "Let's make a prediction before we test anything!",
+                  message: l("Let's make a prediction before we test anything!"),
                   size: isShort ? 75 : 90,
                 ),
               ),

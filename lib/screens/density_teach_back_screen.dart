@@ -402,9 +402,9 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
                             color: ColorSystem.lavender,
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text(
-                            'EXPLAIN IN YOUR OWN WORDS',
-                            style: TextStyle(
+                          child: Text(
+                            l('EXPLAIN IN YOUR OWN WORDS'),
+                            style: const TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: 9.5,
                               fontWeight: FontWeight.w900,
@@ -414,9 +414,9 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
                         ),
                         const SizedBox(height: 8),
 
-                        const Text(
-                          'Why do some objects float while others sink?',
-                          style: TextStyle(
+                        Text(
+                          l('Why do some objects float while others sink?'),
+                          style: const TextStyle(
                             fontFamily: 'Fredoka',
                             fontSize: 15,
                             fontWeight: FontWeight.w900,
@@ -426,7 +426,7 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Imagine explaining density to a friend who has never learned science before. Try to touch on these concepts:',
+                          l('Imagine explaining density to a friend who has never learned science before. Try to touch on these concepts:'),
                           style: TextStyle(
                             fontFamily: 'Fredoka',
                             fontSize: 11,
@@ -437,11 +437,11 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
                         const SizedBox(height: 10),
 
                         // Bullet prompts
-                        _buildPromptItem('What is density? (Mass packed inside volume)'),
+                        _buildPromptItem(l('What is density? (Mass packed inside volume)')),
                         const SizedBox(height: 6),
-                        _buildPromptItem('How do mass and volume affect whether an object floats?'),
+                        _buildPromptItem(l('How do mass and volume affect whether an object floats?')),
                         const SizedBox(height: 6),
-                        _buildPromptItem('How does an object\'s density compare to water (1.00 kg/L)?'),
+                        _buildPromptItem(l('How does an object\'s density compare to water (1.00 kg/L)?')),
                       ],
                     ),
                   ),

@@ -579,7 +579,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          node.description,
+                          l(node.description),
                           style: TextStyle(
                             fontFamily: 'Fredoka',
                             fontSize: 12,
@@ -592,8 +592,8 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
                     DendyMascot(
                       state: isLocked ? DendyState.confused : DendyState.idle,
                       message: isLocked
-                          ? 'This is currently locked! Resolve the prerequisites first.'
-                          : 'You are ready to proceed with this challenge!',
+                          ? l('This is currently locked! Resolve the prerequisites first.')
+                          : l('You are ready to proceed with this challenge!'),
                       size: 68,
                     ),
                   ],

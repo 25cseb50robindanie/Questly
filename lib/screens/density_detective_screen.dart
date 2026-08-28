@@ -6,6 +6,7 @@ import '../models/activity.dart';
 import '../models/progress.dart';
 import '../models/student.dart';
 import '../services/sound_service.dart';
+import '../services/localization_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/dendy_mascot.dart';
 import '../widgets/questly_background.dart';
@@ -573,9 +574,9 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                   color: ColorSystem.lavender,
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text(
-                  'MYSTERY INVESTIGATION',
-                  style: TextStyle(
+                child: Text(
+                  l('MYSTERY INVESTIGATION'),
+                  style: const TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 10,
                     fontWeight: FontWeight.w900,
@@ -586,9 +587,9 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
               ),
               const SizedBox(height: 10),
 
-              const Text(
-                'DENSITY DETECTIVE',
-                style: TextStyle(
+              Text(
+                l('DENSITY DETECTIVE'),
+                style: const TextStyle(
                   fontFamily: 'Fredoka',
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
@@ -599,7 +600,7 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
               const SizedBox(height: 6),
 
               Text(
-                'Three mystery objects have lost their laboratory labels. Can you deduce what they are using mass, volume, and floating evidence?',
+                l('Three mystery objects have lost their laboratory labels. Can you deduce what they are using mass, volume, and floating evidence?'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Fredoka',
@@ -621,13 +622,13 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                 child: DendyMascot(
                   size: isShort ? 44 : 50,
                   state: DendyState.thinking,
-                  message: 'Use the clues carefully! A good detective does not guess — they look at mass, volume, and buoyancy evidence.',
+                  message: l('Use the clues carefully! A good detective does not guess — they look at mass, volume, and buoyancy evidence.'),
                 ),
               ),
               SizedBox(height: isShort ? 14 : 20),
 
               CustomButton(
-                text: 'START INVESTIGATION',
+                text: l('START INVESTIGATION'),
                 backgroundColor: ColorSystem.purple,
                 textColor: Colors.white,
                 height: 42,
