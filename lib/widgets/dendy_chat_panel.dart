@@ -128,7 +128,9 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
 
     try {
       final lang = LocalizationService.currentLanguage;
-      final langCode = lang == 'ta' ? 'ta-IN' : (lang == 'hi' ? 'hi-IN' : 'en-US');
+      final langCode = lang == 'ta'
+          ? 'ta-IN'
+          : (lang == 'hi' ? 'hi-IN' : (lang == 'or' ? 'or-IN' : 'en-US'));
 
       final recognition = SpeechRecognitionHelper.create();
       if (recognition != null) {

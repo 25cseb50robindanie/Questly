@@ -137,11 +137,13 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
     }
   }
 
-  void _submitExplanation() {
+  TeachBackEvaluation? _evaluation;
+  bool _isEvaluating = false;
+
+  Future<void> _submitExplanation() async {
     final text = _isManualTyping ? _textController.text.trim() : _transcribedText.trim();
     if (text.isEmpty) return;
 
-    SoundService.playSuccess();
     if (_isListening) {
       try {
         _speechRecognition?.stop();
@@ -150,8 +152,24 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
     }
 
     setState(() {
-      _stage = _TeachBackStage.mastery;
+      _isEvaluating = true;
     });
+
+    final eval = await Locator.whisperVoiceService.evaluateTeachBack(
+      moduleId: 'mod_density',
+      transcript: text,
+      language: LocalizationService.currentLanguage,
+      topicTitle: 'Density & Buoyancy',
+    );
+
+    if (mounted) {
+      setState(() {
+        _evaluation = eval;
+        _isEvaluating = false;
+        _stage = _TeachBackStage.mastery;
+      });
+      SoundService.playSuccess();
+    }
   }
 
   Future<void> _completeLevel1Mastery() async {
@@ -531,11 +549,11 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
 
                 // Action Buttons
                 CustomButton(
-                  text: 'SUBMIT EXPLANATION',
-                  backgroundColor: hasContent ? ColorSystem.green : Colors.grey.shade400,
+                  text: _isEvaluating ? 'EVALUATING WITH WHISPER AI...' : 'SUBMIT EXPLANATION',
+                  backgroundColor: hasContent && !_isEvaluating ? ColorSystem.green : Colors.grey.shade400,
                   textColor: Colors.white,
                   height: isShort ? 36 : 42,
-                  onPressed: hasContent ? _submitExplanation : () {},
+                  onPressed: hasContent && !_isEvaluating ? _submitExplanation : () {},
                 ),
               ],
             ),
@@ -732,31 +750,56 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: ColorSystem.gold.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: ColorSystem.gold, width: 1.2),
-                  ),
-                  child: const Text(
-                    'LEVEL 1 COMPLETE',
-                    style: TextStyle(
-                      fontFamily: 'Fredoka',
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      color: ColorSystem.plum,
-                      letterSpacing: 0.5,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: ColorSystem.gold.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: ColorSystem.gold, width: 1.2),
+                      ),
+                      child: const Text(
+                        'LEVEL 1 COMPLETE',
+                        style: TextStyle(
+                          fontFamily: 'Fredoka',
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: ColorSystem.plum,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
                     ),
-                  ),
+                    if (_evaluation != null) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: ColorSystem.green.withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: ColorSystem.green, width: 1.2),
+                        ),
+                        child: Text(
+                          'SCORE: ${_evaluation!.masteryScore}%',
+                          style: const TextStyle(
+                            fontFamily: 'Fredoka',
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            color: ColorSystem.green,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 8),
 
-                const Text(
-                  'DENSITY MASTERED',
-                  style: TextStyle(
+                Text(
+                  _evaluation?.feedbackTitle ?? 'DENSITY MASTERED',
+                  style: const TextStyle(
                     fontFamily: 'Fredoka',
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.w900,
                     color: ColorSystem.purple,
                     letterSpacing: 0.5,
@@ -764,7 +807,7 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Great job explaining density in your own words! You completed all 5 steps of Level 1.',
+                  _evaluation?.feedbackBody ?? 'Great job explaining density in your own words! You completed all 5 steps of Level 1.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Fredoka',
@@ -805,8 +848,8 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
                   ),
                   child: DendyMascot(
                     size: isShort ? 40 : 46,
-                    state: DendyState.success,
-                    message: 'You understand density deeply! Level 2: Float or Sink is now unlocked on your Roadmap.',
+                    state: _evaluation?.dendyMood == 'thinking' ? DendyState.thinking : DendyState.success,
+                    message: _evaluation?.feedbackBody ?? 'You understand density deeply! Level 2: Float or Sink is now unlocked on your Roadmap.',
                   ),
                 ),
                 const SizedBox(height: 14),
