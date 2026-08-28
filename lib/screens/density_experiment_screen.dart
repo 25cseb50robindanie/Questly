@@ -272,18 +272,15 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
 
       if (!mounted) return;
 
-      await showDialog(
+      await QuestCompletionDialog.show(
         context: context,
-        barrierDismissible: false,
-        builder: (ctx) => QuestCompletionDialog(
-          lessonTitle: l('lesson_2_measure_density'),
-          earnedXp: 60,
-          earnedCoins: 15,
-          onContinue: () {
-            Navigator.pop(ctx);
-            Navigator.pop(context);
-          },
-        ),
+        title: l('lesson_2_measure_density'),
+        xpReward: 60,
+        goldReward: 15,
+        earnedStars: 3,
+        onContinue: () {
+          Navigator.pop(context); // Return to overview / roadmap
+        },
       );
     } else {
       Navigator.pop(context);
@@ -389,13 +386,13 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
           Row(
             children: [
               ResourceCounter(
-                type: ResourceType.gold,
-                count: _student?.gold ?? 0,
+                iconWidget: VectorAssetHelper.questCoinIcon(size: 16),
+                value: '${_student?.gold ?? 0}',
               ),
               const SizedBox(width: 10),
               ResourceCounter(
-                type: ResourceType.xp,
-                count: _student?.xp ?? 0,
+                iconWidget: VectorAssetHelper.xpStarIcon(size: 16),
+                value: '${_student?.xp ?? 0} XP',
               ),
             ],
           ),

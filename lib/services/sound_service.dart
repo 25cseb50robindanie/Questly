@@ -31,8 +31,13 @@ class SoundService {
     AudioHelper.playSound('audio/47313572-ui-pop-sound-316482.mp3');
   }
 
-  // 4. Level Up Fanfare (cartoon_music-correct-game-show-alert-499485.mp3)
+  // 4. Level Up & Correct Answer Fanfare (cartoon_music-correct-game-show-alert-499485.mp3)
   static Future<void> playLevelUp() async {
+    if (!soundEnabled) return;
+    AudioHelper.playSound('audio/cartoon_music-correct-game-show-alert-499485.mp3');
+  }
+
+  static Future<void> playCorrect() async {
     if (!soundEnabled) return;
     AudioHelper.playSound('audio/cartoon_music-correct-game-show-alert-499485.mp3');
   }
