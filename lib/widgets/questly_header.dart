@@ -6,6 +6,7 @@ import '../services/localization_service.dart';
 import 'xp_progress_bar.dart';
 import 'resource_counter.dart';
 import 'vector_asset_helper.dart';
+import 'avatar_badge.dart';
 
 class QuestlyHeader extends StatelessWidget {
   final Student student;
@@ -144,12 +145,14 @@ class QuestlyHeader extends StatelessWidget {
                   ),
                   const SizedBox(width: 14),
 
-                  // Profile Avatar trigger
-                  IconButton(
-                    icon: const Icon(Icons.account_circle_outlined, color: ColorSystem.plum, size: 24),
-                    onPressed: onProfilePressed,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+                  // Profile Avatar trigger (equipped avatar badge)
+                  GestureDetector(
+                    onTap: onProfilePressed,
+                    child: AvatarBadge(
+                      avatarId: currentStudent.equippedAvatarId,
+                      size: 28,
+                      showRarityBorder: true,
+                    ),
                   ),
                   const SizedBox(width: 14),
 

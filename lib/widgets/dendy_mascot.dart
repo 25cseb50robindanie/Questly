@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../core/locator.dart';
 import '../core/theme/color_system.dart';
 import 'dendy_speak_button.dart';
 
@@ -24,6 +25,7 @@ class DendyMascot extends StatefulWidget {
   final DendyMood? mood;
   final String? message;
   final double size;
+  final String? skinId;
 
   const DendyMascot({
     Key? key,
@@ -31,6 +33,7 @@ class DendyMascot extends StatefulWidget {
     this.mood,
     this.message,
     this.size = 90.0,
+    this.skinId,
   }) : super(key: key);
 
   @override
@@ -81,6 +84,10 @@ class _DendyMascotState extends State<DendyMascot> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final effectiveSkin = widget.skinId ??
+        Locator.studentRepository.getCurrentStudent()?.equippedDendySkinId ??
+        'dendy_classic';
+
     return AnimatedBuilder(
       animation: _bobAnimation,
       builder: (context, child) {
@@ -95,7 +102,10 @@ class _DendyMascotState extends State<DendyMascot> with SingleTickerProviderStat
                 width: widget.size,
                 height: widget.size,
                 child: CustomPaint(
-                  painter: _DendyPainter(state: _effectiveState),
+                  painter: _DendyPainter(
+                    state: _effectiveState,
+                    skinId: effectiveSkin,
+                  ),
                 ),
               ),
               // Speech Bubble
@@ -165,8 +175,12 @@ class _DendyMascotState extends State<DendyMascot> with SingleTickerProviderStat
 
 class _DendyPainter extends CustomPainter {
   final DendyState state;
+  final String skinId;
 
-  _DendyPainter({required this.state});
+  _DendyPainter({
+    required this.state,
+    this.skinId = 'dendy_classic',
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -269,38 +283,68 @@ class _DendyPainter extends CustomPainter {
       ..strokeWidth = strokeW
       ..strokeCap = StrokeCap.round;
     
-    final wavePath = Path()
+    final muzzleBoundaryPath = Path()
       ..moveTo(centerX - headWidth * 0.43, centerY + headHeight * 0.1)
       ..quadraticBezierTo(centerX - headWidth * 0.22, centerY - headHeight * 0.05, centerX, centerY + headHeight * 0.08)
       ..quadraticBezierTo(centerX + headWidth * 0.22, centerY - headHeight * 0.05, centerX + headWidth * 0.43, centerY + headHeight * 0.1);
-    canvas.drawPath(wavePath, muzzleBorderPaint);
+    canvas.drawPath(muzzleBoundaryPath, muzzleBorderPaint);
+
     canvas.drawPath(headPath, borderPaint);
 
-    // 5. Forehead Glossy Shine Highlight (on top right forehead)
+    // 5. White Glossy Forehead Highlight
     canvas.save();
-    canvas.translate(centerX + headWidth * 0.14, centerY - headHeight * 0.32);
-    canvas.rotate(-math.pi / 7);
+    canvas.translate(centerX + headWidth * 0.15, centerY - headHeight * 0.28);
+    canvas.rotate(-math.pi / 6);
     canvas.drawOval(
-      Rect.fromCenter(center: Offset.zero, width: headWidth * 0.14, height: headHeight * 0.07),
-      whiteHighlightPaint..color = Colors.white.withOpacity(0.48),
+      Rect.fromCenter(
+        center: Offset.zero,
+        width: headWidth * 0.14,
+        height: headHeight * 0.08,
+      ),
+      whiteHighlightPaint..color = Colors.white.withOpacity(0.55),
     );
     canvas.restore();
 
-    // 6. Blush Cheeks (Rosy gold/pink ovals on cheeks)
+    // 6. Blush Cheeks (Rosy peach ovals on cheek fur)
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(centerX - headWidth * 0.30, centerY + headHeight * 0.14), width: headWidth * 0.14, height: headHeight * 0.06),
+      Rect.fromCenter(
+        center: Offset(centerX - headWidth * 0.35, centerY + headHeight * 0.14),
+        width: headWidth * 0.14,
+        height: headHeight * 0.08,
+      ),
       blushPaint,
     );
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(centerX + headWidth * 0.30, centerY + headHeight * 0.14), width: headWidth * 0.14, height: headHeight * 0.06),
+      Rect.fromCenter(
+        center: Offset(centerX + headWidth * 0.35, centerY + headHeight * 0.14),
+        width: headWidth * 0.14,
+        height: headHeight * 0.08,
+      ),
       blushPaint,
     );
 
-    // 7. Eyes (Huge, round, shiny black eyes with white circular highlight sparkles)
+    // 7. Cute Black Button Nose
+    final double noseY = centerY + headHeight * 0.12;
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(centerX, noseY),
+        width: headWidth * 0.10,
+        height: headHeight * 0.065,
+      ),
+      plumPaint,
+    );
+    // Nose highlight speck
+    canvas.drawCircle(
+      Offset(centerX - headWidth * 0.02, noseY - headHeight * 0.015),
+      headWidth * 0.018,
+      whiteHighlightPaint..color = Colors.white.withOpacity(0.85),
+    );
+
+    // 8. Eyes & Expression
     final double eyeY = centerY - headHeight * 0.02;
-    final double leftEyeX = centerX - headWidth * 0.22;
-    final double rightEyeX = centerX + headWidth * 0.22;
-    final double eyeRadius = headWidth * 0.105;
+    final double leftEyeX = centerX - headWidth * 0.20;
+    final double rightEyeX = centerX + headWidth * 0.20;
+    final double eyeRadius = headWidth * 0.085;
 
     switch (state) {
       case DendyState.idle:
@@ -309,8 +353,8 @@ class _DendyPainter extends CustomPainter {
         canvas.drawCircle(Offset(leftEyeX, eyeY), eyeRadius, plumPaint);
         canvas.drawCircle(Offset(rightEyeX, eyeY), eyeRadius, plumPaint);
         // Double sparkles
-        final sparkleL = (eyeRadius * 0.32).clamp(1.5, 3.5);
-        final sparkleS = (eyeRadius * 0.16).clamp(0.8, 1.8);
+        final sparkleL = (eyeRadius * 0.38).clamp(1.5, 4.0);
+        final sparkleS = (eyeRadius * 0.2).clamp(0.8, 2.2);
         canvas.drawCircle(Offset(leftEyeX - eyeRadius * 0.3, eyeY - eyeRadius * 0.3), sparkleL, whiteHighlightPaint..color = Colors.white);
         canvas.drawCircle(Offset(leftEyeX + eyeRadius * 0.3, eyeY + eyeRadius * 0.3), sparkleS, whiteHighlightPaint);
         canvas.drawCircle(Offset(rightEyeX - eyeRadius * 0.3, eyeY - eyeRadius * 0.3), sparkleL, whiteHighlightPaint);
@@ -367,14 +411,6 @@ class _DendyPainter extends CustomPainter {
         break;
     }
 
-    // 8. Dark Nose (cute oval shape placed right on the center wave)
-    final double noseX = centerX;
-    final double noseY = centerY + headHeight * 0.08;
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(noseX, noseY), width: headWidth * 0.14, height: headHeight * 0.14),
-      plumPaint,
-    );
-
     // 9. Happy Chibi Smile Mouth
     final mouthPaint = Paint()
       ..color = ColorSystem.plum
@@ -401,6 +437,102 @@ class _DendyPainter extends CustomPainter {
         ..quadraticBezierTo(centerX + headWidth * 0.035, mouthY + headHeight * 0.08, centerX + headWidth * 0.07, mouthY + headHeight * 0.02);
       canvas.drawPath(pathL, mouthPaint);
       canvas.drawPath(pathR, mouthPaint);
+    }
+
+    // 10. Cosmetic Skin Accessories
+    _drawSkinAccessories(canvas, centerX, centerY, headWidth, headHeight, strokeW);
+  }
+
+  void _drawSkinAccessories(Canvas canvas, double cx, double cy, double hw, double hh, double strokeW) {
+    final plumBorder = Paint()
+      ..color = ColorSystem.plum
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeW
+      ..strokeCap = StrokeCap.round;
+
+    switch (skinId) {
+      case 'dendy_explorer':
+        // Explorer Pith Safari Hat on head
+        final hatPath = Path()
+          ..moveTo(cx - hw * 0.38, cy - hh * 0.38)
+          ..quadraticBezierTo(cx, cy - hh * 0.44, cx + hw * 0.38, cy - hh * 0.38)
+          ..lineTo(cx + hw * 0.32, cy - hh * 0.58)
+          ..quadraticBezierTo(cx, cy - hh * 0.72, cx - hw * 0.32, cy - hh * 0.58)
+          ..close();
+        canvas.drawPath(hatPath, Paint()..color = const Color(0xFFD4A373));
+        // Leather band
+        final bandPath = Path()
+          ..moveTo(cx - hw * 0.35, cy - hh * 0.42)
+          ..quadraticBezierTo(cx, cy - hh * 0.46, cx + hw * 0.35, cy - hh * 0.42)
+          ..lineTo(cx + hw * 0.34, cy - hh * 0.47)
+          ..quadraticBezierTo(cx, cy - hh * 0.51, cx - hw * 0.34, cy - hh * 0.47)
+          ..close();
+        canvas.drawPath(bandPath, Paint()..color = const Color(0xFF7F4F24));
+        canvas.drawPath(hatPath, plumBorder);
+        // Golden compass badge
+        canvas.drawCircle(Offset(cx, cy - hh * 0.52), hw * 0.05, Paint()..color = const Color(0xFFF59E0B));
+        canvas.drawCircle(Offset(cx, cy - hh * 0.52), hw * 0.02, Paint()..color = Colors.white);
+        break;
+
+      case 'dendy_scientist':
+        // Cyan science safety goggles resting across forehead
+        final goggleRectL = Rect.fromCenter(center: Offset(cx - hw * 0.18, cy - hh * 0.32), width: hw * 0.24, height: hh * 0.22);
+        final goggleRectR = Rect.fromCenter(center: Offset(cx + hw * 0.18, cy - hh * 0.32), width: hw * 0.24, height: hh * 0.22);
+        final lensPaint = Paint()..color = const Color(0xFF38BDF8).withValues(alpha: 0.85);
+        canvas.drawOval(goggleRectL, lensPaint);
+        canvas.drawOval(goggleRectR, lensPaint);
+        canvas.drawOval(goggleRectL, plumBorder);
+        canvas.drawOval(goggleRectR, plumBorder);
+        // Bridge strap
+        canvas.drawLine(Offset(cx - hw * 0.06, cy - hh * 0.32), Offset(cx + hw * 0.06, cy - hh * 0.32), plumBorder);
+        // Mini beaker icon badge
+        canvas.drawCircle(Offset(cx + hw * 0.32, cy + hh * 0.3), hw * 0.06, Paint()..color = const Color(0xFF10B981));
+        break;
+
+      case 'dendy_space':
+        // Cosmic Star Antenna and floating stardust aura
+        canvas.drawLine(Offset(cx, cy - hh * 0.44), Offset(cx, cy - hh * 0.72), plumBorder);
+        canvas.drawCircle(Offset(cx, cy - hh * 0.75), hw * 0.07, Paint()..color = const Color(0xFF06B6D4));
+        canvas.drawCircle(Offset(cx, cy - hh * 0.75), hw * 0.03, Paint()..color = Colors.white);
+        // Floating sparkles
+        final sparklePaint = Paint()..color = const Color(0xFFFBBF24);
+        canvas.drawCircle(Offset(cx - hw * 0.42, cy - hh * 0.4), hw * 0.03, sparklePaint);
+        canvas.drawCircle(Offset(cx + hw * 0.42, cy - hh * 0.4), hw * 0.03, sparklePaint);
+        break;
+
+      case 'dendy_astronaut':
+        // Space Bubble Halo Visor
+        final domePaint = Paint()
+          ..color = const Color(0xFF0284C7).withValues(alpha: 0.18)
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(Offset(cx, cy - hh * 0.05), hw * 0.58, domePaint);
+        final domeRim = Paint()
+          ..color = const Color(0xFF38BDF8)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeW * 1.2;
+        canvas.drawCircle(Offset(cx, cy - hh * 0.05), hw * 0.58, domeRim);
+        // Star patch
+        canvas.drawCircle(Offset(cx - hw * 0.34, cy + hh * 0.34), hw * 0.05, Paint()..color = const Color(0xFFF59E0B));
+        break;
+
+      case 'dendy_wizard':
+        // Pointy Magic Wizard Hat with Crescent Moon
+        final hatPath = Path()
+          ..moveTo(cx - hw * 0.42, cy - hh * 0.36)
+          ..quadraticBezierTo(cx, cy - hh * 0.42, cx + hw * 0.42, cy - hh * 0.36)
+          ..quadraticBezierTo(cx + hw * 0.1, cy - hh * 0.8, cx + hw * 0.15, cy - hh * 0.95)
+          ..quadraticBezierTo(cx - hw * 0.1, cy - hh * 0.7, cx - hw * 0.42, cy - hh * 0.36)
+          ..close();
+        canvas.drawPath(hatPath, Paint()..color = const Color(0xFF312E81));
+        canvas.drawPath(hatPath, plumBorder);
+        // Gold Crescent Moon on Hat
+        canvas.drawCircle(Offset(cx - hw * 0.04, cy - hh * 0.55), hw * 0.06, Paint()..color = const Color(0xFFFBBF24));
+        canvas.drawCircle(Offset(cx - hw * 0.02, cy - hh * 0.56), hw * 0.048, Paint()..color = const Color(0xFF312E81));
+        break;
+
+      default:
+        // Classic Dendy — clean signature appearance
+        break;
     }
   }
 

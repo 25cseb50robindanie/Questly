@@ -83,6 +83,7 @@ flutter:
     - assets/simulations/fraction_module/
     - assets/simulations/fraction_module/assets/
     - assets/simulations/fraction_module/assets/fonts/
+    - assets/simulations/fraction_module/assets/images/
     - assets/simulations/fraction_module/css/
     - assets/simulations/fraction_module/js/
     - assets/simulations/fraction_module/js/data/

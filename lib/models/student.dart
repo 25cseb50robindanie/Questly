@@ -4,9 +4,13 @@ class Student {
   final int level;
   final int xp;
   final int gold; // acts as Quest Coins
-  final String language; // 'en', 'ta', 'hi'
+  final String language; // 'en', 'ta', 'hi', 'or'
   final String? currentModuleId;
   final String? currentLessonId;
+  final String equippedAvatarId;
+  final String equippedDendySkinId;
+  final String equippedThemeId;
+  final int longestStreak;
 
   Student({
     required this.questlyId,
@@ -17,6 +21,10 @@ class Student {
     this.language = 'en',
     this.currentModuleId,
     this.currentLessonId,
+    this.equippedAvatarId = 'avatar_fox',
+    this.equippedDendySkinId = 'dendy_classic',
+    this.equippedThemeId = 'theme_classic',
+    this.longestStreak = 1,
   });
 
   Map<String, dynamic> toJson() => {
@@ -28,6 +36,10 @@ class Student {
         'language': language,
         'currentModuleId': currentModuleId,
         'currentLessonId': currentLessonId,
+        'equippedAvatarId': equippedAvatarId,
+        'equippedDendySkinId': equippedDendySkinId,
+        'equippedThemeId': equippedThemeId,
+        'longestStreak': longestStreak,
       };
 
   factory Student.fromJson(Map<String, dynamic> json) => Student(
@@ -39,6 +51,10 @@ class Student {
         language: json['language'] as String? ?? 'en',
         currentModuleId: json['currentModuleId'] as String?,
         currentLessonId: json['currentLessonId'] as String?,
+        equippedAvatarId: json['equippedAvatarId'] as String? ?? 'avatar_fox',
+        equippedDendySkinId: json['equippedDendySkinId'] as String? ?? 'dendy_classic',
+        equippedThemeId: json['equippedThemeId'] as String? ?? 'theme_classic',
+        longestStreak: json['longestStreak'] as int? ?? 1,
       );
 
   Student copyWith({
@@ -49,6 +65,10 @@ class Student {
     String? language,
     String? currentModuleId,
     String? currentLessonId,
+    String? equippedAvatarId,
+    String? equippedDendySkinId,
+    String? equippedThemeId,
+    int? longestStreak,
   }) {
     return Student(
       questlyId: questlyId,
@@ -59,6 +79,10 @@ class Student {
       language: language ?? this.language,
       currentModuleId: currentModuleId ?? this.currentModuleId,
       currentLessonId: currentLessonId ?? this.currentLessonId,
+      equippedAvatarId: equippedAvatarId ?? this.equippedAvatarId,
+      equippedDendySkinId: equippedDendySkinId ?? this.equippedDendySkinId,
+      equippedThemeId: equippedThemeId ?? this.equippedThemeId,
+      longestStreak: longestStreak ?? this.longestStreak,
     );
   }
 }

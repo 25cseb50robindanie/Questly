@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
+import '../core/theme/theme_manager.dart';
+import '../models/shop_item.dart';
 import '../models/student.dart';
 import '../services/localization_service.dart';
+import '../widgets/avatar_badge.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/dendy_mascot.dart';
 import '../widgets/vector_asset_helper.dart';
+import 'shop_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -31,217 +37,474 @@ class ProfileScreen extends StatelessWidget {
     return completedModules;
   }
 
+  int _getTotalModulesCount() {
+    return Locator.moduleRepository.getModules().length;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([Locator.studentRepository, Locator.collectionRepository]),
+      listenable: Listenable.merge([
+        Locator.studentRepository,
+        Locator.shopRepository,
+        Locator.collectionRepository,
+      ]),
       builder: (context, _) {
         final Student? student = Locator.studentRepository.getCurrentStudent();
         if (student == null) return const SizedBox();
 
         final completedModules = _getCompletedModulesCount(student.questlyId);
-        final badgesCount = Locator.collectionRepository.getUnlockedBadges(student.questlyId.toLowerCase()).length;
-        final collectiblesCount = Locator.collectionRepository.getCollectibles(student.questlyId.toLowerCase()).where((i) => i.isUnlocked).length;
+        final totalModules = _getTotalModulesCount();
+        final currentTheme = ThemeManager.getTheme(student.equippedThemeId);
+        final dendySkinItem = ShopCatalog.getItemById(student.equippedDendySkinId);
 
-        final double screenHeight = MediaQuery.of(context).size.height;
-        final bool isCompact = screenHeight < 360;
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 1. Top Profile Showcase Card
+                _buildProfileShowcaseCard(context, student, currentTheme, dendySkinItem),
 
-    // Avatar column child
-    final Widget avatarColumn = Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: isCompact ? 60 : 80,
-          height: isCompact ? 60 : 80,
-          decoration: BoxDecoration(
-            color: ColorSystem.lavender.withOpacity(0.3),
-            shape: BoxShape.circle,
-            border: Border.all(color: ColorSystem.plum, width: 2),
-          ),
-          child: Icon(
-            Icons.face_retouching_natural_rounded,
-            color: ColorSystem.purple,
-            size: isCompact ? 32 : 44,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          student.displayName,
-          style: const TextStyle(
-            fontFamily: 'Fredoka',
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: ColorSystem.plum,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          'ID: ${student.questlyId}',
-          style: TextStyle(
-            fontFamily: 'Fredoka',
-            fontSize: 10,
-            color: ColorSystem.plum.withOpacity(0.5),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            VectorAssetHelper.levelRankIcon(student.level, size: 22),
-            const SizedBox(width: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: ColorSystem.purple,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                'LEVEL ${student.level}',
-                style: const TextStyle(
-                  fontFamily: 'Fredoka',
-                  fontSize: 9,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+                const SizedBox(height: 14),
+
+                // 2. Progression & Statistics Grid
+                _buildStatsGrid(student, completedModules, totalModules, currentTheme),
+
+                const SizedBox(height: 14),
+
+                // 3. Equipped Cosmetics Summary & Quick Shop Access
+                _buildCosmeticsDeck(context, student, currentTheme, dendySkinItem),
+              ],
             ),
-          ],
-        ),
-      ],
+          ),
+        );
+      },
     );
+  }
 
-    // Stats grid child using Production Vector Assets
-    final Widget statsGrid = Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildProfileShowcaseCard(
+    BuildContext context,
+    Student student,
+    QuestlyThemeData theme,
+    ShopItem? dendySkinItem,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.borderColor, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: theme.borderColor.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Equipped Avatar Badge
+          AvatarBadge(
+            avatarId: student.equippedAvatarId,
+            size: 80,
+            showRarityBorder: true,
+            isEquipped: true,
+          ),
+          const SizedBox(width: 16),
+
+          // User Identity & Level
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  student.displayName,
+                  style: const TextStyle(
+                    fontFamily: 'Fredoka',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: ColorSystem.plum,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'ID: ${student.questlyId}',
+                  style: TextStyle(
+                    fontFamily: 'Fredoka',
+                    fontSize: 11,
+                    color: ColorSystem.plum.withValues(alpha: 0.55),
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Level Badge & XP Progress Pill
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: theme.primaryColor,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'LEVEL ${student.level}',
+                        style: const TextStyle(
+                          fontFamily: 'Fredoka',
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: ColorSystem.gold.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: ColorSystem.gold, width: 1),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          VectorAssetHelper.xpStarIcon(size: 12),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${student.xp} XP',
+                            style: const TextStyle(
+                              fontFamily: 'Fredoka',
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              color: ColorSystem.plum,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Customize Shortcut Button
+          IconButton(
+            icon: const Icon(Icons.shopping_bag_rounded, color: ColorSystem.purple, size: 26),
+            tooltip: l('shop'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (ctx) => Scaffold(
+                    appBar: AppBar(
+                      title: Text(l('shop_title'), style: const TextStyle(fontFamily: 'Fredoka', fontWeight: FontWeight.bold)),
+                      backgroundColor: theme.cardBackground,
+                      foregroundColor: ColorSystem.plum,
+                      elevation: 0,
+                    ),
+                    body: const ShopScreen(isStandalone: true),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsGrid(
+    Student student,
+    int completedModules,
+    int totalModules,
+    QuestlyThemeData theme,
+  ) {
+    return Row(
       children: [
-        Row(
-          children: [
-            _buildStatCard(l('TOTAL XP'), '${student.xp}', VectorAssetHelper.xpStarIcon(size: 16)),
-            const SizedBox(width: 8),
-            _buildStatCard(l('COINS'), '${student.gold}', VectorAssetHelper.questCoinIcon(size: 16)),
-          ],
+        // Coin Wallet
+        Expanded(
+          child: _buildMetricTile(
+            title: l('coins'),
+            value: '${student.gold}',
+            icon: VectorAssetHelper.questCoinIcon(size: 22),
+            accentColor: ColorSystem.gold,
+            theme: theme,
+          ),
         ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            _buildStatCard(l('COMPLETED'), '$completedModules ${l('modules')}', const Icon(Icons.check_circle_rounded, color: ColorSystem.green, size: 16)),
-            const SizedBox(width: 8),
-            _buildStatCard(l('BADGES'), '$badgesCount ${l('earned')}', VectorAssetHelper.badgeIcon('Explorer', size: 16)),
-          ],
+        const SizedBox(width: 10),
+
+        // Longest Streak
+        Expanded(
+          child: _buildMetricTile(
+            title: l('streak'),
+            value: '${student.longestStreak} ${l('days')}',
+            icon: const Icon(Icons.local_fire_department_rounded, color: Color(0xFFF97316), size: 22),
+            accentColor: const Color(0xFFF97316),
+            theme: theme,
+          ),
         ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            _buildStatCard(l('COLLECTIBLES'), '$collectiblesCount ${l('unlocked')}', VectorAssetHelper.collectibleIcon('diamond', size: 16)),
-            const SizedBox(width: 8),
-            _buildStatCard(l('OFFLINE SYNC'), l('ready'), const Icon(Icons.cloud_done_rounded, color: ColorSystem.purple, size: 16)),
-          ],
+        const SizedBox(width: 10),
+
+        // Modules Completed
+        Expanded(
+          child: _buildMetricTile(
+            title: l('completed'),
+            value: '$completedModules / $totalModules',
+            icon: const Icon(Icons.verified_rounded, color: ColorSystem.green, size: 22),
+            accentColor: ColorSystem.green,
+            theme: theme,
+          ),
         ),
       ],
     );
+  }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+  Widget _buildMetricTile({
+    required String title,
+    required String value,
+    required Widget icon,
+    required Color accentColor,
+    required QuestlyThemeData theme,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.borderColor, width: 1.8),
+        boxShadow: [
+          BoxShadow(
+            color: theme.borderColor.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              icon,
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           Text(
-            l('profile').toUpperCase(),
+            value,
             style: const TextStyle(
               fontFamily: 'Fredoka',
               fontSize: 14,
               fontWeight: FontWeight.w900,
-              color: ColorSystem.purple,
-              letterSpacing: 0.5,
+              color: ColorSystem.plum,
             ),
           ),
-          const SizedBox(height: 8),
-
-          // Main layout grid
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(isCompact ? 12 : 20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: ColorSystem.plum, width: 2),
-              ),
-              child: isCompact
-                  ? SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          avatarColumn,
-                          const SizedBox(height: 12),
-                          const Divider(color: ColorSystem.cream, thickness: 1.5),
-                          const SizedBox(height: 8),
-                          statsGrid,
-                        ],
-                      ),
-                    )
-                  : Row(
-                      children: [
-                        Expanded(
-                          flex: 8,
-                          child: avatarColumn,
-                        ),
-                        const VerticalDivider(width: 32, thickness: 1.5, color: ColorSystem.cream),
-                        Expanded(
-                          flex: 12,
-                          child: statsGrid,
-                        ),
-                      ],
-                    ),
+          const SizedBox(height: 2),
+          Text(
+            title.toUpperCase(),
+            style: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: 9.5,
+              fontWeight: FontWeight.bold,
+              color: ColorSystem.plum.withValues(alpha: 0.55),
+              letterSpacing: 0.4,
             ),
           ),
         ],
       ),
     );
-  },
-);
   }
 
-  Widget _buildStatCard(String label, String value, Widget iconWidget) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-        decoration: BoxDecoration(
-          color: ColorSystem.cream.withOpacity(0.4),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: ColorSystem.plum.withOpacity(0.15), width: 1),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                iconWidget,
-                const SizedBox(width: 4),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontFamily: 'Fredoka',
-                    fontSize: 8,
-                    fontWeight: FontWeight.bold,
-                    color: ColorSystem.plum.withOpacity(0.55),
+  Widget _buildCosmeticsDeck(
+    BuildContext context,
+    Student student,
+    QuestlyThemeData theme,
+    ShopItem? dendySkinItem,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.borderColor, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: theme.borderColor.withValues(alpha: 0.06),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l('equipped_cosmetics').toUpperCase(),
+                style: const TextStyle(
+                  fontFamily: 'Fredoka',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  color: ColorSystem.plum,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (ctx) => Scaffold(
+                        appBar: AppBar(
+                          title: Text(l('shop_title'), style: const TextStyle(fontFamily: 'Fredoka', fontWeight: FontWeight.bold)),
+                          backgroundColor: Colors.white,
+                          foregroundColor: ColorSystem.plum,
+                          elevation: 0,
+                        ),
+                        body: const ShopScreen(isStandalone: true),
+                      ),
+                    ),
+                  );
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      l('change_in_shop'),
+                      style: const TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: ColorSystem.purple,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.arrow_forward_ios_rounded, color: ColorSystem.purple, size: 10),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          Row(
+            children: [
+              // Equipped Dendy Skin Card
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: ColorSystem.lavender.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: theme.borderColor, width: 1.5),
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 44,
+                        height: 44,
+                        child: DendyMascot(
+                          size: 44,
+                          skinId: student.equippedDendySkinId,
+                          mood: DendyMood.happy,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l('equipped_dendy'),
+                              style: TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: 9,
+                                color: ColorSystem.plum.withValues(alpha: 0.6),
+                              ),
+                            ),
+                            Text(
+                              dendySkinItem != null ? l(dendySkinItem.nameKey) : l('dendy_classic'),
+                              style: const TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w900,
+                                color: ColorSystem.plum,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 3),
-            Text(
-              value,
-              style: const TextStyle(
-                fontFamily: 'Fredoka',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: ColorSystem.plum,
               ),
-            ),
-          ],
-        ),
+              const SizedBox(width: 10),
+
+              // Equipped Theme Card
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    gradient: theme.backgroundGradient,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: theme.borderColor, width: 1.5),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: theme.borderColor, width: 1.5),
+                        ),
+                        child: const Icon(Icons.palette_rounded, color: Colors.white, size: 16),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l('active_theme'),
+                              style: TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: 9,
+                                color: ColorSystem.plum.withValues(alpha: 0.6),
+                              ),
+                            ),
+                            Text(
+                              l(theme.nameKey),
+                              style: const TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w900,
+                                color: ColorSystem.plum,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
-

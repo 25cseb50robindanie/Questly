@@ -4,6 +4,7 @@ import '../services/student_repository.dart';
 import '../services/module_repository.dart';
 import '../services/progress_repository.dart';
 import '../services/collection_repository.dart';
+import '../services/shop_repository.dart';
 import '../services/notification_repository.dart';
 import '../services/localization_service.dart';
 import '../services/roadmap_repository.dart';
@@ -27,6 +28,7 @@ class Locator {
   static late final ModuleRepository moduleRepository;
   static late final ProgressRepository progressRepository;
   static late final CollectionRepository collectionRepository;
+  static late final ShopRepository shopRepository;
   static late final NotificationRepository notificationRepository;
   static late final AuthService authService;
   
@@ -59,6 +61,7 @@ class Locator {
     moduleRepository = ModuleRepository();
     progressRepository = ProgressRepository(storageService);
     collectionRepository = CollectionRepository(storageService);
+    shopRepository = ShopRepository(storageService, studentRepository);
     notificationRepository = NotificationRepository(storageService);
     
     // Instantiate progression services

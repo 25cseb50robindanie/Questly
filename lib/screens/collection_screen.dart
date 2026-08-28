@@ -4,6 +4,7 @@ import '../core/theme/color_system.dart';
 import '../models/student.dart';
 import '../models/collectible.dart';
 import '../models/reward.dart';
+import 'shop_screen.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/dendy_mascot.dart';
 import '../widgets/resource_counter.dart';
@@ -160,7 +161,7 @@ class _CollectionScreenState extends State<CollectionScreen> with SingleTickerPr
         final shopRewards = Locator.collectionRepository.getShopRewards(sId);
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -172,29 +173,29 @@ class _CollectionScreenState extends State<CollectionScreen> with SingleTickerPr
                     l('collection').toUpperCase(),
                     style: const TextStyle(
                       fontFamily: 'Fredoka',
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w900,
                       color: ColorSystem.purple,
                       letterSpacing: 0.5,
                     ),
                   ),
-                  // Current Coin Balance (Uses exact vector coin asset & live balance)
+                  // Current Coin Balance
                   ResourceCounter(
-                    iconWidget: VectorAssetHelper.questCoinIcon(size: 20),
+                    iconWidget: VectorAssetHelper.questCoinIcon(size: 16),
                     value: '${currentStudent.gold}',
-                    label: 'Coins Available',
+                    label: l('coins'),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 4),
 
               // Custom TabBar
               Container(
-                height: 38,
+                height: 30,
                 decoration: BoxDecoration(
-                  color: ColorSystem.lavender.withOpacity(0.2),
+                  color: ColorSystem.lavender.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: ColorSystem.plum, width: 1.5),
+                  border: Border.all(color: ColorSystem.plum, width: 1.2),
                 ),
                 child: TabBar(
                   controller: _tabController,
@@ -203,32 +204,33 @@ class _CollectionScreenState extends State<CollectionScreen> with SingleTickerPr
                     borderRadius: BorderRadius.circular(6),
                   ),
                   labelColor: Colors.white,
-                  unselectedLabelColor: ColorSystem.plum.withOpacity(0.7),
+                  unselectedLabelColor: ColorSystem.plum.withValues(alpha: 0.7),
+                  labelPadding: EdgeInsets.zero,
                   labelStyle: const TextStyle(
                     fontFamily: 'Fredoka',
-                    fontSize: 11,
+                    fontSize: 10.5,
                     fontWeight: FontWeight.bold,
                   ),
                   tabs: [
+                    Tab(text: l('shop').toUpperCase()),
                     Tab(text: l('badges').toUpperCase()),
                     Tab(text: l('collectibles').toUpperCase()),
-                    Tab(text: l('shop').toUpperCase()),
                   ],
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 6),
 
               // TabBar Views
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    // 1. Badges Grid
+                    // 1. Full Questly Shop with Avatars, Dendy Skins, and Themes
+                    const ShopScreen(isStandalone: false),
+                    // 2. Badges Grid
                     _buildBadgesGrid(allBadges, unlockedBadges),
-                    // 2. Collectibles Grid
+                    // 3. Collectibles Grid
                     _buildCollectiblesGrid(collectibles),
-                    // 3. Shop list
-                    _buildShopGrid(shopRewards),
                   ],
                 ),
               ),

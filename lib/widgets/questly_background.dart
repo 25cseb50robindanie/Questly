@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/theme/color_system.dart';
+import '../core/theme/theme_manager.dart';
 
 class QuestlyBackground extends StatelessWidget {
   final Widget child;
@@ -8,24 +9,35 @@ class QuestlyBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Abstract Geometric Vector Shapes Layer
-        Positioned.fill(
-          child: CustomPaint(
-            painter: _AbstractBackgroundPainter(),
+    final theme = ThemeManager.currentTheme();
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: theme.backgroundGradient,
+      ),
+      child: Stack(
+        children: [
+          // Abstract Geometric Vector Shapes Layer
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _AbstractBackgroundPainter(accentColor: theme.primaryColor),
+            ),
           ),
-        ),
-        // Child content layer on top
-        Positioned.fill(
-          child: child,
-        ),
-      ],
+          // Child content layer on top
+          Positioned.fill(
+            child: child,
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _AbstractBackgroundPainter extends CustomPainter {
+  final Color? accentColor;
+
+  _AbstractBackgroundPainter({this.accentColor});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..style = PaintingStyle.fill;

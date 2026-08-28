@@ -3,6 +3,7 @@ import '../core/locator.dart';
 import '../core/theme/color_system.dart';
 import '../models/leaderboard_entry.dart';
 import '../models/student.dart';
+import '../widgets/avatar_badge.dart';
 import '../widgets/questly_background.dart';
 import '../widgets/vector_asset_helper.dart';
 import '../services/localization_service.dart';
@@ -17,13 +18,13 @@ class LeaderboardScreen extends StatelessWidget {
 
   List<LeaderboardEntry> _getLeaderboardEntries(Student student) {
     return [
-      LeaderboardEntry(name: 'Ananya', xp: 1240),
-      LeaderboardEntry(name: 'Rahul', xp: 1180),
-      LeaderboardEntry(name: student.displayName, xp: student.xp, isMe: true),
-      LeaderboardEntry(name: 'Meena', xp: 990),
-      LeaderboardEntry(name: 'Arjun', xp: 920),
-      LeaderboardEntry(name: 'Priya', xp: 880),
-      LeaderboardEntry(name: 'Karthik', xp: 850),
+      LeaderboardEntry(name: 'Ananya', xp: 1240, avatarId: 'dragon'),
+      LeaderboardEntry(name: 'Rahul', xp: 1180, avatarId: 'wolf'),
+      LeaderboardEntry(name: student.displayName, xp: student.xp, isMe: true, avatarId: student.equippedAvatarId),
+      LeaderboardEntry(name: 'Meena', xp: 990, avatarId: 'cat'),
+      LeaderboardEntry(name: 'Arjun', xp: 920, avatarId: 'space_robot'),
+      LeaderboardEntry(name: 'Priya', xp: 880, avatarId: 'rabbit'),
+      LeaderboardEntry(name: 'Karthik', xp: 850, avatarId: 'panda'),
     ]..sort((a, b) => b.xp.compareTo(a.xp));
   }
 
@@ -117,6 +118,12 @@ class LeaderboardScreen extends StatelessWidget {
                               SizedBox(
                                 width: 32,
                                 child: Center(child: rankWidget),
+                              ),
+                              const SizedBox(width: 8),
+                              AvatarBadge(
+                                avatarId: entry.avatarId,
+                                size: 26,
+                                showRarityBorder: true,
                               ),
                               const SizedBox(width: 8),
                               Text(

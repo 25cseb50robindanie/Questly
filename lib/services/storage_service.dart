@@ -170,6 +170,16 @@ class StorageService {
     await _prefs.setStringList('questly_rewards_${studentId.toLowerCase()}', list);
   }
 
+  // Shop Owned Items list
+  List<String> getOwnedShopItemsRaw(String studentId) {
+    final list = _prefs.getStringList('questly_shop_owned_${studentId.toLowerCase()}');
+    return list ?? ['avatar_fox', 'dendy_classic', 'theme_classic'];
+  }
+
+  Future<void> saveOwnedShopItemsRaw(String studentId, List<String> list) async {
+    await _prefs.setStringList('questly_shop_owned_${studentId.toLowerCase()}', list);
+  }
+
   // Notifications
   List<dynamic> getNotificationsRaw(String studentId) {
     final raw = _prefs.getString('questly_notifications_${studentId.toLowerCase()}');
