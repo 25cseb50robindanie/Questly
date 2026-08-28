@@ -565,7 +565,7 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
     final isMaterialUnlocked = _currentMission == LabMission.mission3Compare || _currentMission == LabMission.discoveryComplete;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -578,242 +578,245 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Object Header with Density Live Badge
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: matInfo.primaryColor.withOpacity(0.25),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: matInfo.borderColor, width: 1.5),
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Object Header with Density Live Badge
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: matInfo.primaryColor.withOpacity(0.25),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: matInfo.borderColor, width: 1.5),
+                      ),
+                      child: Icon(matInfo.icon, size: 16, color: matInfo.borderColor),
                     ),
-                    child: Icon(matInfo.icon, size: 18, color: matInfo.borderColor),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _isCompareMode
-                            ? (isObjectA ? l('object_a') : l('object_b'))
-                            : l(matInfo.nameKey).toUpperCase(),
-                        style: const TextStyle(
-                          fontFamily: 'Fredoka',
-                          fontSize: 13,
-                          fontWeight: FontWeight.w900,
-                          color: ColorSystem.plum,
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _isCompareMode
+                              ? (isObjectA ? l('object_a') : l('object_b'))
+                              : l(matInfo.nameKey).toUpperCase(),
+                          style: const TextStyle(
+                            fontFamily: 'Fredoka',
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w900,
+                            color: ColorSystem.plum,
+                          ),
                         ),
-                      ),
-                      Text(
-                        l(matInfo.nameKey),
-                        style: TextStyle(
-                          fontFamily: 'Fredoka',
-                          fontSize: 10,
-                          color: ColorSystem.plum.withOpacity(0.6),
+                        Text(
+                          l(matInfo.nameKey),
+                          style: TextStyle(
+                            fontFamily: 'Fredoka',
+                            fontSize: 9.5,
+                            color: ColorSystem.plum.withOpacity(0.6),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                      ],
+                    ),
+                  ],
+                ),
 
-              // Live Density Metric
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: currentDensity < 1.0
-                      ? ColorSystem.green.withOpacity(0.15)
-                      : ColorSystem.pink.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: currentDensity < 1.0 ? ColorSystem.green : ColorSystem.pink,
-                    width: 1.2,
+                // Live Density Metric
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                  decoration: BoxDecoration(
+                    color: currentDensity < 1.0
+                        ? ColorSystem.green.withOpacity(0.15)
+                        : ColorSystem.pink.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: currentDensity < 1.0 ? ColorSystem.green : ColorSystem.pink,
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Text(
+                    '${currentDensity.toStringAsFixed(2)} kg/L (${currentDensity < 1.0 ? l('float').toUpperCase() : l('sink').toUpperCase()})',
+                    style: TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w900,
+                      color: currentDensity < 1.0 ? ColorSystem.green : ColorSystem.pink,
+                    ),
                   ),
                 ),
-                child: Text(
-                  '${currentDensity.toStringAsFixed(2)} kg/L (${currentDensity < 1.0 ? l('float').toUpperCase() : l('sink').toUpperCase()})',
+              ],
+            ),
+
+            const Divider(color: ColorSystem.cream, thickness: 1.5, height: 12),
+
+            // 1. Mass Slider (Mission 1+)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l('mass_kg'),
+                      style: const TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.bold,
+                        color: ColorSystem.plum,
+                      ),
+                    ),
+                    Text(
+                      '${currentMass.toStringAsFixed(1)} kg',
+                      style: const TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w900,
+                        color: ColorSystem.purple,
+                      ),
+                    ),
+                  ],
+                ),
+                SliderTheme(
+                  data: SliderThemeData(
+                    activeTrackColor: ColorSystem.purple,
+                    inactiveTrackColor: ColorSystem.purple.withOpacity(0.15),
+                    thumbColor: ColorSystem.purple,
+                    overlayColor: ColorSystem.purple.withOpacity(0.12),
+                    trackHeight: 5,
+                  ),
+                  child: Slider(
+                    value: currentMass,
+                    min: 1.0,
+                    max: 10.0,
+                    divisions: 18,
+                    onChanged: _onMassChanged,
+                  ),
+                ),
+              ],
+            ),
+
+            // 2. Volume Slider (Mission 2+)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l('volume_l'),
+                      style: TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.bold,
+                        color: isVolumeUnlocked ? ColorSystem.plum : Colors.grey,
+                      ),
+                    ),
+                    Text(
+                      '${currentVolume.toStringAsFixed(1)} L',
+                      style: TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w900,
+                        color: isVolumeUnlocked ? ColorSystem.blue : Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+                SliderTheme(
+                  data: SliderThemeData(
+                    activeTrackColor: isVolumeUnlocked ? ColorSystem.blue : Colors.grey.shade300,
+                    inactiveTrackColor: ColorSystem.blue.withOpacity(0.15),
+                    thumbColor: isVolumeUnlocked ? ColorSystem.blue : Colors.grey,
+                    overlayColor: ColorSystem.blue.withOpacity(0.12),
+                    trackHeight: 5,
+                  ),
+                  child: Slider(
+                    value: currentVolume,
+                    min: 1.0,
+                    max: 10.0,
+                    divisions: 18,
+                    onChanged: isVolumeUnlocked ? _onVolumeChanged : null,
+                  ),
+                ),
+              ],
+            ),
+
+            // 3. Material Selector (Mission 3+)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l('materials').toUpperCase(),
                   style: TextStyle(
                     fontFamily: 'Fredoka',
-                    fontSize: 11,
-                    fontWeight: FontWeight.w900,
-                    color: currentDensity < 1.0 ? ColorSystem.green : ColorSystem.pink,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.bold,
+                    color: isMaterialUnlocked ? ColorSystem.plum.withOpacity(0.6) : Colors.grey,
+                    letterSpacing: 0.5,
                   ),
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(height: 4),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: LabMaterial.values.map((mat) {
+                      final isSel = currentMat == mat;
+                      final info = kMaterialData[mat]!;
 
-          const Divider(color: ColorSystem.cream, thickness: 1.5, height: 16),
-
-          // 1. Mass Slider (Mission 1+)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    l('mass_kg'),
-                    style: const TextStyle(
-                      fontFamily: 'Fredoka',
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: ColorSystem.plum,
-                    ),
-                  ),
-                  Text(
-                    '${currentMass.toStringAsFixed(1)} kg',
-                    style: const TextStyle(
-                      fontFamily: 'Fredoka',
-                      fontSize: 13,
-                      fontWeight: FontWeight.w900,
-                      color: ColorSystem.purple,
-                    ),
-                  ),
-                ],
-              ),
-              SliderTheme(
-                data: SliderThemeData(
-                  activeTrackColor: ColorSystem.purple,
-                  inactiveTrackColor: ColorSystem.purple.withOpacity(0.15),
-                  thumbColor: ColorSystem.purple,
-                  overlayColor: ColorSystem.purple.withOpacity(0.12),
-                  trackHeight: 6,
-                ),
-                child: Slider(
-                  value: currentMass,
-                  min: 1.0,
-                  max: 10.0,
-                  divisions: 18,
-                  onChanged: _onMassChanged,
-                ),
-              ),
-            ],
-          ),
-
-          // 2. Volume Slider (Mission 2+)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    l('volume_l'),
-                    style: TextStyle(
-                      fontFamily: 'Fredoka',
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: isVolumeUnlocked ? ColorSystem.plum : Colors.grey,
-                    ),
-                  ),
-                  Text(
-                    '${currentVolume.toStringAsFixed(1)} L',
-                    style: TextStyle(
-                      fontFamily: 'Fredoka',
-                      fontSize: 13,
-                      fontWeight: FontWeight.w900,
-                      color: isVolumeUnlocked ? ColorSystem.blue : Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-              SliderTheme(
-                data: SliderThemeData(
-                  activeTrackColor: isVolumeUnlocked ? ColorSystem.blue : Colors.grey.shade300,
-                  inactiveTrackColor: ColorSystem.blue.withOpacity(0.15),
-                  thumbColor: isVolumeUnlocked ? ColorSystem.blue : Colors.grey,
-                  overlayColor: ColorSystem.blue.withOpacity(0.12),
-                  trackHeight: 6,
-                ),
-                child: Slider(
-                  value: currentVolume,
-                  min: 1.0,
-                  max: 10.0,
-                  divisions: 18,
-                  onChanged: isVolumeUnlocked ? _onVolumeChanged : null,
-                ),
-              ),
-            ],
-          ),
-
-          // 3. Material Selector (Mission 3+)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l('materials').toUpperCase(),
-                style: TextStyle(
-                  fontFamily: 'Fredoka',
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: isMaterialUnlocked ? ColorSystem.plum.withOpacity(0.6) : Colors.grey,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 6),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: LabMaterial.values.map((mat) {
-                    final isSel = currentMat == mat;
-                    final info = kMaterialData[mat]!;
-
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 6),
-                      child: GestureDetector(
-                        onTap: isMaterialUnlocked ? () => _onMaterialSelected(mat) : null,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: isSel ? info.primaryColor.withOpacity(0.3) : (isMaterialUnlocked ? Colors.grey.shade50 : Colors.grey.shade100),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: isSel ? info.borderColor : Colors.grey.shade300,
-                              width: isSel ? 1.5 : 1,
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: GestureDetector(
+                          onTap: isMaterialUnlocked ? () => _onMaterialSelected(mat) : null,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isSel ? info.primaryColor.withOpacity(0.3) : (isMaterialUnlocked ? Colors.grey.shade50 : Colors.grey.shade100),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: isSel ? info.borderColor : Colors.grey.shade300,
+                                width: isSel ? 1.5 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  info.icon,
+                                  size: 11,
+                                  color: isMaterialUnlocked ? info.borderColor : Colors.grey,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  l(info.nameKey),
+                                  style: TextStyle(
+                                    fontFamily: 'Fredoka',
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: isMaterialUnlocked
+                                        ? (isSel ? ColorSystem.plum : ColorSystem.plum.withOpacity(0.6))
+                                        : Colors.grey,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                info.icon,
-                                size: 12,
-                                color: isMaterialUnlocked ? info.borderColor : Colors.grey,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                l(info.nameKey),
-                                style: TextStyle(
-                                  fontFamily: 'Fredoka',
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: isMaterialUnlocked
-                                      ? (isSel ? ColorSystem.plum : ColorSystem.plum.withOpacity(0.6))
-                                      : Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
