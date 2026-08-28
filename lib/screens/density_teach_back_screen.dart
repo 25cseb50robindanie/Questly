@@ -1,5 +1,7 @@
 import 'dart:async';
 import '../services/speech_recognition_helper.dart';
+import '../services/whisper_voice_service.dart';
+import '../services/localization_service.dart';
 import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
