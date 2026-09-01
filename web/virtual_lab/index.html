@@ -261,10 +261,15 @@
             <span class="fb-icon">🧪</span>
             <span class="fb-text" id="expFeedbackText">Interact directly with the apparatus to conduct your experiment.</span>
           </div>
-          <button id="btnFinishExperiment" class="primary-btn" disabled>
-            <span>Analyze Results & View Report</span>
-            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
-          </button>
+          <div style="display: flex; gap: 8px;">
+            <button id="btnResetCurrentSim" class="secondary-btn" title="Reset and re-run this experiment step">
+              <span>🔄 Reset Apparatus</span>
+            </button>
+            <button id="btnFinishExperiment" class="primary-btn" disabled>
+              <span>Analyze Results & View Report</span>
+              <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -379,6 +384,23 @@
         <div class="modal-body" id="conceptModalBody"></div>
         <div class="modal-footer">
           <button class="primary-btn" onclick="closeConceptModal()">Got it! 👍</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= MODAL: OVER-TITRATION & MISCONCEPTION ADVISORY ================= -->
+    <div id="modalMisconceptionRetry" class="modal-backdrop">
+      <div class="modal-card" style="max-width: 520px; text-align: center; padding: 24px;">
+        <div id="misconceptionIcon" style="font-size: 44px; margin-bottom: 8px;">⚠️</div>
+        <span id="misconceptionBadge" class="modal-badge" style="color: #EF4444; font-size: 11px;">EXPERIMENTAL ERROR & MISCONCEPTION</span>
+        <h3 id="misconceptionTitle" style="font-family: var(--font-display); font-size: 20px; font-weight: 800; margin: 8px 0; color: #2D144B;">Over-Titrated!</h3>
+        <p id="misconceptionDesc" style="font-size: 13px; color: #475569; margin-bottom: 14px; line-height: 1.5;">The flask turned dark magenta because excess NaOH titrant was added past the stoichiometric equivalence point (pH > 9.5).</p>
+        <div style="background: #FFF1F2; border: 1.5px solid #FDA4AF; border-radius: 8px; padding: 12px; margin-bottom: 18px; text-align: left;">
+          <strong style="color: #9F1239; font-size: 12px; display: block; margin-bottom: 4px;">💡 Scientific Correction & Advice:</strong>
+          <span id="misconceptionAdvice" style="font-size: 12px; color: #881337;">The true stoichiometric endpoint occurs when exactly 10.0 mL of 0.1 M NaOH neutralizes 10.0 mL of 0.1 M HCl, giving a permanent FAINT PALE PINK color (pH 8.2). As you approach 9.5 mL, switch to single drops!</span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="primary-btn" style="flex: 1; justify-content: center;" onclick="resetAndRetryCurrentExperiment()">🔄 Reset & Retry Titration</button>
         </div>
       </div>
     </div>

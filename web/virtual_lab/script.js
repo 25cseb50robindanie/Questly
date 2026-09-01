@@ -1,7 +1,7 @@
 /**
  * QUESTLY VIRTUAL SCIENCE LAB ENGINE
  * High-fidelity, gamified, multi-module virtual lab simulator.
- * Features direct hands-on physical interactions, photorealistic glassware, 3D blast furnace cutaway, and balanced audio.
+ * Features direct hands-on physical interactions, photorealistic glassware, 3D blast furnace cutaway, accurate stoichiometry, and balanced audio.
  * Supports: Acid-Base Titration, Smelting & Blast Furnace Metallurgy, Calorimetry, Flame Test.
  */
 
@@ -412,69 +412,71 @@ function getRealisticBottleHTML(item) {
 }
 
 // ============================================================================
-// 3. MODULE DATABASE
+// 3. MODULE DATABASE (SCIENTIFICALLY ACCURATE STOICHIOMETRY)
 // ============================================================================
 const LAB_MODULES = {
   titration: {
     id: 'titration',
     name: 'Acid–Base Titration',
-    subtitle: 'Determine the exact neutralization endpoint using standardized 0.1 M NaOH & HCl.',
+    subtitle: 'Determine the exact neutralization equivalence point using standardized 0.100 M NaOH and 10.0 mL of 0.100 M HCl.',
     xpReward: 60,
     goldReward: 20,
     concept: {
-      title: 'Neutralization Reaction & Titrimetric Analysis',
-      subtitle: 'Understand stoichiometry, indicators, apparatus, and dropwise titration.',
+      title: 'Neutralization Stoichiometry & Volumetric Analysis',
+      subtitle: 'Understand stoichiometric equivalence: 10.0 mL of 0.1 M HCl requires exactly 10.0 mL of 0.1 M NaOH.',
       cards: {
         principle: {
           tag: 'Chemical Principle',
-          heading: 'Neutralization & Equivalence Point',
-          desc: 'A neutralization reaction occurs when stoichiometric amounts of an acid and a base react to form a neutral salt and water. Moles of H⁺ equal moles of OH⁻ at equivalence.',
-          formula: 'HCl(aq) + NaOH(aq) → NaCl(aq) + H₂O(l)   [M₁V₁ = M₂V₂]',
+          heading: 'Stoichiometric Neutralization (1:1 Ratio)',
+          desc: '10.0 mL of 0.100 M HCl contains 0.001 mol of H⁺ ions. Neutralization is complete when exactly 10.0 mL of 0.100 M NaOH (0.001 mol OH⁻) is added, achieving pH 7.0.',
+          formula: 'HCl(aq) + NaOH(aq) → NaCl(aq) + H₂O(l)   [M₁V₁ = M₂V₂  →  (0.1)(10.0) = (0.1)(10.0)]',
           modalDetails: `
-            <h4>1. Theory & Mechanism</h4>
-            <p>Acid-base titration calculates the unknown concentration of an identified analyte. In this lab, we titrate 10.0 mL of Hydrochloric Acid (HCl) against standard 0.1 M Sodium Hydroxide (NaOH).</p>
+            <h4>1. Stoichiometry & Exact Calculation</h4>
+            <p><code>Moles of HCl = 0.1000 M &times; 0.0100 L = 0.00100 mol</code></p>
+            <p><code>Volume of 0.1000 M NaOH required = 0.00100 mol / 0.1000 M = 0.0100 L = 10.0 mL</code></p>
             <br>
-            <h4>2. Equivalence vs. Endpoint</h4>
-            <p><strong>Equivalence Point:</strong> Theoretical stoichiometric neutralization (pH = 7.0).</p>
-            <p><strong>Endpoint:</strong> Sharp color change of Phenolphthalein from colorless to faint, permanent pale pink (pH 8.2 - 8.3).</p>
+            <h4>2. Indicator Transition: Equivalence vs. Endpoint</h4>
+            <p><strong>Equivalence Point (pH = 7.0):</strong> Exact stoichiometric neutralization. Liquid is still colorless.</p>
+            <p><strong>Endpoint (pH = 8.2 - 8.3):</strong> One single excess drop of 0.1 M NaOH shifts the pH past 8.2, turning Phenolphthalein into a <strong>faint, permanent pale pink</strong>.</p>
+            <p><strong>Over-Titration Misconception:</strong> If the solution turns dark magenta (pH > 9.5), too much titrant was dispensed!</p>
           `
         },
         apparatus: {
           tag: 'Lab Equipment',
           heading: 'Required Apparatus',
-          desc: 'Precision volumetric glassware including a 50 mL graduated Burette, 10 mL Volumetric Pipette, 250 mL Conical Flask, and Retort Stand.',
-          tags: ['Burette (50 mL)', 'Pipette (10 mL)', 'Conical Flask (250 mL)', 'Retort Stand & Clamp'],
+          desc: 'Precision volumetric glassware including a 50 mL graduated Burette, 10.0 mL Volumetric Pipette, 250 mL Conical Flask, and Retort Stand.',
+          tags: ['Burette (50 mL)', 'Pipette (10.0 mL)', 'Conical Flask (250 mL)', 'Retort Stand & Clamp'],
           modalDetails: `
             <h4>Apparatus Utility:</h4>
             <ul>
               <li><strong>Burette:</strong> Delivers variable volumes of NaOH drop by drop.</li>
-              <li><strong>Pipette:</strong> Accurately measures 10.0 mL of HCl analyte.</li>
-              <li><strong>Conical Flask:</strong> Prevents splashing during swirling.</li>
-              <li><strong>White Tile:</strong> Enhances pale pink color detection.</li>
+              <li><strong>Pipette:</strong> Accurately measures exactly 10.0 mL of HCl analyte.</li>
+              <li><strong>Conical Flask:</strong> Prevents splashing during vigorous swirling.</li>
+              <li><strong>White Tile:</strong> Provides high contrast to detect the very first faint pink blush.</li>
             </ul>
           `
         },
         solutions: {
           tag: 'Chemical Reagents',
           heading: 'Required Solutions',
-          desc: 'Standard Hydrochloric Acid (HCl 0.1 M), Sodium Hydroxide (NaOH 0.1 M), and Phenolphthalein Indicator.',
-          tags: ['0.1 M HCl (Analyte)', '0.1 M NaOH (Titrant)', 'Phenolphthalein Indicator'],
+          desc: 'Standard Hydrochloric Acid (HCl 0.100 M), Sodium Hydroxide (NaOH 0.100 M), and Phenolphthalein Indicator.',
+          tags: ['0.100 M HCl (Analyte)', '0.100 M NaOH (Titrant)', 'Phenolphthalein Indicator'],
           modalDetails: `
             <h4>Reagents:</h4>
-            <p>0.1 M HCl (in flask), 0.1 M NaOH (in burette), and 2 drops of Phenolphthalein indicator.</p>
+            <p>10.0 mL of 0.100 M HCl in the flask, 0.100 M NaOH in the burette, and 2 drops of Phenolphthalein indicator.</p>
           `
         },
         procedure: {
           tag: 'Standard Procedure',
           heading: 'Step-by-Step Execution',
-          desc: '1. Rinse & fill burette. 2. Pipette 10 mL HCl. 3. Add 2 drops indicator. 4. Dispense titrant until permanent pale pink.',
+          desc: '1. Fill burette with 0.1 M NaOH. 2. Pipette 10 mL HCl. 3. Add 2 drops indicator. 4. Dispense titrant until permanent faint pale pink (10.0 mL).',
           modalDetails: `
-            <h4>Protocol:</h4>
+            <h4>Execution Protocol:</h4>
             <ol>
-              <li>Fill burette with 0.1 M NaOH.</li>
+              <li>Fill burette with 0.100 M NaOH to 0.0 mL mark.</li>
               <li>Pipette 10.0 mL HCl into conical flask.</li>
-              <li>Add 2 drops of indicator.</li>
-              <li>Dispense titrant while swirling until permanent pale pink persists.</li>
+              <li>Add 2 drops of Phenolphthalein indicator.</li>
+              <li>Dispense titrant slowly while swirling until permanent faint pale pink persists (exact reading: 10.0 mL).</li>
             </ol>
           `
         }
@@ -508,13 +510,18 @@ const LAB_MODULES = {
       title: 'Acid–Base Titration Summary Sheet',
       content: `
         <div class="rev-block">
-          <h4>📌 Core Equation & Calculations:</h4>
-          <p><code>HCl + NaOH &rarr; NaCl + H₂O</code></p>
+          <h4>📌 Core Stoichiometry & Calculation:</h4>
+          <p><code>HCl(aq) + NaOH(aq) &rarr; NaCl(aq) + H₂O(l)</code></p>
           <p>Molarity Formula: <code>M₁ &times; V₁ = M₂ &times; V₂</code></p>
+          <p><code>(0.1000 M HCl) &times; (10.0 mL) = (0.1000 M NaOH) &times; (10.0 mL)</code></p>
         </div>
         <div class="rev-block">
-          <h4>📌 Indicators & pH Ranges:</h4>
-          <p>Phenolphthalein: Colorless (pH < 8.2) &rarr; Pale Pink (pH 8.2 - 10.0).</p>
+          <h4>📌 Indicator Transitions:</h4>
+          <ul>
+            <li><strong>Acidic (pH < 8.2):</strong> Colorless</li>
+            <li><strong>Equivalence Endpoint (pH 8.2 - 9.0):</strong> Faint Permanent Pale Pink (10.0 mL)</li>
+            <li><strong>Over-Titrated (pH > 9.5):</strong> Deep Magenta</li>
+          </ul>
         </div>
       `
     }
@@ -581,13 +588,13 @@ const LAB_MODULES = {
         procedure: {
           tag: 'Standard Procedure',
           heading: 'Smelting Protocol',
-          desc: '1. Charge ore, coke & flux into hopper. 2. Ignite tuyere hot air. 3. Regulate temp to 1400°C–1500°C. 4. Tap molten iron & slag.',
+          desc: '1. Charge ore, coke & flux into hopper. 2. Ignite tuyere hot air. 3. Regulate temp to 1400°C–1550°C. 4. Tap molten iron & slag.',
           modalDetails: `
             <h4>Operational Steps:</h4>
             <ol>
               <li>Load raw charge (Fe₂O₃ + Coke + CaCO₃) through the double-bell top hopper.</li>
               <li>Engage the tuyere hot air blast to initiate combustion.</li>
-              <li>Adjust temperature slider to reach optimal smelting zone (1400°C – 1500°C).</li>
+              <li>Adjust temperature slider to reach optimal smelting zone (1400°C – 1550°C).</li>
               <li>Open the bottom taphole: observe blazing white-hot molten iron flowing into the ladle mold while lighter slag floats and taps separately!</li>
             </ol>
           `
@@ -640,20 +647,29 @@ const LAB_MODULES = {
 
   calorimetry: {
     id: 'calorimetry',
-    name: 'Calorimetry & Heat of Reaction',
-    subtitle: 'Measure the enthalpy of neutralization (ΔH) using an insulated polystyrene calorimeter.',
+    name: 'Calorimetry & Heat of Neutralization',
+    subtitle: 'Measure the molar enthalpy of neutralization (ΔH ≈ -57.1 kJ/mol) using an insulated polystyrene calorimeter.',
     xpReward: 60,
     goldReward: 20,
     concept: {
       title: 'Thermochemistry & Enthalpy of Neutralization',
-      subtitle: 'Measure temperature rise (ΔT) and compute heat evolved: q = mcΔT.',
+      subtitle: 'Measure temperature rise (ΔT = +6.8°C) when 50 mL 1.0 M HCl reacts with 50 mL 1.0 M NaOH.',
       cards: {
         principle: {
           tag: 'Chemical Principle',
-          heading: 'Exothermic Neutralization & Enthalpy',
-          desc: 'When strong acids and strong bases neutralize, energy is released into the solution, increasing temperature. q = m · c · ΔT.',
-          formula: 'q = m · c · ΔT   |   ΔH_neut ≈ -57.1 kJ/mol',
-          modalDetails: `<p>Heat evolved is absorbed by the aqueous solution: q = -(m · c · ΔT).</p>`
+          heading: 'Exothermic Neutralization & Enthalpy Calculation',
+          desc: 'Energy released heats 100 g aqueous solution (c = 4.184 J/g·°C). q = m · c · ΔT = 100g × 4.184 × 6.8 = 2.845 kJ. ΔH = -q / moles = -56.9 kJ/mol.',
+          formula: 'q = m · c · ΔT   |   ΔH_neut = -q / n ≈ -57.1 kJ/mol',
+          modalDetails: `
+            <h4>1. Thermodynamic Calculations:</h4>
+            <p><code>Mass of mixed solution (m) = 50 g + 50 g = 100 g</code></p>
+            <p><code>Heat evolved (q) = 100 g &times; 4.184 J/(g&middot;&deg;C) &times; 6.8&deg;C = 2845 J = 2.845 kJ</code></p>
+            <p><code>Moles of H₂O formed (n) = 0.050 L &times; 1.0 M = 0.050 mol</code></p>
+            <p><code>Enthalpy of Neutralization (&Delta;H) = -2.845 kJ / 0.050 mol = -56.9 kJ/mol</code></p>
+            <br>
+            <h4>2. Misconception Alert:</h4>
+            <p>Why must the lid be closed immediately? If unsealed, convective heat loss to surrounding air results in an artificially lower ΔT measurement.</p>
+          `
         },
         apparatus: {
           tag: 'Lab Equipment',
@@ -672,8 +688,8 @@ const LAB_MODULES = {
         procedure: {
           tag: 'Standard Procedure',
           heading: 'Experimental Protocol',
-          desc: '1. Measure initial T₁. 2. Mix 50 mL HCl + 50 mL NaOH. 3. Close lid & stir. 4. Record peak T₂.',
-          modalDetails: `<p>Record temperature every 5 seconds until peak.</p>`
+          desc: '1. Measure initial T₁ (22.0°C). 2. Mix 50 mL HCl + 50 mL NaOH. 3. Rapidly seal lid & stir. 4. Record peak T₂ (28.8°C).',
+          modalDetails: `<p>Record peak temperature and calculate ΔH.</p>`
         }
       }
     },
@@ -703,7 +719,7 @@ const LAB_MODULES = {
     },
     revision: {
       title: 'Calorimetry Summary',
-      content: `<div class="rev-block"><p>q = mcΔT = 100g × 4.184 × 6.8 = 2.85 kJ</p></div>`
+      content: `<div class="rev-block"><p>q = mcΔT = 100g × 4.184 × 6.8 = 2.85 kJ &rarr; ΔH = -56.9 kJ/mol.</p></div>`
     }
   },
 
@@ -722,7 +738,17 @@ const LAB_MODULES = {
           heading: 'Electronic Excitation & Emission',
           desc: 'Thermal energy promotes electrons to excited states. Returning to ground state releases photons of specific wavelength (E = hc/λ).',
           formula: 'E = h · ν = (h · c) / λ   [Photon Emission]',
-          modalDetails: `<p>Discrete wavelengths emitted upon electron relaxation.</p>`
+          modalDetails: `
+            <h4>1. Spectroscopic Emission:</h4>
+            <ul>
+              <li><strong>Sodium (Na⁺):</strong> 589 nm (Intense Golden Yellow)</li>
+              <li><strong>Strontium (Sr²⁺):</strong> 650 nm (Crimson Red)</li>
+              <li><strong>Copper (Cu²⁺):</strong> 510 nm (Turquoise Blue-Green)</li>
+            </ul>
+            <br>
+            <h4>2. Misconception Alert:</h4>
+            <p>Why must concentrated HCl be used to clean the loop? It converts metal salts into volatile metal chlorides that vaporize efficiently in the flame.</p>
+          `
         },
         apparatus: {
           tag: 'Lab Equipment',
@@ -833,7 +859,8 @@ class LabStateManager {
         flaskVolume: 10.0,
         hasIndicator: false,
         stopcockMode: 0, // 0 = OFF, 1 = SLOW DRIP, 2 = FAST FLOW
-        endpointReached: false
+        endpointReached: false,
+        overTitrated: false
       };
     } else if (this.currentModuleId === 'smelting') {
       this.expState = {
@@ -939,6 +966,11 @@ function bindGlobalEvents() {
   document.getElementById('btnProceedStage3').addEventListener('click', () => {
     labSound.playClick();
     goToStage(4);
+  });
+
+  document.getElementById('btnResetCurrentSim').addEventListener('click', () => {
+    labSound.playClick();
+    resetAndRetryCurrentExperiment();
   });
 
   document.getElementById('btnFinishExperiment').addEventListener('click', () => {
@@ -1268,7 +1300,7 @@ function renderDirectTitrationWorkbench(container) {
   metrics.innerHTML = `
     <div class="metric-card">
       <span class="metric-label">Burette Reading</span>
-      <span class="metric-value" id="titrBuretteVal">0.0 mL</span>
+      <span class="metric-value" id="titrBuretteVal">${state.expState.buretteVolume.toFixed(1)} mL</span>
     </div>
     <div class="metric-card">
       <span class="metric-label">Flask pH</span>
@@ -1316,11 +1348,11 @@ function renderDirectTitrationWorkbench(container) {
       <div class="panel-section-title">🧪 WORKBENCH TOOLBAR</div>
 
       <!-- Interactive Indicator Dropper Card -->
-      <div class="direct-action-card" id="toolDropperCard">
+      <div class="direct-action-card ${state.expState.hasIndicator ? 'active' : ''}" id="toolDropperCard">
         <div class="action-card-icon">💧</div>
         <div>
           <div class="action-card-title">Phenolphthalein Dropper</div>
-          <div class="action-card-hint">Click to squeeze 2 drops into flask</div>
+          <div class="action-card-hint">${state.expState.hasIndicator ? '✔ Indicator added (2 drops in acid)' : 'Click to squeeze 2 drops into flask'}</div>
         </div>
       </div>
 
@@ -1393,15 +1425,15 @@ function bindDirectTitrationEvents() {
       valve.textContent = 'OFF';
       document.getElementById('valveStatusText').textContent = 'Current: OFF (Closed)';
     } else if (state.expState.stopcockMode === 1) {
-      startTitrationDrip(0.2, 400);
+      startTitrationDrip(0.1, 350);
       valve.className = 'stopcock-valve open';
       valve.textContent = 'SLOW';
-      document.getElementById('valveStatusText').textContent = 'Current: SLOW DRIP (0.2 mL/s)';
+      document.getElementById('valveStatusText').textContent = 'Current: SLOW DRIP (0.1 mL/s)';
     } else {
-      startTitrationDrip(0.6, 250);
+      startTitrationDrip(0.4, 250);
       valve.className = 'stopcock-valve open';
       valve.textContent = 'FAST';
-      document.getElementById('valveStatusText').textContent = 'Current: FAST FLOW (0.6 mL/s)';
+      document.getElementById('valveStatusText').textContent = 'Current: FAST FLOW (0.4 mL/s)';
     }
   };
 
@@ -1416,16 +1448,16 @@ function bindDirectTitrationEvents() {
     valve.textContent = 'OFF';
 
     const vol = state.expState.buretteVolume;
-    if (vol >= 19.5 && vol <= 20.5) {
+    if (vol >= 9.8 && vol <= 10.3) {
       labSound.playFanfare();
       state.expState.endpointReached = true;
       btnFinish.disabled = false;
-      updateExpFeedback('🎯 PERFECT! Precise pale-pink equivalence endpoint locked in at 20.0 mL (pH 7.0)!');
+      updateExpFeedback('🎯 PERFECT! True stoichiometric equivalence point confirmed at exactly 10.0 mL of 0.1 M NaOH (pH 8.2)!');
       seal.style.display = 'none';
     } else {
       labSound.playError();
       state.stage4Mistakes++;
-      updateExpFeedback(`⚠️ Incorrect endpoint (${vol.toFixed(1)} mL). Regulate volume to exactly 20.0 mL.`);
+      updateExpFeedback(`⚠️ Endpoint deviation (${vol.toFixed(1)} mL). Expected 10.0 mL for 10.0 mL of 0.1 M HCl.`);
     }
     updateHeaderScore();
   });
@@ -1449,18 +1481,18 @@ function dispenseTitrant(amt) {
     liquidBar.style.height = `${pct}%`;
   }
 
-  // Calculate pH curve based on neutralization stoichiometry
+  // Exact neutralization stoichiometry curve: (10.0 mL of 0.1 M HCl + vol of 0.1 M NaOH)
   let ph = 1.0;
-  if (vol < 18.0) {
-    ph = 1.0 + (vol / 18.0) * 2.2;
-  } else if (vol < 19.8) {
-    ph = 3.2 + ((vol - 18.0) / 1.8) * 2.8;
-  } else if (vol <= 20.2) {
-    ph = 7.0 + ((vol - 19.8) / 0.4) * 1.5;
-  } else if (vol < 22.0) {
-    ph = 8.5 + ((vol - 20.2) / 1.8) * 3.5;
+  if (vol < 8.0) {
+    ph = 1.0 + (vol / 8.0) * 1.5; // 1.0 -> 2.5
+  } else if (vol < 9.7) {
+    ph = 2.5 + ((vol - 8.0) / 1.7) * 2.5; // 2.5 -> 5.0
+  } else if (vol <= 10.2) {
+    ph = 7.0 + ((vol - 9.7) / 0.5) * 1.6; // 7.0 -> 8.6
+  } else if (vol < 11.5) {
+    ph = 9.0 + ((vol - 10.2) / 1.3) * 2.5; // 9.0 -> 11.5
   } else {
-    ph = 12.0 + Math.min(1.5, (vol - 22.0) * 0.3);
+    ph = 11.5 + Math.min(1.5, (vol - 11.5) * 0.15);
   }
 
   document.getElementById('titrPhVal').textContent = ph.toFixed(1);
@@ -1485,7 +1517,24 @@ function dispenseTitrant(amt) {
     colorVal.textContent = 'Dark Magenta (Over-Titrated ⚠️)';
     colorVal.style.color = '#BE185D';
     if (seal) seal.style.display = 'none';
-    updateExpFeedback('⚠️ Excess titrant added! The solution is over-titrated (Dark Magenta).');
+
+    // If significantly over-titrated, stop and show misconception advisory popup
+    if (vol >= 11.0 && !state.expState.overTitrated) {
+      state.expState.overTitrated = true;
+      stopTitrationDrip();
+      const valve = document.getElementById('interactiveStopcock');
+      if (valve) {
+        valve.className = 'stopcock-valve';
+        valve.textContent = 'OFF';
+      }
+      state.stage4Mistakes++;
+      openMisconceptionModal(
+        '⚠️ Solution Over-Titrated!',
+        `You added ${vol.toFixed(1)} mL of NaOH, surpassing the 10.0 mL equivalence point. The flask is now dark magenta (pH ${ph.toFixed(1)}).`,
+        'In titration, 10.0 mL of 0.100 M HCl requires exactly 10.0 mL of 0.100 M NaOH. When the burette passes 9.0 mL, use SLOW DRIP and stop at the very first faint pale pink!'
+      );
+      updateHeaderScore();
+    }
   }
 }
 
@@ -1514,7 +1563,7 @@ function renderDirectSmeltingWorkbench(container) {
   metrics.innerHTML = `
     <div class="metric-card">
       <span class="metric-label">Hearth Pyrometer</span>
-      <span class="metric-value" id="smeltTempVal" style="color: #F97316;">600 °C</span>
+      <span class="metric-value" id="smeltTempVal" style="color: #F97316;">${state.expState.temperature} °C</span>
     </div>
     <div class="metric-card">
       <span class="metric-label">Thermal State</span>
@@ -1522,7 +1571,7 @@ function renderDirectSmeltingWorkbench(container) {
     </div>
     <div class="metric-card">
       <span class="metric-label">Molten Iron Yield</span>
-      <span class="metric-value" id="smeltYieldVal">0.0%</span>
+      <span class="metric-value" id="smeltYieldVal">${state.expState.ironTapped ? '98.5%' : '0.0%'}</span>
     </div>
   `;
 
@@ -1565,14 +1614,14 @@ function renderDirectSmeltingWorkbench(container) {
         </div>
 
         <!-- Molten Iron Tap Channel & Ladle Mold -->
-        <div class="taphole-channel" id="tapStream"></div>
+        <div class="taphole-channel ${state.expState.ironTapped ? 'flowing' : ''}" id="tapStream"></div>
         <div class="ladle-mold-container" id="ladleMold" title="Molten Iron Ingot Ladle">
-          <div class="ladle-liquid-iron" id="ladleLiquid"></div>
+          <div class="ladle-liquid-iron" id="ladleLiquid" style="height: ${state.expState.ironTapped ? '100%' : '0%'};"></div>
           <span class="ladle-label">IRON MOLD</span>
         </div>
 
         <!-- Slag Tap Box -->
-        <div class="slag-tap-box" id="slagTapBox">SLAG RUNNER: IDLE</div>
+        <div class="slag-tap-box" id="slagTapBox">${state.expState.ironTapped ? 'SLAG SEPARATED ✔' : 'SLAG RUNNER: IDLE'}</div>
       </div>
     </div>
 
@@ -1581,7 +1630,7 @@ function renderDirectSmeltingWorkbench(container) {
       <div class="panel-section-title">🧱 1. CHARGE PLATFORM</div>
 
       <!-- Ore Charge Card -->
-      <div class="direct-action-card" id="cardChargeOre">
+      <div class="direct-action-card ${state.expState.chargedOre ? 'active disabled' : ''}" id="cardChargeOre">
         <div class="action-card-icon">🪨</div>
         <div>
           <div class="action-card-title">Dump Hematite Ore (Fe₂O₃)</div>
@@ -1590,7 +1639,7 @@ function renderDirectSmeltingWorkbench(container) {
       </div>
 
       <!-- Coke Charge Card -->
-      <div class="direct-action-card disabled" id="cardChargeCoke">
+      <div class="direct-action-card ${state.expState.chargedCoke ? 'active disabled' : (state.expState.chargedOre ? '' : 'disabled')}" id="cardChargeCoke">
         <div class="action-card-icon">🔥</div>
         <div>
           <div class="action-card-title">Dump Metallurgical Coke (C)</div>
@@ -1599,7 +1648,7 @@ function renderDirectSmeltingWorkbench(container) {
       </div>
 
       <!-- Limestone Charge Card -->
-      <div class="direct-action-card disabled" id="cardChargeFlux">
+      <div class="direct-action-card ${state.expState.chargedFlux ? 'active disabled' : (state.expState.chargedCoke ? '' : 'disabled')}" id="cardChargeFlux">
         <div class="action-card-icon">🧪</div>
         <div>
           <div class="action-card-title">Dump Limestone Flux (CaCO₃)</div>
@@ -1610,11 +1659,11 @@ function renderDirectSmeltingWorkbench(container) {
       <div class="panel-section-title" style="margin-top: 6px;">💨 2. TUYERE BLAST & HEARTH TEMP</div>
 
       <!-- Tuyere Toggle -->
-      <div class="direct-action-card disabled" id="cardTuyereBlast">
+      <div class="direct-action-card ${state.expState.tuyereBlastOn ? 'active' : (state.expState.chargedFlux ? '' : 'disabled')}" id="cardTuyereBlast">
         <div class="action-card-icon">🌬️</div>
         <div>
           <div class="action-card-title">Engage Tuyere Air Blast</div>
-          <div class="action-card-hint">Ignites coke in pre-heated air</div>
+          <div class="action-card-hint">${state.expState.tuyereBlastOn ? 'Air Blast ACTIVE 🟢' : 'Ignites coke in pre-heated air'}</div>
         </div>
       </div>
 
@@ -1622,13 +1671,13 @@ function renderDirectSmeltingWorkbench(container) {
       <div class="temp-slider-container" style="margin-top: 4px;">
         <div class="temp-slider-header">
           <span>Hearth Temperature Dial:</span>
-          <strong id="sliderTempDisplay">600 °C</strong>
+          <strong id="sliderTempDisplay">${state.expState.temperature} °C</strong>
         </div>
-        <input type="range" id="tempRangeSlider" class="temp-range-input" min="300" max="2000" step="25" value="600" disabled>
+        <input type="range" id="tempRangeSlider" class="temp-range-input" min="300" max="2000" step="25" value="${state.expState.temperature}" ${state.expState.tuyereBlastOn ? '' : 'disabled'}>
       </div>
 
       <!-- Taphole Drill Lever -->
-      <div class="direct-action-card disabled" id="cardTapIron" style="margin-top: 4px;">
+      <div class="direct-action-card ${state.expState.ironTapped ? 'active disabled' : (state.expState.tuyereBlastOn ? '' : 'disabled')}" id="cardTapIron" style="margin-top: 4px;">
         <div class="action-card-icon">🌋</div>
         <div>
           <div class="action-card-title">Tap Molten Metal & Slag</div>
@@ -1793,7 +1842,7 @@ function renderDirectCalorimetryWorkbench(container) {
     </div>
     <div class="metric-card">
       <span class="metric-label">Current Temp</span>
-      <span class="metric-value" id="calorTemp">22.0 °C</span>
+      <span class="metric-value" id="calorTemp">${state.expState.currentTemp.toFixed(1)} °C</span>
     </div>
     <div class="metric-card">
       <span class="metric-label">Heat Evolved (q)</span>
@@ -1806,7 +1855,7 @@ function renderDirectCalorimetryWorkbench(container) {
       <div style="width: 140px; height: 160px; position: relative;">
         ${getRealisticApparatusSVG('calorimeter')}
         <div style="position: absolute; top: 10px; right: -50px; background: white; border: 2px solid #7C3AED; padding: 6px 12px; border-radius: 8px; font-family: var(--font-mono); font-weight: 800; font-size: 16px; color: #7C3AED;" id="digitalProbe">
-          22.0 °C
+          ${state.expState.currentTemp.toFixed(1)} °C
         </div>
       </div>
       <div style="margin-top: 14px; font-family: var(--font-display); font-size: 14px; font-weight: 800; color: #2D144B;" id="calorStatus">
@@ -1817,7 +1866,7 @@ function renderDirectCalorimetryWorkbench(container) {
     <div class="workbench-tools-tray">
       <div class="panel-section-title">🧪 1. POUR REACTANTS</div>
 
-      <div class="direct-action-card" id="cardPourAcid">
+      <div class="direct-action-card ${state.expState.acidAdded ? 'active disabled' : ''}" id="cardPourAcid">
         <div class="action-card-icon">🥛</div>
         <div>
           <div class="action-card-title">Pour 50 mL 1.0 M HCl</div>
@@ -1825,7 +1874,7 @@ function renderDirectCalorimetryWorkbench(container) {
         </div>
       </div>
 
-      <div class="direct-action-card disabled" id="cardPourBase">
+      <div class="direct-action-card ${state.expState.baseAdded ? 'active disabled' : (state.expState.acidAdded ? '' : 'disabled')}" id="cardPourBase">
         <div class="action-card-icon">🥛</div>
         <div>
           <div class="action-card-title">Pour 50 mL 1.0 M NaOH</div>
@@ -1835,7 +1884,7 @@ function renderDirectCalorimetryWorkbench(container) {
 
       <div class="panel-section-title" style="margin-top: 6px;">🔒 2. SEAL & STIR</div>
 
-      <div class="direct-action-card disabled" id="cardSealLid">
+      <div class="direct-action-card ${state.expState.lidClosed ? 'active disabled' : (state.expState.baseAdded ? '' : 'disabled')}" id="cardSealLid">
         <div class="action-card-icon">🛡️</div>
         <div>
           <div class="action-card-title">Seal Insulated Lid</div>
@@ -1843,7 +1892,7 @@ function renderDirectCalorimetryWorkbench(container) {
         </div>
       </div>
 
-      <div class="direct-action-card disabled" id="cardStirMix">
+      <div class="direct-action-card ${state.expState.stirring ? 'active disabled' : (state.expState.lidClosed ? '' : 'disabled')}" id="cardStirMix">
         <div class="action-card-icon">🌀</div>
         <div>
           <div class="action-card-title">Stir Solution & Measure ΔT</div>
@@ -1893,12 +1942,14 @@ function bindDirectCalorimetryEvents() {
   cardStir.addEventListener('click', () => {
     if (!state.expState.lidClosed) return;
     labSound.playSuccess();
+    state.expState.stirring = true;
     cardStir.classList.add('active', 'disabled');
     document.getElementById('calorStatus').textContent = 'Stirring... Exothermic reaction in progress! 📈';
 
     let temp = 22.0;
     const interval = setInterval(() => {
       temp += 0.2;
+      state.expState.currentTemp = temp;
       document.getElementById('calorTemp').textContent = `${temp.toFixed(1)} °C`;
       document.getElementById('digitalProbe').textContent = `${temp.toFixed(1)} °C`;
 
@@ -2038,6 +2089,28 @@ function updateExpFeedback(text) {
   if (fb) fb.textContent = text;
 }
 
+function resetAndRetryCurrentExperiment() {
+  labSound.playClick();
+  stopTitrationDrip();
+  state.initExpState();
+  closeMisconceptionModal();
+  renderStage4();
+  document.getElementById('btnFinishExperiment').disabled = true;
+  updateExpFeedback('🔄 Workbench apparatus reset! You can now re-run the experiment carefully.');
+}
+
+function openMisconceptionModal(title, desc, advice) {
+  labSound.playError();
+  document.getElementById('misconceptionTitle').textContent = title;
+  document.getElementById('misconceptionDesc').textContent = desc;
+  document.getElementById('misconceptionAdvice').textContent = advice;
+  document.getElementById('modalMisconceptionRetry').classList.add('open');
+}
+
+function closeMisconceptionModal() {
+  document.getElementById('modalMisconceptionRetry').classList.remove('open');
+}
+
 // ============================================================================
 // 10. STAGE 5: REPORT & QUICK REVISION
 // ============================================================================
@@ -2057,17 +2130,18 @@ function renderStage5() {
 
   document.getElementById('apparatusPerf').textContent = state.stage2Mistakes === 0 ? '100% (No Mistakes)' : `${state.stage2Mistakes} Mistakes`;
   document.getElementById('cupboardPerf').textContent = state.stage3Mistakes === 0 ? '100% (No Mistakes)' : `${state.stage3Mistakes} Mistakes`;
-  document.getElementById('simPerf').textContent = state.stage4Mistakes === 0 ? 'Optimal Performance' : 'Completed with Retries';
+  document.getElementById('simPerf').textContent = state.stage4Mistakes === 0 ? 'Optimal Operation' : 'Completed with Retries';
 
   const tableContainer = document.getElementById('reportDataTable');
   if (state.currentModuleId === 'titration') {
     tableContainer.innerHTML = `
       <table class="log-table">
-        <tr><th>Parameter</th><th>Measured Value</th><th>Theoretical</th></tr>
+        <tr><th>Parameter</th><th>Measured Value</th><th>Theoretical Equivalence</th></tr>
         <tr><td>Volume of HCl Analyte</td><td>10.0 mL</td><td>10.0 mL</td></tr>
-        <tr><td>Volume of 0.1 M NaOH</td><td>${state.expState.buretteVolume.toFixed(1)} mL</td><td>20.0 mL</td></tr>
-        <tr><td>Calculated Molarity (M₂)</td><td>0.100 M</td><td>0.100 M</td></tr>
-        <tr><td>Indicator Transition</td><td>Colorless &rarr; Pale Pink</td><td>pH 8.2 Endpoint</td></tr>
+        <tr><td>Concentration of HCl</td><td>0.100 M</td><td>0.100 M</td></tr>
+        <tr><td>Volume of 0.100 M NaOH Titrant</td><td>${state.expState.buretteVolume.toFixed(1)} mL</td><td>10.0 mL (Exact 1:1 Stoichiometry)</td></tr>
+        <tr><td>Calculated NaOH Molarity</td><td>0.100 M</td><td>0.100 M</td></tr>
+        <tr><td>Endpoint Color Indicator</td><td>Faint Pale Pink</td><td>pH 8.2 (Phenolphthalein)</td></tr>
       </table>
     `;
   } else if (state.currentModuleId === 'smelting') {
@@ -2084,12 +2158,12 @@ function renderStage5() {
   } else if (state.currentModuleId === 'calorimetry') {
     tableContainer.innerHTML = `
       <table class="log-table">
-        <tr><th>Parameter</th><th>Measured Value</th></tr>
-        <tr><td>Initial Temp (T₁)</td><td>22.0 °C</td></tr>
-        <tr><td>Peak Temp (T₂)</td><td>28.8 °C</td></tr>
-        <tr><td>Temperature Rise (ΔT)</td><td>+6.8 °C</td></tr>
-        <tr><td>Heat of Neutralization (q)</td><td>2.85 kJ</td></tr>
-        <tr><td>Molar Enthalpy (ΔH)</td><td>-57.0 kJ/mol</td></tr>
+        <tr><th>Parameter</th><th>Measured Value</th><th>Standard Value</th></tr>
+        <tr><td>Initial Temp (T₁)</td><td>22.0 °C</td><td>22.0 °C</td></tr>
+        <tr><td>Peak Temp (T₂)</td><td>28.8 °C</td><td>28.8 °C</td></tr>
+        <tr><td>Temperature Rise (ΔT)</td><td>+6.8 °C</td><td>+6.8 °C</td></tr>
+        <tr><td>Heat of Neutralization (q)</td><td>2.845 kJ</td><td>2.85 kJ</td></tr>
+        <tr><td>Molar Enthalpy (ΔH)</td><td>-56.9 kJ/mol</td><td>-57.1 kJ/mol</td></tr>
       </table>
     `;
   } else {
