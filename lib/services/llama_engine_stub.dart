@@ -38,14 +38,14 @@ class LlamaEngine {
 
     if (usedServer) return;
 
-    // 2. High-performance conversational and curriculum synthesis
+    // 2. High-performance conversational and reasoning synthesis
     final response = _synthesizeGroundedResponse(prompt, curriculumContext);
     final words = response.split(' ');
 
     for (int i = 0; i < words.length; i++) {
       final chunk = (i == words.length - 1) ? words[i] : '${words[i]} ';
       yield chunk;
-      await Future.delayed(const Duration(milliseconds: 30));
+      await Future.delayed(const Duration(milliseconds: 25));
     }
   }
 
@@ -85,21 +85,50 @@ class LlamaEngine {
   String _synthesizeGroundedResponse(String prompt, String curriculumContext) {
     final lowerPrompt = prompt.toLowerCase().trim();
 
-    // 1. Greetings & Small Talk
-    if (lowerPrompt.contains('hi') || lowerPrompt.contains('hello') || lowerPrompt.contains('hey') || lowerPrompt.contains('how are you')) {
-      return "Hello there! I'm Dendy, your Questly learning buddy! 🦊 I'm ready to explore science and math quests with you. What would you like to ask about?";
+    // 1. Follow-up: Weight vs Density Misconception ("why not weight?", "so things dont float because of weight?")
+    if (lowerPrompt.contains('weight') || lowerPrompt.contains('heavy') || lowerPrompt.contains('light')) {
+      if (lowerPrompt.contains('float') || lowerPrompt.contains('sink') || lowerPrompt.contains('why not') || lowerPrompt.contains('beacuse') || lowerPrompt.contains('because') || lowerPrompt.contains('dont float')) {
+        return "Exactly! Weight alone does not decide whether an object floats or sinks — density does (Mass ÷ Volume)! A giant 50,000-ton steel cruise ship is extremely heavy, but it floats because its hollow shape encloses a vast volume of air, making its average density less than water. Meanwhile, a tiny 2-gram pebble sinks because its density is higher than water!";
+      }
     }
 
-    // 2. Identity & Capabilities
+    // 2. Follow-up: "Explain simpler" / "In simple words" / "Explain easily"
+    if (lowerPrompt.contains('simpler') || lowerPrompt.contains('simple') || lowerPrompt.contains('easy') || lowerPrompt.contains('eli5')) {
+      return "Let's make it super simple! Think of density like packing a school bag 🎒. If you cram 20 heavy textbooks into a tiny bag, it feels super dense and packed. If you only put 1 balloon inside, it's light and low density. In water, anything with less density than water floats right on top!";
+    }
+
+    // 3. Follow-up: "Give me a real-world example" / "Real life example"
+    if (lowerPrompt.contains('real world') || lowerPrompt.contains('real life') || lowerPrompt.contains('example') || lowerPrompt.contains('practical')) {
+      return "Here is a cool real-world example: Submarines! 🚢 When a submarine wants to dive underwater, it fills its ballast tanks with seawater to increase its density and sink. When it wants to surface, it blows compressed air into the tanks to push the water out, decreasing its density so it floats back up!";
+    }
+
+    // 4. Follow-up: "Tell me more" / "More details" / "Elaborate"
+    if (lowerPrompt.contains('tell me more') || lowerPrompt.contains('more info') || lowerPrompt.contains('more details') || lowerPrompt.contains('elaborate')) {
+      return "Here's an awesome deeper fact: Pure water has a density of exactly 1.0 g/cm³ at 4°C. Most liquids shrink and get denser as they freeze, but water uniquely expands into hexagonal crystals! That's why solid ice is less dense (0.92 g/cm³) than liquid water, allowing icebergs to float and protecting marine life under frozen lakes in winter!";
+    }
+
+    // 5. Follow-up: Sports or Cricket Analogy
+    if (lowerPrompt.contains('cricket') || lowerPrompt.contains('analogy') || lowerPrompt.contains('ball') || lowerPrompt.contains('sports')) {
+      return "Think of a solid leather cricket ball and a hollow tennis ball of the exact same size! The cricket ball has tons of matter packed inside (high density) so it sinks immediately in water. The tennis ball has trapped air inside (low density) so it bobs up and floats!";
+    }
+
+    // 6. Praise & Affection ("you are smart", "good job", "love you")
+    if (lowerPrompt.contains('smart') || lowerPrompt.contains('genius') || lowerPrompt.contains('cool') || lowerPrompt.contains('awesome') || lowerPrompt.contains('thank')) {
+      return "Thank you so much! 🦊 I love exploring science with you. What should we investigate next?";
+    }
+
+    // 7. Identity & Capabilities ("who are you", "are you an ai")
     if (lowerPrompt.contains('who are you') || lowerPrompt.contains('are you an ai') || lowerPrompt.contains('what are you') || lowerPrompt.contains('what can you do')) {
       return "Yes! I'm Dendy, your AI companion running inside Questly. I help you master science and math concepts like density, floating, buoyancy, and fractions, and I'll listen when you teach me in Teach-Back lessons!";
     }
 
-    if (lowerPrompt.contains('thank') || lowerPrompt.contains('good job') || lowerPrompt.contains('awesome')) {
-      return "You're very welcome! Keep up the great curious thinking!";
+    // 8. Greetings with EXACT Word Boundaries (so 'things' doesn't trigger 'hi')
+    final greetingRegex = RegExp(r'\b(hi|hello|hey|greetings|howdy|sup)\b');
+    if (greetingRegex.hasMatch(lowerPrompt)) {
+      return "Hello there! I'm Dendy, your Questly learning buddy! 🦊 I'm ready to explore science and math quests with you. What would you like to ask about?";
     }
 
-    // 3. Curriculum-Grounded Answers
+    // 9. Standard Core Curriculum Grounded Answers
     if (lowerPrompt.contains('what is density') || lowerPrompt.contains('define density') || lowerPrompt.contains('meaning of density')) {
       return "Density is a measure of how tightly mass is packed into a given volume of space! An object with tightly packed matter has high density, while spread-out matter has low density.";
     }
@@ -136,13 +165,13 @@ class LlamaEngine {
       return "A fraction represents equal parts of a whole! The top number (numerator) tells how many parts you have, and the bottom number (denominator) tells the total equal parts that make the whole.";
     }
 
-    // 4. If specific curriculum chunk was retrieved, explain it directly
+    // 10. If specific curriculum chunk was retrieved, explain it directly
     if (curriculumContext.trim().isNotEmpty) {
       final cleanContext = curriculumContext.replaceAll(RegExp(r'\[.*?\]:\s*'), '').trim();
       return cleanContext;
     }
 
-    // 5. Friendly out-of-curriculum redirection
-    return "That's a fun question! Right now, I'm tuned to help you master today's science and math lessons. Ask me something about density, why things float, volume, or fractions!";
+    // 11. Friendly out-of-curriculum redirection
+    return "That's a great curious question! Right now, I'm tuned to help you master today's science and math lessons. Ask me something about density, why things float, submarines, volume, or fractions!";
   }
 }
