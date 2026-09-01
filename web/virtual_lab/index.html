@@ -90,7 +90,7 @@
             <div class="card-content">
               <span class="card-tag">Chemical Principle</span>
               <h3 id="principleHeading">Core Principle</h3>
-              <p id="principleDesc">Explanation of the chemical reactions and thermodynamic principles.</p>
+              <p id="principleDesc">Explanation of chemical reactions and thermodynamic principles.</p>
               <div class="formula-box" id="principleFormula">
                 <code>Reaction Equation</code>
               </div>
@@ -244,26 +244,22 @@
       <section id="stage4" class="stage-view">
         <div class="stage-banner exp-banner">
           <div class="banner-text">
-            <div class="stage-tag">STAGE 4 • HANDS-ON EXPERIMENT SIMULATION</div>
+            <div class="stage-tag">STAGE 4 • DIRECT HANDS-ON EXPERIMENT SIMULATION</div>
             <h2 id="expTitle">Experiment Simulation</h2>
-            <p id="expSubtitle">Conduct the experiment, regulate controls and temperature, and observe real-time physical & chemical changes!</p>
+            <p id="expSubtitle">Interact directly with the lab apparatus on the bench below. Touch, drop, stir, and regulate controls in real-time!</p>
           </div>
           <div class="exp-metrics-bar" id="expMetrics"></div>
         </div>
 
-        <!-- Dynamic Lab Simulator Canvas / Viewport -->
-        <div class="simulator-layout">
-          <!-- Simulation Interactive Bench -->
-          <div class="sim-viewport" id="simViewport"></div>
-
-          <!-- Simulation Control Desk & Instruments -->
-          <div class="sim-controls-panel" id="simControlsPanel"></div>
+        <!-- Dynamic Lab Simulator Workbench -->
+        <div class="sim-interactive-workbench" id="simWorkbenchArea">
+          <!-- Rendered dynamically by script.js with rich direct-interaction items -->
         </div>
 
         <div class="stage-footer exp-footer">
           <div id="expFeedback" class="live-feedback-box info">
             <span class="fb-icon">🧪</span>
-            <span class="fb-text" id="expFeedbackText">Follow the steps on the control panel to conduct your experiment.</span>
+            <span class="fb-text" id="expFeedbackText">Interact directly with the apparatus to conduct your experiment.</span>
           </div>
           <button id="btnFinishExperiment" class="primary-btn" disabled>
             <span>Analyze Results & View Report</span>
@@ -361,7 +357,7 @@
           </div>
           <div class="preview-item">
             <span class="item-icon">3️⃣</span>
-            <span>Execute the experiment and regulate temperature precisely!</span>
+            <span>Execute hands-on experiment directly on the workbench!</span>
           </div>
         </div>
         <button id="btnHurrahGo" class="primary-btn hurrah-btn">

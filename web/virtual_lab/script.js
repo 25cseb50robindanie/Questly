@@ -1,12 +1,12 @@
 /**
  * QUESTLY VIRTUAL SCIENCE LAB ENGINE
  * High-fidelity, gamified, multi-module virtual lab simulator.
- * Features realistic laboratory glassware, authentic chemical labels, GHS hazard diamonds, and blast furnace rigs.
+ * Features direct hands-on physical interactions, photorealistic glassware, 3D blast furnace cutaway, and balanced audio.
  * Supports: Acid-Base Titration, Smelting & Blast Furnace Metallurgy, Calorimetry, Flame Test.
  */
 
 // ============================================================================
-// 1. SOUND SYSTEM (WEB AUDIO API SYNTHESIZER)
+// 1. SOUND SYSTEM (PLEASANT, GENTLE SYNTHESIZER)
 // ============================================================================
 class LabSoundEngine {
   constructor() {
@@ -33,14 +33,14 @@ class LabSoundEngine {
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(600, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.05);
-    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+    osc.frequency.setValueAtTime(520, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(260, this.ctx.currentTime + 0.04);
+    gain.gain.setValueAtTime(0.06, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
     osc.connect(gain);
     gain.connect(this.ctx.destination);
     osc.start();
-    osc.stop(this.ctx.currentTime + 0.05);
+    osc.stop(this.ctx.currentTime + 0.04);
   }
 
   playSuccess() {
@@ -48,18 +48,17 @@ class LabSoundEngine {
     this._initCtx();
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
-    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+    [523.25, 659.25, 783.99].forEach((freq, i) => {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, now + i * 0.08);
-      gain.gain.setValueAtTime(0, now + i * 0.08);
-      gain.gain.linearRampToValueAtTime(0.18, now + i * 0.08 + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.25);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + i * 0.07);
+      gain.gain.setValueAtTime(0.05, now + i * 0.07);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.2);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
-      osc.start(now + i * 0.08);
-      osc.stop(now + i * 0.08 + 0.25);
+      osc.start(now + i * 0.07);
+      osc.stop(now + i * 0.07 + 0.2);
     });
   }
 
@@ -70,15 +69,15 @@ class LabSoundEngine {
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(180, now);
-    osc.frequency.linearRampToValueAtTime(110, now + 0.25);
-    gain.gain.setValueAtTime(0.2, now);
-    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(140, now + 0.12);
+    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.linearRampToValueAtTime(0.001, now + 0.12);
     osc.connect(gain);
     gain.connect(this.ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.25);
+    osc.stop(now + 0.12);
   }
 
   playWaterDrop() {
@@ -89,32 +88,32 @@ class LabSoundEngine {
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(1200, now);
-    osc.frequency.exponentialRampToValueAtTime(400, now + 0.08);
-    gain.gain.setValueAtTime(0.2, now);
-    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+    osc.frequency.setValueAtTime(950, now);
+    osc.frequency.exponentialRampToValueAtTime(350, now + 0.06);
+    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.linearRampToValueAtTime(0.001, now + 0.06);
     osc.connect(gain);
     gain.connect(this.ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.08);
+    osc.stop(now + 0.06);
   }
 
-  playFurnaceRoar() {
+  playFurnaceHum() {
     if (!this.enabled) return;
     this._initCtx();
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(90, now);
-    osc.frequency.linearRampToValueAtTime(140, now + 0.4);
-    gain.gain.setValueAtTime(0.25, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(110, now);
+    osc.frequency.linearRampToValueAtTime(150, now + 0.3);
+    gain.gain.setValueAtTime(0.05, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
     osc.connect(gain);
     gain.connect(this.ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.5);
+    osc.stop(now + 0.35);
   }
 
   playFanfare() {
@@ -126,14 +125,14 @@ class LabSoundEngine {
     notes.forEach((freq, idx) => {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(freq, now + idx * 0.12);
-      gain.gain.setValueAtTime(0.12, now + idx * 0.12);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.4);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+      gain.gain.setValueAtTime(0.06, now + idx * 0.09);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.3);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
-      osc.start(now + idx * 0.12);
-      osc.stop(now + idx * 0.12 + 0.4);
+      osc.start(now + idx * 0.09);
+      osc.stop(now + idx * 0.09 + 0.3);
     });
   }
 }
@@ -141,32 +140,22 @@ class LabSoundEngine {
 const labSound = new LabSoundEngine();
 
 // ============================================================================
-// 2. REALISTIC LAB VISUAL ASSET GENERATOR (HIGH-FIDELITY SVGs)
+// 2. REALISTIC LAB VISUAL ASSET GENERATOR (SVGs & LAB BOTTLES)
 // ============================================================================
 function getRealisticApparatusSVG(id) {
   switch (id) {
     case 'burette':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Stand Rod & Clamp -->
           <rect x="25" y="10" width="6" height="105" fill="#475569" rx="2"/>
           <path d="M25 45 L50 45 L52 48 L48 52 L25 50" fill="#334155"/>
           <circle cx="28" cy="47" r="4" fill="#94A3B8"/>
-          <!-- Burette Glass Body -->
           <rect x="48" y="15" width="12" height="75" fill="rgba(224, 242, 254, 0.5)" stroke="#334155" stroke-width="1.5" rx="2"/>
-          <!-- Liquid Fill -->
           <rect x="49" y="35" width="10" height="54" fill="rgba(59, 130, 246, 0.45)" rx="1"/>
-          <!-- Scale Markings -->
           <line x1="48" y1="25" x2="54" y2="25" stroke="#1E293B" stroke-width="1"/>
-          <line x1="48" y1="35" x2="52" y2="35" stroke="#1E293B" stroke-width="0.8"/>
           <line x1="48" y1="45" x2="55" y2="45" stroke="#1E293B" stroke-width="1"/>
-          <line x1="48" y1="55" x2="52" y2="55" stroke="#1E293B" stroke-width="0.8"/>
           <line x1="48" y1="65" x2="55" y2="65" stroke="#1E293B" stroke-width="1"/>
-          <line x1="48" y1="75" x2="52" y2="75" stroke="#1E293B" stroke-width="0.8"/>
-          <!-- Stopcock Valve -->
           <circle cx="54" cy="93" r="5" fill="#EF4444" stroke="#991B1B" stroke-width="1"/>
-          <rect x="47" y="91" width="14" height="4" fill="#EF4444" rx="1"/>
-          <!-- Jet Nozzle Tip -->
           <polygon points="52,98 56,98 54,112" fill="rgba(224, 242, 254, 0.7)" stroke="#334155" stroke-width="1"/>
         </svg>
       `;
@@ -174,18 +163,12 @@ function getRealisticApparatusSVG(id) {
     case 'conical_flask':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Glass Neck & Lip -->
           <rect x="42" y="15" width="16" height="6" fill="#E2E8F0" stroke="#334155" stroke-width="1.5" rx="2"/>
           <rect x="44" y="20" width="12" height="25" fill="rgba(241, 245, 249, 0.6)" stroke="#334155" stroke-width="1.5"/>
-          <!-- Flask Body Polygon -->
           <polygon points="44,45 15,102 85,102 56,45" fill="rgba(224, 242, 254, 0.55)" stroke="#334155" stroke-width="2"/>
-          <!-- Liquid Fill Inside Flask -->
           <polygon points="32,70 17,100 83,100 68,70" fill="rgba(244, 114, 182, 0.35)"/>
-          <!-- Frosted Volume Marks -->
           <line x1="40" y1="75" x2="60" y2="75" stroke="rgba(255,255,255,0.8)" stroke-width="1.2"/>
           <line x1="35" y1="85" x2="65" y2="85" stroke="rgba(255,255,255,0.8)" stroke-width="1.2"/>
-          <line x1="30" y1="95" x2="70" y2="95" stroke="rgba(255,255,255,0.8)" stroke-width="1.2"/>
-          <!-- Glass Reflection Highlight -->
           <path d="M22 96 L47 48" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/>
         </svg>
       `;
@@ -193,17 +176,10 @@ function getRealisticApparatusSVG(id) {
     case 'pipette':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Rubber Pipette Bulb -->
           <ellipse cx="50" cy="18" rx="10" ry="12" fill="#DC2626" stroke="#991B1B" stroke-width="1.5"/>
-          <rect x="46" y="28" width="8" height="6" fill="#991B1B" rx="1"/>
-          <!-- Top Stem -->
           <rect x="48" y="34" width="4" height="25" fill="rgba(224, 242, 254, 0.6)" stroke="#334155" stroke-width="1"/>
-          <!-- Calibration Ring -->
           <line x1="47" y1="48" x2="53" y2="48" stroke="#D97706" stroke-width="1.5"/>
-          <!-- Volumetric Bulb -->
           <ellipse cx="50" cy="72" rx="9" ry="16" fill="rgba(224, 242, 254, 0.6)" stroke="#334155" stroke-width="1.5"/>
-          <ellipse cx="50" cy="72" rx="7" ry="13" fill="rgba(59, 130, 246, 0.35)"/>
-          <!-- Bottom Delivery Tip -->
           <polygon points="48,88 52,88 50,114" fill="rgba(224, 242, 254, 0.7)" stroke="#334155" stroke-width="1"/>
         </svg>
       `;
@@ -211,17 +187,11 @@ function getRealisticApparatusSVG(id) {
     case 'stand_clamp':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Cast Iron Base -->
           <rect x="15" y="98" width="70" height="12" fill="#1E293B" stroke="#0F172A" stroke-width="1.5" rx="3"/>
-          <ellipse cx="50" cy="98" rx="30" ry="4" fill="#334155"/>
-          <!-- Vertical Steel Rod -->
           <rect x="25" y="15" width="6" height="85" fill="#94A3B8" stroke="#475569" stroke-width="1" rx="1"/>
-          <!-- 3-Finger Clamp Assembly -->
           <rect x="23" y="38" width="18" height="8" fill="#475569" rx="2"/>
-          <circle cx="21" cy="42" r="4" fill="#CBD5E1"/>
-          <path d="M40 42 L65 34 L72 38" stroke="#334155" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-          <path d="M40 42 L65 50 L72 46" stroke="#334155" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-          <!-- Rubber Clamp Sleeves -->
+          <path d="M40 42 L65 34 L72 38" stroke="#334155" stroke-width="2.5" fill="none"/>
+          <path d="M40 42 L65 50 L72 46" stroke="#334155" stroke-width="2.5" fill="none"/>
           <rect x="68" y="32" width="8" height="6" fill="#EF4444" rx="2"/>
           <rect x="68" y="46" width="8" height="6" fill="#EF4444" rx="2"/>
         </svg>
@@ -230,55 +200,35 @@ function getRealisticApparatusSVG(id) {
     case 'beaker':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Spout & Rim -->
           <path d="M22 30 L18 28 L24 35 L76 35 L76 30 Z" fill="#CBD5E1"/>
-          <!-- Cylindrical Body -->
           <rect x="24" y="32" width="52" height="68" fill="rgba(224, 242, 254, 0.55)" stroke="#334155" stroke-width="2" rx="3"/>
-          <!-- Liquid Level -->
           <rect x="26" y="55" width="48" height="43" fill="rgba(14, 165, 233, 0.4)" rx="2"/>
-          <!-- Printed Graduation Markings -->
           <line x1="60" y1="45" x2="72" y2="45" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-          <text x="50" y="48" fill="#475569" font-size="6" font-family="sans-serif">80ml</text>
           <line x1="60" y1="60" x2="72" y2="60" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-          <text x="50" y="63" fill="#475569" font-size="6" font-family="sans-serif">50ml</text>
           <line x1="60" y1="75" x2="72" y2="75" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-          <text x="50" y="78" fill="#475569" font-size="6" font-family="sans-serif">20ml</text>
         </svg>
       `;
 
     case 'furnace_rig':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Double-Bell Charging Top -->
           <polygon points="35,15 65,15 60,25 40,25" fill="#64748B" stroke="#1E293B" stroke-width="1.5"/>
-          <rect x="42" y="10" width="16" height="6" fill="#475569" rx="1"/>
-          <!-- Blast Furnace Stack & Hearth Body -->
           <polygon points="40,25 60,25 78,80 70,105 30,105 22,80" fill="#334155" stroke="#0F172A" stroke-width="2"/>
-          <!-- Refractory Lining Heat Window -->
-          <ellipse cx="50" cy="88" rx="14" ry="12" fill="#F97316" filter="drop-shadow(0 0 4px #F97316)"/>
+          <ellipse cx="50" cy="88" rx="14" ry="12" fill="#F97316"/>
           <ellipse cx="50" cy="88" rx="8" ry="7" fill="#FDE047"/>
-          <!-- Bustle Pipe & Tuyeres -->
           <rect x="15" y="76" width="70" height="6" fill="#475569" stroke="#1E293B" stroke-width="1" rx="2"/>
-          <!-- Taphole & Slag Runner -->
           <polygon points="35,105 20,114 40,114" fill="#EAB308"/>
-          <rect x="60" y="102" width="15" height="4" fill="#64748B"/>
         </svg>
       `;
 
     case 'pyrometer':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Optical Sensor Body -->
           <rect x="25" y="25" width="50" height="35" fill="#1E293B" stroke="#0F172A" stroke-width="2" rx="4"/>
-          <!-- Lens Barrel -->
-          <rect x="75" y="32" width="14" height="20" fill="#475569" stroke="#1E293B" stroke-width="1.5" rx="2"/>
-          <circle cx="88" cy="42" r="5" fill="#DC2626"/>
-          <!-- Backlit Digital LCD Screen -->
+          <rect x="75" y="32" width="14" height="20" fill="#475569" rx="2"/>
           <rect x="32" y="32" width="34" height="20" fill="#022C22" stroke="#065F46" stroke-width="1.5" rx="2"/>
           <text x="35" y="46" fill="#34D399" font-size="8" font-weight="bold" font-family="monospace">1450°C</text>
-          <!-- Ergonomic Handle Grip -->
           <path d="M35 60 L30 105 L45 105 L50 60 Z" fill="#334155" stroke="#1E293B" stroke-width="1.5"/>
-          <!-- Trigger Button -->
           <rect x="50" y="65" width="6" height="10" fill="#EF4444" rx="2"/>
         </svg>
       `;
@@ -286,13 +236,9 @@ function getRealisticApparatusSVG(id) {
     case 'tuyere_blower':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Heavy Cast Flange Base -->
           <rect x="15" y="40" width="14" height="40" fill="#64748B" stroke="#1E293B" stroke-width="1.5" rx="2"/>
-          <!-- Tapered Copper Blast Pipe -->
           <polygon points="29,46 80,52 80,68 29,74" fill="#B45309" stroke="#78350F" stroke-width="2"/>
-          <!-- Water-Cooled Jacket Sleeve -->
           <rect x="42" y="44" width="22" height="32" fill="#D97706" stroke="#92400E" stroke-width="1.5" rx="2"/>
-          <!-- Air Jet Stream -->
           <path d="M82 54 L96 50 L94 70 L82 66 Z" fill="rgba(56, 189, 248, 0.6)"/>
         </svg>
       `;
@@ -300,30 +246,18 @@ function getRealisticApparatusSVG(id) {
     case 'ladle_mold':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Steel Ladle Shell -->
           <path d="M20 40 L28 95 L72 95 L80 40 Z" fill="#334155" stroke="#0F172A" stroke-width="2"/>
-          <!-- Pouring Spout Lip -->
-          <polygon points="18,40 10,32 28,40" fill="#475569" stroke="#0F172A" stroke-width="1"/>
-          <!-- Molten Metal Surface inside Ladle -->
           <ellipse cx="50" cy="50" rx="26" ry="8" fill="#FDE047" stroke="#F97316" stroke-width="1.5"/>
-          <ellipse cx="50" cy="50" rx="18" ry="4" fill="#FFFFFF"/>
-          <!-- Heavy Suspension Trunnion Bail Handle -->
-          <path d="M22 55 L22 25 L78 25 L78 55" stroke="#64748B" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M22 55 L22 25 L78 25 L78 55" stroke="#64748B" stroke-width="3" fill="none"/>
         </svg>
       `;
 
     case 'calorimeter':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Outer Insulated Vessel -->
           <rect x="22" y="35" width="56" height="68" fill="#E2E8F0" stroke="#475569" stroke-width="2" rx="4"/>
-          <!-- Inner Styrofoam Lining -->
-          <rect x="28" y="42" width="44" height="56" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
-          <!-- Insulating Lid Stopper -->
           <rect x="18" y="28" width="64" height="10" fill="#94A3B8" stroke="#334155" stroke-width="1.5" rx="2"/>
-          <!-- Digital Thermometer Probe Through Lid -->
           <rect x="36" y="8" width="4" height="60" fill="#DC2626" rx="1"/>
-          <!-- Wire Stirrer Loop -->
           <path d="M58 12 L58 85 A8 8 0 0 1 50 93 A8 8 0 0 1 42 85" stroke="#64748B" stroke-width="2" fill="none"/>
         </svg>
       `;
@@ -331,13 +265,10 @@ function getRealisticApparatusSVG(id) {
     case 'thermometer':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Digital Meter Box -->
           <rect x="25" y="15" width="50" height="35" fill="#F1F5F9" stroke="#334155" stroke-width="2" rx="4"/>
           <rect x="30" y="22" width="40" height="20" fill="#1E293B" rx="2"/>
           <text x="33" y="36" fill="#38BDF8" font-size="9" font-family="monospace" font-weight="bold">22.0°C</text>
-          <!-- Braided Cable -->
           <path d="M50 50 Q60 65 48 78" stroke="#64748B" stroke-width="2" fill="none"/>
-          <!-- Stainless Steel Thermocouple Needle -->
           <rect x="46" y="78" width="4" height="35" fill="#CBD5E1" stroke="#475569" stroke-width="1" rx="1"/>
         </svg>
       `;
@@ -345,17 +276,10 @@ function getRealisticApparatusSVG(id) {
     case 'bunsen_burner':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Flame (Hot Blue Cone) -->
           <polygon points="50,10 40,42 60,42" fill="#38BDF8" opacity="0.85"/>
           <polygon points="50,18 45,42 55,42" fill="#FFFFFF"/>
-          <!-- Brass Chimney Tube -->
           <rect x="45" y="42" width="10" height="42" fill="#F59E0B" stroke="#B45309" stroke-width="1.5"/>
-          <!-- Rotating Air-Hole Collar -->
           <rect x="43" y="72" width="14" height="10" fill="#78350F" rx="1"/>
-          <ellipse cx="50" cy="77" rx="3" ry="2" fill="#000000"/>
-          <!-- Gas Intake Nozzle -->
-          <path d="M55 86 L78 92 L76 98 L55 92 Z" fill="#94A3B8" stroke="#475569" stroke-width="1"/>
-          <!-- Heavy Cast Iron Base -->
           <polygon points="20,108 80,108 72,94 28,94" fill="#334155" stroke="#0F172A" stroke-width="2"/>
         </svg>
       `;
@@ -363,13 +287,9 @@ function getRealisticApparatusSVG(id) {
     case 'platinum_loop':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Glass/Aluminum Handle -->
           <rect x="46" y="10" width="8" height="60" fill="#94A3B8" stroke="#475569" stroke-width="1.5" rx="2"/>
-          <!-- Brass Chuck Collet -->
           <polygon points="45,70 55,70 53,78 47,78" fill="#F59E0B"/>
-          <!-- Platinum Wire -->
           <line x1="50" y1="78" x2="50" y2="104" stroke="#E2E8F0" stroke-width="1.8"/>
-          <!-- 2mm Loop Ring -->
           <circle cx="50" cy="108" r="4" stroke="#E2E8F0" stroke-width="1.8" fill="none"/>
         </svg>
       `;
@@ -377,11 +297,8 @@ function getRealisticApparatusSVG(id) {
     case 'watch_glass':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Concave Curved Glass Dish -->
           <path d="M15 65 Q50 90 85 65 Q50 78 15 65 Z" fill="rgba(224, 242, 254, 0.65)" stroke="#64748B" stroke-width="1.5"/>
-          <!-- Chemical Powder Crystals on Glass -->
           <ellipse cx="50" cy="74" rx="18" ry="6" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
-          <!-- Light Rim Highlights -->
           <path d="M22 66 Q50 86 78 66" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" fill="none"/>
         </svg>
       `;
@@ -389,25 +306,16 @@ function getRealisticApparatusSVG(id) {
     case 'cobalt_glass':
       return `
         <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <!-- Royal Cobalt Blue Glass Plate -->
           <rect x="20" y="25" width="60" height="70" fill="rgba(30, 58, 138, 0.85)" stroke="#1E3A8A" stroke-width="2" rx="3"/>
-          <!-- Refraction Bevel Edges -->
           <rect x="24" y="29" width="52" height="62" fill="rgba(37, 99, 235, 0.6)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
-          <path d="M25 30 L45 90" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
         </svg>
       `;
 
     default:
-      return `
-        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
-          <rect x="20" y="20" width="60" height="80" fill="rgba(224,242,254,0.5)" stroke="#475569" stroke-width="2" rx="4"/>
-          <circle cx="50" cy="60" r="16" fill="#7C3AED" opacity="0.2"/>
-        </svg>
-      `;
+      return `<svg viewBox="0 0 100 120" class="real-apparatus-svg"><rect x="20" y="20" width="60" height="80" fill="#E2E8F0" rx="4"/></svg>`;
   }
 }
 
-// Realistic Laboratory Chemical Bottle Visual Generator
 function getRealisticBottleHTML(item) {
   const isOre = item.hazard && item.hazard.includes('Mineral');
   const isFuel = item.hazard && item.hazard.includes('Fuel');
@@ -434,7 +342,6 @@ function getRealisticBottleHTML(item) {
     hazardColor = '#7F1D1D';
   }
 
-  // Minerals & Solid Ores
   if (isOre) {
     return `
       <div class="mineral-jar-visual">
@@ -485,7 +392,6 @@ function getRealisticBottleHTML(item) {
     `;
   }
 
-  // Standard Chemical Liquid Reagents
   return `
     <div class="bottle-visual ${bottleTypeClass}">
       <div class="bottle-cap"></div>
@@ -506,7 +412,7 @@ function getRealisticBottleHTML(item) {
 }
 
 // ============================================================================
-// 3. MODULE DATABASE (TITRATION, SMELTING, CALORIMETRY, FLAME TEST)
+// 3. MODULE DATABASE
 // ============================================================================
 const LAB_MODULES = {
   titration: {
@@ -725,7 +631,7 @@ const LAB_MODULES = {
           <h4>📌 Key Temperature Operating Windows:</h4>
           <ul>
             <li><strong>Optimal Smelting Zone:</strong> 1400°C – 1550°C (Liquefies iron & allows slag to float).</li>
-            <li><strong>Density Separation:</strong> Molten slag ($\rho \approx 2.5\text{ g/cm}^3$) floats above molten iron ($\rho \approx 7.0\text{ g/cm}^3$), preventing re-oxidation.</li>
+            <li><strong>Density Separation:</strong> Molten slag floats above molten iron.</li>
           </ul>
         </div>
       `
@@ -926,8 +832,7 @@ class LabStateManager {
         buretteVolume: 0.0,
         flaskVolume: 10.0,
         hasIndicator: false,
-        stopcockOpen: false,
-        flowMode: 'stop',
+        stopcockMode: 0, // 0 = OFF, 1 = SLOW DRIP, 2 = FAST FLOW
         endpointReached: false
       };
     } else if (this.currentModuleId === 'smelting') {
@@ -939,8 +844,7 @@ class LabStateManager {
         temperature: 600,
         reactionRate: 0,
         slagTapped: false,
-        ironTapped: false,
-        smeltingComplete: false
+        ironTapped: false
       };
     } else if (this.currentModuleId === 'calorimetry') {
       this.expState = {
@@ -1236,7 +1140,7 @@ function handleApparatusClick(item, cardEl) {
 }
 
 // ============================================================================
-// 8. STAGE 3: REALISTIC CHEMICAL CUPBOARD & LAB BOTTLES
+// 8. STAGE 3: REALISTIC CHEMICAL STORAGE CUPBOARD
 // ============================================================================
 function renderStage3() {
   const mod = state.moduleData;
@@ -1335,28 +1239,277 @@ function handleBottleClick(item, bottleEl) {
 }
 
 // ============================================================================
-// 9. STAGE 4: EXPERIMENT SIMULATION BENCH
+// 9. STAGE 4: DIRECT HANDS-ON WORKBENCH SIMULATION
 // ============================================================================
 function renderStage4() {
   const mod = state.moduleData;
   document.getElementById('expTitle').textContent = `${mod.name} Simulation`;
-  document.getElementById('expSubtitle').textContent = mod.subtitle;
+  document.getElementById('expSubtitle').textContent = "Interact directly with the lab equipment on the workbench desk below!";
+
+  const workbenchArea = document.getElementById('simWorkbenchArea');
+  workbenchArea.innerHTML = '';
 
   if (state.currentModuleId === 'titration') {
-    renderTitrationSim();
+    renderDirectTitrationWorkbench(workbenchArea);
   } else if (state.currentModuleId === 'smelting') {
-    renderSmeltingSim();
+    renderDirectSmeltingWorkbench(workbenchArea);
   } else if (state.currentModuleId === 'calorimetry') {
-    renderCalorimetrySim();
+    renderDirectCalorimetryWorkbench(workbenchArea);
   } else if (state.currentModuleId === 'flametest') {
-    renderFlameTestSim();
+    renderDirectFlameTestWorkbench(workbenchArea);
   }
 }
 
 // ----------------------------------------------------------------------------
-// SMELTING EXPERIMENT SIMULATION
+// DIRECT INTERACTIVE TITRATION WORKBENCH
 // ----------------------------------------------------------------------------
-function renderSmeltingSim() {
+function renderDirectTitrationWorkbench(container) {
+  const metrics = document.getElementById('expMetrics');
+  metrics.innerHTML = `
+    <div class="metric-card">
+      <span class="metric-label">Burette Reading</span>
+      <span class="metric-value" id="titrBuretteVal">0.0 mL</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-label">Flask pH</span>
+      <span class="metric-value" id="titrPhVal">1.0</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-label">Color Indicator</span>
+      <span class="metric-value" id="titrColorVal" style="color: #64748B;">Colorless</span>
+    </div>
+  `;
+
+  container.innerHTML = `
+    <!-- Left Main Workbench -->
+    <div class="workbench-viewport">
+      <div class="titration-rig">
+        <div class="stand-post"></div>
+        <div class="stand-base"></div>
+        <div class="white-tile">
+          <div id="endpointSealBadge" style="display: none; font-family: var(--font-display); font-size: 9px; font-weight: 900; color: #065F46; background: #D1FAE5; padding: 2px 6px; border-radius: 4px; border: 1px solid #10B981; cursor: pointer;">
+            ✨ CLICK TO CONFIRM ENDPOINT
+          </div>
+        </div>
+
+        <div class="burette-assembly">
+          <div class="burette-liquid" id="buretteLiquidBar"></div>
+          <div class="burette-scale">
+            <div class="scale-mark"></div><div class="scale-mark"></div><div class="scale-mark"></div><div class="scale-mark"></div><div class="scale-mark"></div>
+          </div>
+          <!-- Clickable Stopcock Valve on Burette -->
+          <div class="stopcock-valve" id="interactiveStopcock" title="Click Valve to toggle flow speed!">
+            OFF
+          </div>
+          <div class="droplet-stream" id="dropletStream"></div>
+        </div>
+
+        <!-- Clickable & Swirlable Conical Flask -->
+        <div class="conical-flask-sim interactive-bench-item" id="interactiveFlask" title="Click to swirl solution!">
+          <div class="flask-liquid colorless" id="flaskLiquid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Interactive Tools Tray -->
+    <div class="workbench-tools-tray">
+      <div class="panel-section-title">🧪 WORKBENCH TOOLBAR</div>
+
+      <!-- Interactive Indicator Dropper Card -->
+      <div class="direct-action-card" id="toolDropperCard">
+        <div class="action-card-icon">💧</div>
+        <div>
+          <div class="action-card-title">Phenolphthalein Dropper</div>
+          <div class="action-card-hint">Click to squeeze 2 drops into flask</div>
+        </div>
+      </div>
+
+      <!-- Interactive Swirl Card -->
+      <div class="direct-action-card" id="toolSwirlCard">
+        <div class="action-card-icon">🌀</div>
+        <div>
+          <div class="action-card-title">Swirl Conical Flask</div>
+          <div class="action-card-hint">Mixes analyte and titrant uniformly</div>
+        </div>
+      </div>
+
+      <!-- Valve Speed Controller -->
+      <div class="direct-action-card" id="toolValveCard">
+        <div class="action-card-icon">🎛️</div>
+        <div>
+          <div class="action-card-title">Burette Stopcock (Click Valve)</div>
+          <div class="action-card-hint" id="valveStatusText">Current: OFF (Closed)</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  bindDirectTitrationEvents();
+}
+
+let directTitrTimer = null;
+
+function bindDirectTitrationEvents() {
+  const dropperCard = document.getElementById('toolDropperCard');
+  const swirlCard = document.getElementById('toolSwirlCard');
+  const valveCard = document.getElementById('toolValveCard');
+  const valve = document.getElementById('interactiveStopcock');
+  const flask = document.getElementById('interactiveFlask');
+  const seal = document.getElementById('endpointSealBadge');
+  const btnFinish = document.getElementById('btnFinishExperiment');
+
+  // Add Indicator
+  dropperCard.addEventListener('click', () => {
+    if (state.expState.hasIndicator) return;
+    labSound.playWaterDrop();
+    state.expState.hasIndicator = true;
+    dropperCard.classList.add('active');
+    dropperCard.querySelector('.action-card-hint').textContent = '✔ Indicator added (2 drops in acid)';
+    updateExpFeedback('Phenolphthalein added! Click the Burette stopcock valve to begin dropwise titration.');
+  });
+
+  // Swirl Flask
+  const triggerSwirl = () => {
+    labSound.playClick();
+    flask.classList.add('swirl-anim');
+    setTimeout(() => flask.classList.remove('swirl-anim'), 600);
+  };
+  swirlCard.addEventListener('click', triggerSwirl);
+  flask.addEventListener('click', triggerSwirl);
+
+  // Toggle Stopcock Valve
+  const toggleValve = () => {
+    if (!state.expState.hasIndicator) {
+      showErrorToast('Add Indicator First!', 'Please add Phenolphthalein drops using the dropper before opening the burette.');
+      return;
+    }
+
+    labSound.playClick();
+    state.expState.stopcockMode = (state.expState.stopcockMode + 1) % 3;
+
+    if (state.expState.stopcockMode === 0) {
+      stopTitrationDrip();
+      valve.className = 'stopcock-valve';
+      valve.textContent = 'OFF';
+      document.getElementById('valveStatusText').textContent = 'Current: OFF (Closed)';
+    } else if (state.expState.stopcockMode === 1) {
+      startTitrationDrip(0.2, 400);
+      valve.className = 'stopcock-valve open';
+      valve.textContent = 'SLOW';
+      document.getElementById('valveStatusText').textContent = 'Current: SLOW DRIP (0.2 mL/s)';
+    } else {
+      startTitrationDrip(0.6, 250);
+      valve.className = 'stopcock-valve open';
+      valve.textContent = 'FAST';
+      document.getElementById('valveStatusText').textContent = 'Current: FAST FLOW (0.6 mL/s)';
+    }
+  };
+
+  valve.addEventListener('click', toggleValve);
+  valveCard.addEventListener('click', toggleValve);
+
+  // Confirm Endpoint Seal
+  seal.addEventListener('click', () => {
+    stopTitrationDrip();
+    state.expState.stopcockMode = 0;
+    valve.className = 'stopcock-valve';
+    valve.textContent = 'OFF';
+
+    const vol = state.expState.buretteVolume;
+    if (vol >= 19.5 && vol <= 20.5) {
+      labSound.playFanfare();
+      state.expState.endpointReached = true;
+      btnFinish.disabled = false;
+      updateExpFeedback('🎯 PERFECT! Precise pale-pink equivalence endpoint locked in at 20.0 mL (pH 7.0)!');
+      seal.style.display = 'none';
+    } else {
+      labSound.playError();
+      state.stage4Mistakes++;
+      updateExpFeedback(`⚠️ Incorrect endpoint (${vol.toFixed(1)} mL). Regulate volume to exactly 20.0 mL.`);
+    }
+    updateHeaderScore();
+  });
+}
+
+function dispenseTitrant(amt) {
+  if (state.expState.buretteVolume >= 25.0) {
+    stopTitrationDrip();
+    return;
+  }
+
+  labSound.playWaterDrop();
+  state.expState.buretteVolume = Math.min(25.0, state.expState.buretteVolume + amt);
+  const vol = state.expState.buretteVolume;
+
+  document.getElementById('titrBuretteVal').textContent = `${vol.toFixed(1)} mL`;
+
+  const liquidBar = document.getElementById('buretteLiquidBar');
+  if (liquidBar) {
+    const pct = Math.max(10, 90 - (vol / 25.0) * 80);
+    liquidBar.style.height = `${pct}%`;
+  }
+
+  // Calculate pH curve based on neutralization stoichiometry
+  let ph = 1.0;
+  if (vol < 18.0) {
+    ph = 1.0 + (vol / 18.0) * 2.2;
+  } else if (vol < 19.8) {
+    ph = 3.2 + ((vol - 18.0) / 1.8) * 2.8;
+  } else if (vol <= 20.2) {
+    ph = 7.0 + ((vol - 19.8) / 0.4) * 1.5;
+  } else if (vol < 22.0) {
+    ph = 8.5 + ((vol - 20.2) / 1.8) * 3.5;
+  } else {
+    ph = 12.0 + Math.min(1.5, (vol - 22.0) * 0.3);
+  }
+
+  document.getElementById('titrPhVal').textContent = ph.toFixed(1);
+
+  const flaskLiquid = document.getElementById('flaskLiquid');
+  const colorVal = document.getElementById('titrColorVal');
+  const seal = document.getElementById('endpointSealBadge');
+
+  if (ph < 8.2) {
+    flaskLiquid.className = 'flask-liquid colorless';
+    colorVal.textContent = 'Colorless (Acidic)';
+    colorVal.style.color = '#64748B';
+    if (seal) seal.style.display = 'none';
+  } else if (ph >= 8.2 && ph <= 9.2) {
+    flaskLiquid.className = 'flask-liquid pale-pink';
+    colorVal.textContent = 'Faint Pale Pink (Endpoint! ✨)';
+    colorVal.style.color = '#EC4899';
+    if (seal) seal.style.display = 'inline-block';
+    updateExpFeedback('✨ FAINT PALE PINK DETECTED! Turn OFF stopcock valve and click the green confirm seal on the tile!');
+  } else {
+    flaskLiquid.className = 'flask-liquid over-titrated';
+    colorVal.textContent = 'Dark Magenta (Over-Titrated ⚠️)';
+    colorVal.style.color = '#BE185D';
+    if (seal) seal.style.display = 'none';
+    updateExpFeedback('⚠️ Excess titrant added! The solution is over-titrated (Dark Magenta).');
+  }
+}
+
+function startTitrationDrip(amt, ms) {
+  stopTitrationDrip();
+  document.getElementById('dropletStream').classList.add('dropping');
+  directTitrTimer = setInterval(() => {
+    dispenseTitrant(amt);
+  }, ms);
+}
+
+function stopTitrationDrip() {
+  if (directTitrTimer) {
+    clearInterval(directTitrTimer);
+    directTitrTimer = null;
+  }
+  const stream = document.getElementById('dropletStream');
+  if (stream) stream.classList.remove('dropping');
+}
+
+// ----------------------------------------------------------------------------
+// DIRECT INTERACTIVE SMELTING WORKBENCH (3D BLAST FURNACE & HEARTH)
+// ----------------------------------------------------------------------------
+function renderDirectSmeltingWorkbench(container) {
   const metrics = document.getElementById('expMetrics');
   metrics.innerHTML = `
     <div class="metric-card">
@@ -1364,7 +1517,7 @@ function renderSmeltingSim() {
       <span class="metric-value" id="smeltTempVal" style="color: #F97316;">600 °C</span>
     </div>
     <div class="metric-card">
-      <span class="metric-label">Thermal Zone</span>
+      <span class="metric-label">Thermal State</span>
       <span class="metric-value" id="smeltZoneVal" style="color: #EF4444;">Too Cold ❄️</span>
     </div>
     <div class="metric-card">
@@ -1373,124 +1526,173 @@ function renderSmeltingSim() {
     </div>
   `;
 
-  const viewport = document.getElementById('simViewport');
-  viewport.innerHTML = `
-    <div class="furnace-rig">
-      <div class="furnace-top-hopper" id="furnaceHopper">📥 Double-Bell Hopper</div>
-      <div class="furnace-body" id="furnaceBody">
-        <div class="furnace-glow-core cold" id="furnaceGlow"></div>
-        <div style="z-index: 2; font-family: var(--font-display); font-size: 11px; font-weight: 800; color: #FFFFFF; text-shadow: 0 2px 4px rgba(0,0,0,0.8);" id="furnaceStatusText">
-          EMPTY CHARGE
+  container.innerHTML = `
+    <!-- Left Main 3D Blast Furnace Viewport -->
+    <div class="workbench-viewport">
+      <div class="blast-furnace-cutaway">
+        <!-- Top Charging Hopper with Drop Badge -->
+        <div class="hopper-charging-deck" id="hopperDeck" title="Click to charge raw materials!">
+          <span class="hopper-label">📥 CHARGING HOPPER (TOP)</span>
+        </div>
+
+        <!-- Heavy Welded Steel Shell with Clear Readable Zone Badges -->
+        <div class="furnace-outer-shell">
+          <div class="furnace-fiery-core" id="furnaceFieryCore"></div>
+
+          <!-- Upper Reduction Zone Label -->
+          <div class="furnace-zone-banner top-zone">
+            <span class="zone-title">REDUCTION ZONE (500°C–900°C)</span>
+            <span class="zone-sub">Fe₂O₃ + 3CO → 2Fe + 3CO₂</span>
+          </div>
+
+          <!-- Middle Slag Formation Zone Label -->
+          <div class="furnace-zone-banner mid-zone">
+            <span class="zone-title">SLAG FORMATION (1000°C–1200°C)</span>
+            <span class="zone-sub">CaO + SiO₂ → CaSiO₃ (Molten Slag)</span>
+          </div>
+
+          <!-- Bottom Melting Hearth Zone Label -->
+          <div class="furnace-zone-banner hearth-zone">
+            <span class="zone-title">MELTING HEARTH (1400°C–1550°C)</span>
+            <span class="zone-sub">Dense Pure Molten Iron (Fe)</span>
+          </div>
+        </div>
+
+        <!-- Tuyere Air Blast Pipes -->
+        <div class="tuyere-pipe-assembly">
+          <div class="tuyere-pipe">TUYERE L</div>
+          <div class="tuyere-pipe">TUYERE R</div>
+        </div>
+
+        <!-- Molten Iron Tap Channel & Ladle Mold -->
+        <div class="taphole-channel" id="tapStream"></div>
+        <div class="ladle-mold-container" id="ladleMold" title="Molten Iron Ingot Ladle">
+          <div class="ladle-liquid-iron" id="ladleLiquid"></div>
+          <span class="ladle-label">IRON MOLD</span>
+        </div>
+
+        <!-- Slag Tap Box -->
+        <div class="slag-tap-box" id="slagTapBox">SLAG RUNNER: IDLE</div>
+      </div>
+    </div>
+
+    <!-- Right Interactive Direct Charge Toolbar -->
+    <div class="workbench-tools-tray">
+      <div class="panel-section-title">🧱 1. CHARGE PLATFORM</div>
+
+      <!-- Ore Charge Card -->
+      <div class="direct-action-card" id="cardChargeOre">
+        <div class="action-card-icon">🪨</div>
+        <div>
+          <div class="action-card-title">Dump Hematite Ore (Fe₂O₃)</div>
+          <div class="action-card-hint">Click to dump into top hopper</div>
         </div>
       </div>
-      <div class="tuyere-blast-pipe">
-        <div class="tuyere-nozzle" title="Left Tuyere"></div>
-        <div class="tuyere-nozzle" title="Right Tuyere"></div>
+
+      <!-- Coke Charge Card -->
+      <div class="direct-action-card disabled" id="cardChargeCoke">
+        <div class="action-card-icon">🔥</div>
+        <div>
+          <div class="action-card-title">Dump Metallurgical Coke (C)</div>
+          <div class="action-card-hint">Carbon fuel & reducing agent</div>
+        </div>
       </div>
-      <div class="molten-iron-stream" id="moltenIronStream"></div>
-      <div class="iron-ladle-mold">
-        <div class="ladle-molten-fill" id="ladleFill"></div>
-        <span style="z-index: 2;">Iron Mold</span>
+
+      <!-- Limestone Charge Card -->
+      <div class="direct-action-card disabled" id="cardChargeFlux">
+        <div class="action-card-icon">🧪</div>
+        <div>
+          <div class="action-card-title">Dump Limestone Flux (CaCO₃)</div>
+          <div class="action-card-hint">Binds silica impurity into slag</div>
+        </div>
       </div>
-      <div class="slag-tap-layer" id="slagTapBadge">Slag: 0%</div>
+
+      <div class="panel-section-title" style="margin-top: 6px;">💨 2. TUYERE BLAST & HEARTH TEMP</div>
+
+      <!-- Tuyere Toggle -->
+      <div class="direct-action-card disabled" id="cardTuyereBlast">
+        <div class="action-card-icon">🌬️</div>
+        <div>
+          <div class="action-card-title">Engage Tuyere Air Blast</div>
+          <div class="action-card-hint">Ignites coke in pre-heated air</div>
+        </div>
+      </div>
+
+      <!-- Temperature Regulation Slider -->
+      <div class="temp-slider-container" style="margin-top: 4px;">
+        <div class="temp-slider-header">
+          <span>Hearth Temperature Dial:</span>
+          <strong id="sliderTempDisplay">600 °C</strong>
+        </div>
+        <input type="range" id="tempRangeSlider" class="temp-range-input" min="300" max="2000" step="25" value="600" disabled>
+      </div>
+
+      <!-- Taphole Drill Lever -->
+      <div class="direct-action-card disabled" id="cardTapIron" style="margin-top: 4px;">
+        <div class="action-card-icon">🌋</div>
+        <div>
+          <div class="action-card-title">Tap Molten Metal & Slag</div>
+          <div class="action-card-hint">Releases 1500°C molten iron stream</div>
+        </div>
+      </div>
     </div>
   `;
 
-  const controls = document.getElementById('simControlsPanel');
-  controls.innerHTML = `
-    <div class="panel-section-title">🧱 1. CHARGE RAW MATERIALS</div>
-    <div class="control-btn-group">
-      <button class="action-chip-btn" id="btnChargeOre">
-        <span>🪨 Load Fe₂O₃ Ore</span>
-      </button>
-      <button class="action-chip-btn" id="btnChargeCoke" disabled>
-        <span>🔥 Load Coke (C)</span>
-      </button>
-      <button class="action-chip-btn" id="btnChargeFlux" disabled>
-        <span>🧪 Load CaCO₃ Flux</span>
-      </button>
-    </div>
-
-    <div class="panel-section-title" style="margin-top: 10px;">💨 2. TUYERE BLAST & TEMPERATURE REGULATION</div>
-    <div class="control-btn-group">
-      <button class="action-chip-btn" id="btnToggleBlast" disabled>
-        <span>🌬️ Turn ON Air Blast</span>
-      </button>
-    </div>
-
-    <div class="temp-slider-container" style="margin-top: 6px;">
-      <div class="temp-slider-header">
-        <span>Regulate Blast Furnace Temp:</span>
-        <strong id="sliderTempDisplay">600 °C</strong>
-      </div>
-      <input type="range" id="tempRangeSlider" class="temp-range-input" min="300" max="2000" step="25" value="600" disabled>
-    </div>
-
-    <div class="panel-section-title" style="margin-top: 10px;">🌋 3. TAP MOLTEN METAL & SLAG</div>
-    <div class="control-btn-group">
-      <button class="primary-btn" id="btnTapIron" style="width: 100%; justify-content: center;" disabled>
-        <span>🪣 Tap Molten Iron & Slag</span>
-      </button>
-    </div>
-  `;
-
-  bindSmeltingEvents();
+  bindDirectSmeltingEvents();
 }
 
-function bindSmeltingEvents() {
-  const btnOre = document.getElementById('btnChargeOre');
-  const btnCoke = document.getElementById('btnChargeCoke');
-  const btnFlux = document.getElementById('btnChargeFlux');
-  const btnBlast = document.getElementById('btnToggleBlast');
+function bindDirectSmeltingEvents() {
+  const cardOre = document.getElementById('cardChargeOre');
+  const cardCoke = document.getElementById('cardChargeCoke');
+  const cardFlux = document.getElementById('cardChargeFlux');
+  const cardBlast = document.getElementById('cardTuyereBlast');
+  const cardTap = document.getElementById('cardTapIron');
   const slider = document.getElementById('tempRangeSlider');
   const sliderDisplay = document.getElementById('sliderTempDisplay');
-  const btnTap = document.getElementById('btnTapIron');
+  const fieryCore = document.getElementById('furnaceFieryCore');
   const btnFinish = document.getElementById('btnFinishExperiment');
-  const glow = document.getElementById('furnaceGlow');
-  const statusText = document.getElementById('furnaceStatusText');
 
-  btnOre.addEventListener('click', () => {
+  cardOre.addEventListener('click', () => {
+    if (state.expState.chargedOre) return;
     labSound.playClick();
     state.expState.chargedOre = true;
-    btnOre.disabled = true;
-    btnOre.classList.add('active');
-    btnCoke.disabled = false;
-    statusText.textContent = 'ORE LOADED (Fe₂O₃)';
-    updateExpFeedback('Hematite ore added to top hopper. Now add metallurgical coke!');
+    cardOre.classList.add('active');
+    cardOre.classList.add('disabled');
+    cardCoke.classList.remove('disabled');
+    updateExpFeedback('Hematite (Fe₂O₃) loaded into top hopper. Now add Coke fuel!');
   });
 
-  btnCoke.addEventListener('click', () => {
+  cardCoke.addEventListener('click', () => {
+    if (!state.expState.chargedOre || state.expState.chargedCoke) return;
     labSound.playClick();
     state.expState.chargedCoke = true;
-    btnCoke.disabled = true;
-    btnCoke.classList.add('active');
-    btnFlux.disabled = false;
-    statusText.textContent = 'ORE + COKE CHARGED';
-    updateExpFeedback('Coke loaded. Add limestone (CaCO₃) flux to remove silica impurities!');
+    cardCoke.classList.add('active');
+    cardCoke.classList.add('disabled');
+    cardFlux.classList.remove('disabled');
+    updateExpFeedback('Coke loaded. Add Limestone (CaCO₃) flux to remove silica!');
   });
 
-  btnFlux.addEventListener('click', () => {
+  cardFlux.addEventListener('click', () => {
+    if (!state.expState.chargedCoke || state.expState.chargedFlux) return;
     labSound.playSuccess();
     state.expState.chargedFlux = true;
-    btnFlux.disabled = true;
-    btnFlux.classList.add('active');
-    btnBlast.disabled = false;
-    statusText.textContent = 'CHARGE COMPLETE (READY)';
-    updateExpFeedback('All materials charged! Engage the tuyere hot air blast to initiate combustion.');
+    cardFlux.classList.add('active');
+    cardFlux.classList.add('disabled');
+    cardBlast.classList.remove('disabled');
+    updateExpFeedback('Raw charge complete! Engage the Tuyere Air Blast to start combustion.');
   });
 
-  btnBlast.addEventListener('click', () => {
-    labSound.playFurnaceRoar();
+  cardBlast.addEventListener('click', () => {
+    if (!state.expState.chargedFlux || state.expState.tuyereBlastOn) return;
+    labSound.playFurnaceHum();
     state.expState.tuyereBlastOn = true;
-    btnBlast.disabled = true;
-    btnBlast.classList.add('active');
-    btnBlast.innerHTML = '<span>💨 Tuyere Blast ACTIVE 🟢</span>';
+    cardBlast.classList.add('active');
+    cardBlast.querySelector('.action-card-hint').textContent = 'Air Blast ACTIVE 🟢';
     slider.disabled = false;
-    btnTap.disabled = false;
+    cardTap.classList.remove('disabled');
 
-    glow.className = 'furnace-glow-core warm';
-    statusText.textContent = 'BURNING COKE (CO₂/CO)';
-    updateExpFeedback('Air blast active! Use the temperature slider to regulate the blast furnace to optimal smelting range.');
+    fieryCore.className = 'furnace-fiery-core warm';
+    updateExpFeedback('Air blast active! Use the temperature dial to regulate the hearth to optimal smelting range (1400°C–1550°C).');
   });
 
   slider.addEventListener('input', (e) => {
@@ -1502,29 +1704,27 @@ function bindSmeltingEvents() {
     const zoneVal = document.getElementById('smeltZoneVal');
 
     if (temp < 1100) {
-      glow.className = 'furnace-glow-core cold';
+      fieryCore.className = 'furnace-fiery-core';
       zoneVal.textContent = 'Too Cold ❄️';
       zoneVal.style.color = '#EF4444';
-      statusText.textContent = 'LOW HEAT (NO REDUCTION)';
     } else if (temp >= 1100 && temp < 1350) {
-      glow.className = 'furnace-glow-core warm';
+      fieryCore.className = 'furnace-fiery-core warm';
       zoneVal.textContent = 'Pre-Heating 🔥';
       zoneVal.style.color = '#F97316';
-      statusText.textContent = 'REDUCING Fe₂O₃ → FeO';
     } else if (temp >= 1350 && temp <= 1600) {
-      glow.className = 'furnace-glow-core optimal';
+      fieryCore.className = 'furnace-fiery-core optimal';
       zoneVal.textContent = 'Optimal Smelting 🌟';
       zoneVal.style.color = '#10B981';
-      statusText.textContent = 'MOLTEN IRON (Fe) & SLAG';
     } else {
-      glow.className = 'furnace-glow-core overheat';
+      fieryCore.className = 'furnace-fiery-core overheat';
       zoneVal.textContent = 'DANGEROUS OVERHEAT ⚠️';
       zoneVal.style.color = '#DC2626';
-      statusText.textContent = 'REFRACTORY LINING AT RISK!';
     }
   });
 
-  btnTap.addEventListener('click', () => {
+  cardTap.addEventListener('click', () => {
+    if (!state.expState.tuyereBlastOn || state.expState.ironTapped) return;
+
     const temp = state.expState.temperature;
 
     if (temp < 1200) {
@@ -1532,7 +1732,7 @@ function bindSmeltingEvents() {
       state.stage4Mistakes++;
       openTempAlert(
         '❄️ Temperature Too Low!',
-        `At ${temp}°C, the reduction of hematite cannot complete and slag remains solid rock! The taphole cannot flow.`,
+        `At ${temp}°C, the reduction of hematite cannot complete and slag solidifies into rock! The taphole cannot flow.`,
         '1400 °C - 1550 °C (Molten Smelting Zone)'
       );
       updateHeaderScore();
@@ -1551,21 +1751,19 @@ function bindSmeltingEvents() {
 
     labSound.playFanfare();
     state.expState.ironTapped = true;
-    btnTap.disabled = true;
+    cardTap.classList.add('active');
+    cardTap.classList.add('disabled');
 
-    const stream = document.getElementById('moltenIronStream');
-    const ladleFill = document.getElementById('ladleFill');
-    const slagBadge = document.getElementById('slagTapBadge');
+    const stream = document.getElementById('tapStream');
+    const ladleFill = document.getElementById('ladleLiquid');
+    const slagBox = document.getElementById('slagTapBox');
 
     stream.classList.add('flowing');
     ladleFill.style.height = '100%';
-    slagBadge.textContent = 'Slag Tapped ✔';
-    slagBadge.style.background = '#065F46';
-    slagBadge.style.color = '#34D399';
+    slagBox.textContent = 'SLAG SEPARATED ✔';
+    slagBox.style.background = '#065F46';
 
     document.getElementById('smeltYieldVal').textContent = '98.5%';
-    statusText.textContent = 'PURE MOLTEN IRON TAPPED!';
-
     updateExpFeedback('🎉 SUCCESS! White-hot molten iron (Fe) tapped into ingot mold, and lighter slag separated cleanly!');
     btnFinish.disabled = false;
   });
@@ -1584,265 +1782,9 @@ function closeTempAlert() {
 }
 
 // ----------------------------------------------------------------------------
-// TITRATION SIMULATION
+// DIRECT INTERACTIVE CALORIMETRY WORKBENCH
 // ----------------------------------------------------------------------------
-function renderTitrationSim() {
-  const metrics = document.getElementById('expMetrics');
-  metrics.innerHTML = `
-    <div class="metric-card">
-      <span class="metric-label">Burette Dispensed</span>
-      <span class="metric-value" id="titrBuretteVal">0.0 mL</span>
-    </div>
-    <div class="metric-card">
-      <span class="metric-label">Flask pH</span>
-      <span class="metric-value" id="titrPhVal">1.0</span>
-    </div>
-    <div class="metric-card">
-      <span class="metric-label">Solution Color</span>
-      <span class="metric-value" id="titrColorVal" style="color: #64748B;">Colorless</span>
-    </div>
-  `;
-
-  const viewport = document.getElementById('simViewport');
-  viewport.innerHTML = `
-    <div class="titration-rig">
-      <div class="stand-post"></div>
-      <div class="stand-base"></div>
-      <div class="white-tile"></div>
-      <div class="burette-assembly">
-        <div class="burette-liquid" id="buretteLiquidBar"></div>
-        <div class="burette-scale">
-          <div class="scale-mark"></div>
-          <div class="scale-mark"></div>
-          <div class="scale-mark"></div>
-          <div class="scale-mark"></div>
-          <div class="scale-mark"></div>
-        </div>
-        <div class="stopcock-valve" id="stopcockValve">OFF</div>
-        <div class="droplet-stream" id="dropletStream"></div>
-      </div>
-      <div class="conical-flask-sim" id="conicalFlask">
-        <div class="flask-liquid colorless" id="flaskLiquid"></div>
-      </div>
-    </div>
-  `;
-
-  const controls = document.getElementById('simControlsPanel');
-  controls.innerHTML = `
-    <div class="panel-section-title">🧪 1. PRE-TITRATION STEPS</div>
-    <div class="control-btn-group">
-      <button class="action-chip-btn" id="btnAddIndicator">
-        <span>💧 Add Phenolphthalein</span>
-        <small>(2 Drops)</small>
-      </button>
-      <button class="action-chip-btn" id="btnSwirlFlask">
-        <span>🌀 Swirl Conical Flask</span>
-        <small>Continuous Mix</small>
-      </button>
-    </div>
-
-    <div class="panel-section-title" style="margin-top: 10px;">📏 2. BURETTE DISPENSING CONTROL</div>
-    <div class="control-btn-group">
-      <button class="action-chip-btn" id="btnSingleDrop" disabled>
-        <span>💧 Single Drop</span>
-        <small>+0.1 mL</small>
-      </button>
-      <button class="action-chip-btn" id="btnSlowDrip" disabled>
-        <span>⏱️ Slow Drip</span>
-        <small>+0.5 mL / sec</small>
-      </button>
-      <button class="action-chip-btn" id="btnFastFlow" disabled>
-        <span>🌊 Fast Flow</span>
-        <small>+2.0 mL / sec</small>
-      </button>
-      <button class="action-chip-btn" id="btnStopFlow" disabled>
-        <span>🛑 Stop Dispenser</span>
-      </button>
-    </div>
-
-    <div class="panel-section-title" style="margin-top: 10px;">🎯 3. ENDPOINT DETECTION</div>
-    <button class="primary-btn" id="btnDeclareEndpoint" style="width: 100%; justify-content: center;" disabled>
-      <span>🏁 Confirm Endpoint Reached!</span>
-    </button>
-  `;
-
-  bindTitrationSimEvents();
-}
-
-let titrationInterval = null;
-
-function bindTitrationSimEvents() {
-  const btnIndicator = document.getElementById('btnAddIndicator');
-  const btnSwirl = document.getElementById('btnSwirlFlask');
-  const btnSingle = document.getElementById('btnSingleDrop');
-  const btnSlow = document.getElementById('btnSlowDrip');
-  const btnFast = document.getElementById('btnFastFlow');
-  const btnStop = document.getElementById('btnStopFlow');
-  const btnDeclare = document.getElementById('btnDeclareEndpoint');
-  const btnFinish = document.getElementById('btnFinishExperiment');
-
-  btnIndicator.addEventListener('click', () => {
-    labSound.playWaterDrop();
-    state.expState.hasIndicator = true;
-    btnIndicator.disabled = true;
-    btnIndicator.classList.add('active');
-    btnIndicator.innerHTML = '<span>✔ Indicator Added</span>';
-
-    btnSingle.disabled = false;
-    btnSlow.disabled = false;
-    btnFast.disabled = false;
-
-    updateExpFeedback('Phenolphthalein indicator added. Solution remains colorless in acid. Begin titration!');
-  });
-
-  btnSwirl.addEventListener('click', () => {
-    labSound.playClick();
-    const flask = document.getElementById('conicalFlask');
-    flask.classList.add('swirl-anim');
-    setTimeout(() => flask.classList.remove('swirl-anim'), 800);
-  });
-
-  btnSingle.addEventListener('click', () => {
-    dispenseTitrant(0.1);
-  });
-
-  btnSlow.addEventListener('click', () => {
-    startContinuousFlow(0.2, 300);
-    btnSlow.classList.add('active');
-    btnFast.classList.remove('active');
-    btnStop.disabled = false;
-  });
-
-  btnFast.addEventListener('click', () => {
-    startContinuousFlow(0.5, 200);
-    btnFast.classList.add('active');
-    btnSlow.classList.remove('active');
-    btnStop.disabled = false;
-  });
-
-  btnStop.addEventListener('click', () => {
-    stopContinuousFlow();
-  });
-
-  btnDeclare.addEventListener('click', () => {
-    stopContinuousFlow();
-    const vol = state.expState.buretteVolume;
-    if (vol >= 19.5 && vol <= 20.5) {
-      labSound.playFanfare();
-      state.expState.endpointReached = true;
-      btnFinish.disabled = false;
-      updateExpFeedback('🎯 PERFECT! Exact pale-pink neutralization equivalence reached at 20.0 mL (pH = 7.0)!');
-      btnDeclare.disabled = true;
-    } else if (vol < 19.5) {
-      labSound.playError();
-      state.stage4Mistakes++;
-      updateExpFeedback(`⚠️ Under-titrated (${vol.toFixed(1)} mL). The solution is still acidic! Add more NaOH.`);
-    } else {
-      labSound.playError();
-      state.stage4Mistakes++;
-      updateExpFeedback(`⚠️ Over-titrated (${vol.toFixed(1)} mL)! You added excess base, turning the solution dark fuchsia.`);
-      btnFinish.disabled = false;
-    }
-    updateHeaderScore();
-  });
-}
-
-function startContinuousFlow(amount, rateMs) {
-  stopContinuousFlow();
-  document.getElementById('stopcockValve').classList.add('open');
-  document.getElementById('stopcockValve').textContent = 'ON';
-  document.getElementById('dropletStream').classList.add('dropping');
-
-  titrationInterval = setInterval(() => {
-    dispenseTitrant(amount);
-  }, rateMs);
-}
-
-function stopContinuousFlow() {
-  if (titrationInterval) {
-    clearInterval(titrationInterval);
-    titrationInterval = null;
-  }
-  const valve = document.getElementById('stopcockValve');
-  const stream = document.getElementById('dropletStream');
-  if (valve) {
-    valve.classList.remove('open');
-    valve.textContent = 'OFF';
-  }
-  if (stream) stream.classList.remove('dropping');
-
-  const btnSlow = document.getElementById('btnSlowDrip');
-  const btnFast = document.getElementById('btnFastFlow');
-  if (btnSlow) btnSlow.classList.remove('active');
-  if (btnFast) btnFast.classList.remove('active');
-}
-
-function dispenseTitrant(amount) {
-  labSound.playWaterDrop();
-  state.expState.buretteVolume = Math.min(50.0, state.expState.buretteVolume + amount);
-  const vol = state.expState.buretteVolume;
-
-  const liquidBar = document.getElementById('buretteLiquidBar');
-  const pct = Math.max(10, 90 - (vol / 50.0) * 80);
-  if (liquidBar) liquidBar.style.height = `${pct}%`;
-
-  const buretteVal = document.getElementById('titrBuretteVal');
-  const phVal = document.getElementById('titrPhVal');
-  const colorVal = document.getElementById('titrColorVal');
-  const flaskLiquid = document.getElementById('flaskLiquid');
-  const btnDeclare = document.getElementById('btnDeclareEndpoint');
-
-  if (buretteVal) buretteVal.textContent = `${vol.toFixed(1)} mL`;
-
-  let calcPh = 1.0;
-  if (vol < 18.0) {
-    calcPh = 1.0 + (vol / 18.0) * 2.0;
-  } else if (vol < 19.8) {
-    calcPh = 3.5 + ((vol - 18.0) / 1.8) * 2.5;
-  } else if (vol <= 20.2) {
-    calcPh = 7.0 + (vol - 20.0) * 4.0;
-  } else {
-    calcPh = Math.min(13.0, 10.0 + (vol - 20.2) * 0.4);
-  }
-
-  if (phVal) phVal.textContent = calcPh.toFixed(1);
-
-  if (flaskLiquid && state.expState.hasIndicator) {
-    if (vol < 19.5) {
-      flaskLiquid.className = 'flask-liquid colorless';
-      if (colorVal) {
-        colorVal.textContent = 'Colorless';
-        colorVal.style.color = '#64748B';
-      }
-    } else if (vol >= 19.5 && vol < 20.0) {
-      flaskLiquid.className = 'flask-liquid transient-pink';
-      if (colorVal) {
-        colorVal.textContent = 'Faint Wisps';
-        colorVal.style.color = '#F472B6';
-      }
-      if (btnDeclare) btnDeclare.disabled = false;
-    } else if (vol >= 20.0 && vol <= 20.4) {
-      flaskLiquid.className = 'flask-liquid pale-pink';
-      if (colorVal) {
-        colorVal.textContent = 'Permanent Pale Pink 🌸';
-        colorVal.style.color = '#EC4899';
-      }
-      if (btnDeclare) btnDeclare.disabled = false;
-    } else {
-      flaskLiquid.className = 'flask-liquid over-titrated';
-      if (colorVal) {
-        colorVal.textContent = 'Over-titrated Magenta 🛑';
-        colorVal.style.color = '#BE185D';
-      }
-      if (btnDeclare) btnDeclare.disabled = false;
-    }
-  }
-}
-
-// ----------------------------------------------------------------------------
-// CALORIMETRY SIMULATION
-// ----------------------------------------------------------------------------
-function renderCalorimetrySim() {
+function renderDirectCalorimetryWorkbench(container) {
   const metrics = document.getElementById('expMetrics');
   metrics.innerHTML = `
     <div class="metric-card">
@@ -1859,85 +1801,99 @@ function renderCalorimetrySim() {
     </div>
   `;
 
-  const viewport = document.getElementById('simViewport');
-  viewport.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
-      <div style="width: 120px; height: 140px;" id="calorimeterIcon">
+  container.innerHTML = `
+    <div class="workbench-viewport">
+      <div style="width: 140px; height: 160px; position: relative;">
         ${getRealisticApparatusSVG('calorimeter')}
+        <div style="position: absolute; top: 10px; right: -50px; background: white; border: 2px solid #7C3AED; padding: 6px 12px; border-radius: 8px; font-family: var(--font-mono); font-weight: 800; font-size: 16px; color: #7C3AED;" id="digitalProbe">
+          22.0 °C
+        </div>
       </div>
-      <div style="position: absolute; top: 10px; right: -40px; background: white; border: 2px solid #7C3AED; padding: 6px 12px; border-radius: 8px; font-family: var(--font-mono); font-weight: 800; font-size: 16px; color: #7C3AED;" id="digitalProbe">
-        22.0 °C
+      <div style="margin-top: 14px; font-family: var(--font-display); font-size: 14px; font-weight: 800; color: #2D144B;" id="calorStatus">
+        Calorimeter Chamber Ready
       </div>
-      <div style="margin-top: 10px; font-family: var(--font-display); font-size: 13px; font-weight: 800; color: #2D144B;" id="calorStatus">
-        Calorimeter Ready (Empty)
+    </div>
+
+    <div class="workbench-tools-tray">
+      <div class="panel-section-title">🧪 1. POUR REACTANTS</div>
+
+      <div class="direct-action-card" id="cardPourAcid">
+        <div class="action-card-icon">🥛</div>
+        <div>
+          <div class="action-card-title">Pour 50 mL 1.0 M HCl</div>
+          <div class="action-card-hint">Transfers acid into calorimeter</div>
+        </div>
+      </div>
+
+      <div class="direct-action-card disabled" id="cardPourBase">
+        <div class="action-card-icon">🥛</div>
+        <div>
+          <div class="action-card-title">Pour 50 mL 1.0 M NaOH</div>
+          <div class="action-card-hint">Initiates neutralization</div>
+        </div>
+      </div>
+
+      <div class="panel-section-title" style="margin-top: 6px;">🔒 2. SEAL & STIR</div>
+
+      <div class="direct-action-card disabled" id="cardSealLid">
+        <div class="action-card-icon">🛡️</div>
+        <div>
+          <div class="action-card-title">Seal Insulated Lid</div>
+          <div class="action-card-hint">Prevents heat loss to room</div>
+        </div>
+      </div>
+
+      <div class="direct-action-card disabled" id="cardStirMix">
+        <div class="action-card-icon">🌀</div>
+        <div>
+          <div class="action-card-title">Stir Solution & Measure ΔT</div>
+          <div class="action-card-hint">Continuous temperature sampling</div>
+        </div>
       </div>
     </div>
   `;
 
-  const controls = document.getElementById('simControlsPanel');
-  controls.innerHTML = `
-    <div class="panel-section-title">🔥 1. CHARGE REACTANTS</div>
-    <div class="control-btn-group">
-      <button class="action-chip-btn" id="btnAddAcidCal">
-        <span>🧪 Add 50 mL 1.0 M HCl</span>
-      </button>
-      <button class="action-chip-btn" id="btnAddBaseCal" disabled>
-        <span>🧪 Add 50 mL 1.0 M NaOH</span>
-      </button>
-    </div>
-
-    <div class="panel-section-title" style="margin-top: 10px;">🔒 2. INSULATE & STIR</div>
-    <div class="control-btn-group">
-      <button class="action-chip-btn" id="btnCloseLid" disabled>
-        <span>🛡️ Close Insulated Lid</span>
-      </button>
-      <button class="action-chip-btn" id="btnStirCal" disabled>
-        <span>🌀 Activate Stirrer</span>
-      </button>
-    </div>
-  `;
-
-  bindCalorimetryEvents();
+  bindDirectCalorimetryEvents();
 }
 
-function bindCalorimetryEvents() {
-  const btnAcid = document.getElementById('btnAddAcidCal');
-  const btnBase = document.getElementById('btnAddBaseCal');
-  const btnLid = document.getElementById('btnCloseLid');
-  const btnStir = document.getElementById('btnStirCal');
+function bindDirectCalorimetryEvents() {
+  const cardAcid = document.getElementById('cardPourAcid');
+  const cardBase = document.getElementById('cardPourBase');
+  const cardLid = document.getElementById('cardSealLid');
+  const cardStir = document.getElementById('cardStirMix');
   const btnFinish = document.getElementById('btnFinishExperiment');
 
-  btnAcid.addEventListener('click', () => {
+  cardAcid.addEventListener('click', () => {
+    if (state.expState.acidAdded) return;
     labSound.playWaterDrop();
     state.expState.acidAdded = true;
-    btnAcid.disabled = true;
-    btnAcid.classList.add('active');
-    btnBase.disabled = false;
+    cardAcid.classList.add('active', 'disabled');
+    cardBase.classList.remove('disabled');
     document.getElementById('calorStatus').textContent = '50 mL HCl in Cup (22.0 °C)';
   });
 
-  btnBase.addEventListener('click', () => {
+  cardBase.addEventListener('click', () => {
+    if (!state.expState.acidAdded || state.expState.baseAdded) return;
     labSound.playWaterDrop();
     state.expState.baseAdded = true;
-    btnBase.disabled = true;
-    btnBase.classList.add('active');
-    btnLid.disabled = false;
+    cardBase.classList.add('active', 'disabled');
+    cardLid.classList.remove('disabled');
     document.getElementById('calorStatus').textContent = 'HCl + NaOH Mixed! Rapidly Close Lid!';
   });
 
-  btnLid.addEventListener('click', () => {
+  cardLid.addEventListener('click', () => {
+    if (!state.expState.baseAdded || state.expState.lidClosed) return;
     labSound.playClick();
     state.expState.lidClosed = true;
-    btnLid.disabled = true;
-    btnLid.classList.add('active');
-    btnStir.disabled = false;
+    cardLid.classList.add('active', 'disabled');
+    cardStir.classList.remove('disabled');
     document.getElementById('calorStatus').textContent = 'Calorimeter Sealed. Stir to Measure ΔT.';
   });
 
-  btnStir.addEventListener('click', () => {
+  cardStir.addEventListener('click', () => {
+    if (!state.expState.lidClosed) return;
     labSound.playSuccess();
-    btnStir.disabled = true;
-    btnStir.classList.add('active');
+    cardStir.classList.add('active', 'disabled');
     document.getElementById('calorStatus').textContent = 'Stirring... Exothermic reaction in progress! 📈';
 
     let temp = 22.0;
@@ -1955,14 +1911,14 @@ function bindCalorimetryEvents() {
         document.getElementById('calorStatus').textContent = 'Peak Temperature (28.8 °C) Reached! ΔT = +6.8 °C';
         btnFinish.disabled = false;
       }
-    }, 100);
+    }, 90);
   });
 }
 
 // ----------------------------------------------------------------------------
-// FLAME TEST SIMULATION
+// DIRECT INTERACTIVE FLAME TEST WORKBENCH
 // ----------------------------------------------------------------------------
-function renderFlameTestSim() {
+function renderDirectFlameTestWorkbench(container) {
   const metrics = document.getElementById('expMetrics');
   metrics.innerHTML = `
     <div class="metric-card">
@@ -1979,42 +1935,58 @@ function renderFlameTestSim() {
     </div>
   `;
 
-  const viewport = document.getElementById('simViewport');
-  viewport.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
-      <div id="flameGlowEffect" style="width: 120px; height: 180px; border-radius: 50% 50% 20% 20%; background: radial-gradient(circle, #38BDF8 0%, #3B82F6 60%, transparent 80%); filter: blur(4px); box-shadow: 0 0 40px #38BDF8; transition: all 0.5s ease;"></div>
-      <div style="width: 30px; height: 70px; background: #64748B; border-radius: 4px; margin-top: -10px;"></div>
-      <div style="width: 70px; height: 14px; background: #334155; border-radius: 6px;"></div>
+  container.innerHTML = `
+    <div class="workbench-viewport">
+      <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
+        <div id="flameGlowEffect" style="width: 130px; height: 190px; border-radius: 50% 50% 20% 20%; background: radial-gradient(circle, #38BDF8 0%, #3B82F6 60%, transparent 80%); filter: blur(4px); box-shadow: 0 0 40px #38BDF8; transition: all 0.5s ease;"></div>
+        <div style="width: 32px; height: 75px; background: #64748B; border-radius: 4px; margin-top: -10px;"></div>
+        <div style="width: 75px; height: 16px; background: #334155; border-radius: 6px;"></div>
+      </div>
+    </div>
+
+    <div class="workbench-tools-tray">
+      <div class="panel-section-title">🌈 1. PICK SAMPLE ON PLATINUM LOOP</div>
+
+      <div class="direct-action-card" id="cardSampleNa">
+        <div class="action-card-icon">🧂</div>
+        <div>
+          <div class="action-card-title">Dip Loop in NaCl (Sodium)</div>
+          <div class="action-card-hint">Holds into Bunsen flame</div>
+        </div>
+      </div>
+
+      <div class="direct-action-card" id="cardSampleSr">
+        <div class="action-card-icon">🧂</div>
+        <div>
+          <div class="action-card-title">Dip Loop in SrCl₂ (Strontium)</div>
+          <div class="action-card-hint">Holds into Bunsen flame</div>
+        </div>
+      </div>
+
+      <div class="direct-action-card" id="cardSampleCu">
+        <div class="action-card-icon">🧂</div>
+        <div>
+          <div class="action-card-title">Dip Loop in CuSO₄ (Copper)</div>
+          <div class="action-card-hint">Holds into Bunsen flame</div>
+        </div>
+      </div>
+
+      <div class="panel-section-title" style="margin-top: 6px;">🧼 2. CLEANING BATH</div>
+
+      <div class="direct-action-card" id="cardCleanWire">
+        <div class="action-card-icon">🧪</div>
+        <div>
+          <div class="action-card-title">Rinse Loop in Conc. HCl</div>
+          <div class="action-card-hint">Purifies platinum wire</div>
+        </div>
+      </div>
     </div>
   `;
 
-  const controls = document.getElementById('simControlsPanel');
-  controls.innerHTML = `
-    <div class="panel-section-title">🌈 1. SELECT SAMPLE SALT</div>
-    <div class="control-btn-group">
-      <button class="action-chip-btn" id="btnSampleNa">
-        <span>🧂 NaCl (Sodium)</span>
-      </button>
-      <button class="action-chip-btn" id="btnSampleSr">
-        <span>🧂 SrCl₂ (Strontium)</span>
-      </button>
-      <button class="action-chip-btn" id="btnSampleCu">
-        <span>🧂 CuSO₄ (Copper)</span>
-      </button>
-    </div>
-
-    <div class="panel-section-title" style="margin-top: 10px;">🧹 2. WIRE LOOP PROTOCOL</div>
-    <div class="control-btn-group">
-      <button class="action-chip-btn" id="btnCleanLoop">
-        <span>🧼 Clean Loop in Conc. HCl</span>
-      </button>
-    </div>
-  `;
-
-  bindFlameTestEvents();
+  bindDirectFlameTestEvents();
 }
 
-function bindFlameTestEvents() {
+function bindDirectFlameTestEvents() {
   const glow = document.getElementById('flameGlowEffect');
   const sampleVal = document.getElementById('flameSampleVal');
   const lambdaVal = document.getElementById('flameLambdaVal');
@@ -2022,7 +1994,7 @@ function bindFlameTestEvents() {
 
   let testedCount = 0;
 
-  document.getElementById('btnSampleNa').addEventListener('click', () => {
+  document.getElementById('cardSampleNa').addEventListener('click', () => {
     labSound.playSuccess();
     testedCount++;
     glow.style.background = 'radial-gradient(circle, #FDE047 0%, #EAB308 60%, transparent 80%)';
@@ -2032,7 +2004,7 @@ function bindFlameTestEvents() {
     if (testedCount >= 2) btnFinish.disabled = false;
   });
 
-  document.getElementById('btnSampleSr').addEventListener('click', () => {
+  document.getElementById('cardSampleSr').addEventListener('click', () => {
     labSound.playSuccess();
     testedCount++;
     glow.style.background = 'radial-gradient(circle, #F87171 0%, #DC2626 60%, transparent 80%)';
@@ -2042,7 +2014,7 @@ function bindFlameTestEvents() {
     if (testedCount >= 2) btnFinish.disabled = false;
   });
 
-  document.getElementById('btnSampleCu').addEventListener('click', () => {
+  document.getElementById('cardSampleCu').addEventListener('click', () => {
     labSound.playSuccess();
     testedCount++;
     glow.style.background = 'radial-gradient(circle, #34D399 0%, #059669 60%, transparent 80%)';
@@ -2052,7 +2024,7 @@ function bindFlameTestEvents() {
     if (testedCount >= 2) btnFinish.disabled = false;
   });
 
-  document.getElementById('btnCleanLoop').addEventListener('click', () => {
+  document.getElementById('cardCleanWire').addEventListener('click', () => {
     labSound.playWaterDrop();
     glow.style.background = 'radial-gradient(circle, #38BDF8 0%, #3B82F6 60%, transparent 80%)';
     glow.style.boxShadow = '0 0 40px #38BDF8';
@@ -2143,13 +2115,8 @@ function renderRevisionContent() {
 // ============================================================================
 // 11. MODALS & TOAST NOTICES
 // ============================================================================
-function openHurrahModal() {
-  document.getElementById('modalHurrah').classList.add('open');
-}
-
-function closeHurrahModal() {
-  document.getElementById('modalHurrah').classList.remove('open');
-}
+function openHurrahModal() { document.getElementById('modalHurrah').classList.add('open'); }
+function closeHurrahModal() { document.getElementById('modalHurrah').classList.remove('open'); }
 
 function openConceptModal(cardKey) {
   labSound.playClick();

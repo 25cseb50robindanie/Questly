@@ -55,7 +55,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Base App Container */
 .lab-app {
   display: flex;
   flex-direction: column;
@@ -129,7 +128,6 @@ body {
   line-height: 1.1;
 }
 
-/* Module Tabs */
 .module-tabs {
   display: flex;
   background: #F1F5F9;
@@ -166,7 +164,6 @@ body {
   box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
 }
 
-/* Stage Stepper */
 .stage-stepper {
   display: flex;
   align-items: center;
@@ -230,7 +227,6 @@ body {
   color: var(--color-white);
 }
 
-/* Header Stats */
 .header-stats {
   display: flex;
   align-items: center;
@@ -250,15 +246,8 @@ body {
   font-weight: 800;
 }
 
-.score-pill {
-  color: var(--color-green);
-  border-color: rgba(16, 185, 129, 0.3);
-}
-
-.xp-pill {
-  color: var(--color-gold);
-  border-color: rgba(245, 158, 11, 0.3);
-}
+.score-pill { color: var(--color-green); border-color: rgba(16, 185, 129, 0.3); }
+.xp-pill { color: var(--color-gold); border-color: rgba(245, 158, 11, 0.3); }
 
 /* ==========================================================================
    WORKSPACE & STAGE VIEWS
@@ -289,15 +278,8 @@ body {
 /* ==========================================================================
    STAGE 1: CONCEPT & THEORY CARDS
    ========================================================================== */
-.concept-hero {
-  margin-bottom: 16px;
-}
-
-.concept-badge-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 6px;
-}
+.concept-hero { margin-bottom: 16px; }
+.concept-badge-row { display: flex; gap: 8px; margin-bottom: 6px; }
 
 .stage-tag {
   background: var(--color-lavender);
@@ -456,16 +438,8 @@ body {
   color: #64748B;
 }
 
-.step-dot.active {
-  background: var(--color-purple);
-  color: var(--color-white);
-}
-
-.step-line {
-  flex: 1;
-  height: 2px;
-  background: #CBD5E1;
-}
+.step-dot.active { background: var(--color-purple); color: var(--color-white); }
+.step-line { flex: 1; height: 2px; background: #CBD5E1; }
 
 .card-info-btn {
   margin-top: auto;
@@ -487,7 +461,6 @@ body {
   color: var(--color-white);
 }
 
-/* Action Bar */
 .stage-action-bar {
   display: flex;
   align-items: center;
@@ -509,11 +482,8 @@ body {
   color: #475569;
 }
 
-.guide-icon {
-  font-size: 18px;
-}
+.guide-icon { font-size: 18px; }
 
-/* Primary Button */
 .primary-btn {
   display: inline-flex;
   align-items: center;
@@ -565,9 +535,7 @@ body {
   color: var(--color-purple);
 }
 
-.pulse-anim {
-  animation: pulseGlow 2s infinite;
-}
+.pulse-anim { animation: pulseGlow 2s infinite; }
 
 @keyframes pulseGlow {
   0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.5); }
@@ -576,7 +544,7 @@ body {
 }
 
 /* ==========================================================================
-   STAGE 2: REALISTIC APPARATUS CARDS & SVGs
+   STAGE 2 & 3: APPARATUS & CUPBOARD
    ========================================================================== */
 .stage-banner {
   display: flex;
@@ -704,9 +672,7 @@ body {
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 
-.apparatus-card:hover .real-svg-container {
-  transform: scale(1.08);
-}
+.apparatus-card:hover .real-svg-container { transform: scale(1.08); }
 
 .apparatus-card .app-name {
   font-family: var(--font-display);
@@ -749,9 +715,7 @@ body {
   animation: shakeAnim 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
-.apparatus-card.wrong .wrong-overlay {
-  display: flex !important;
-}
+.apparatus-card.wrong .wrong-overlay { display: flex !important; }
 
 .wrong-overlay {
   display: none;
@@ -768,19 +732,8 @@ body {
   animation: fadeIn 0.2s ease;
 }
 
-.wrong-overlay .cross-icon {
-  font-size: 32px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.wrong-overlay .wrong-text {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 800;
-  text-align: center;
-  margin-top: 4px;
-}
+.wrong-overlay .cross-icon { font-size: 32px; font-weight: 900; line-height: 1; }
+.wrong-overlay .wrong-text { font-family: var(--font-display); font-size: 11px; font-weight: 800; text-align: center; margin-top: 4px; }
 
 @keyframes shakeAnim {
   10%, 90% { transform: translate3d(-2px, 0, 0); }
@@ -815,10 +768,7 @@ body {
   margin-bottom: 12px;
 }
 
-.vent-status {
-  color: #34D399;
-  font-size: 10px;
-}
+.vent-status { color: #34D399; font-size: 10px; }
 
 .cupboard-shelf {
   background: rgba(15, 23, 42, 0.6);
@@ -879,7 +829,6 @@ body {
   box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
 
-/* Glass Bottle Structure */
 .bottle-visual {
   position: relative;
   width: 52px;
@@ -922,10 +871,6 @@ body {
   background: rgba(180, 83, 9, 0.3);
 }
 
-.amber-glass-bottle .bottle-cap {
-  background: #1E1B4B;
-}
-
 .liquid-fill {
   position: absolute;
   bottom: 0;
@@ -945,7 +890,6 @@ body {
   border-radius: 2px;
 }
 
-/* Mineral Jars */
 .mineral-jar-visual {
   position: relative;
   width: 54px;
@@ -1004,7 +948,6 @@ body {
   box-shadow: inset 0 0 8px #94A3B8;
 }
 
-/* Authentic Chemical Label Styling */
 .real-lab-label {
   background: #FFFFFF;
   border: 1px solid #CBD5E1;
@@ -1032,37 +975,10 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-.bottle-formula {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 800;
-  color: #0F172A;
-}
-
-.bottle-conc {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--color-purple);
-}
-
-.bottle-name-sub {
-  font-size: 8px;
-  color: #475569;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.label-purity, .label-cas {
-  font-size: 7px;
-  color: #64748B;
-  font-family: var(--font-mono);
-  border-top: 1px dotted #E2E8F0;
-  margin-top: 2px;
-  padding-top: 1px;
-}
+.bottle-formula { font-family: var(--font-display); font-size: 11px; font-weight: 800; color: #0F172A; }
+.bottle-conc { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--color-purple); }
+.bottle-name-sub { font-size: 8px; color: #475569; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.label-purity, .label-cas { font-size: 7px; color: #64748B; font-family: var(--font-mono); border-top: 1px dotted #E2E8F0; margin-top: 2px; padding-top: 1px; }
 
 .chemical-bottle.picked {
   background: rgba(16, 185, 129, 0.2);
@@ -1090,9 +1006,7 @@ body {
   animation: shakeAnim 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
-.chemical-bottle.wrong .wrong-overlay {
-  display: flex !important;
-}
+.chemical-bottle.wrong .wrong-overlay { display: flex !important; }
 
 /* ==========================================================================
    LIVE FEEDBACK BOX (FOOTER)
@@ -1118,82 +1032,46 @@ body {
   max-width: 65%;
 }
 
-.live-feedback-box.info {
-  color: var(--color-purple);
-}
-
-.live-feedback-box.success {
-  color: var(--color-green);
-}
-
-.live-feedback-box.error {
-  color: var(--color-red);
-}
+.live-feedback-box.info { color: var(--color-purple); }
+.live-feedback-box.success { color: var(--color-green); }
+.live-feedback-box.error { color: var(--color-red); }
 
 /* ==========================================================================
-   STAGE 4: EXPERIMENT SIMULATOR LAYOUT
+   STAGE 4: DIRECT HANDS-ON WORKBENCH SIMULATION
    ========================================================================== */
-.exp-banner {
-  margin-bottom: 12px;
-}
+.exp-banner { margin-bottom: 10px; }
+.exp-metrics-bar { display: flex; gap: 10px; flex-wrap: wrap; }
 
-.exp-metrics-bar {
+.sim-interactive-workbench {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.metric-card {
-  background: var(--color-white);
-  border: 1.5px solid rgba(45, 20, 75, 0.12);
-  border-radius: var(--radius-md);
-  padding: 6px 12px;
-  display: flex;
-  flex-direction: column;
-  min-width: 90px;
-}
-
-.metric-label {
-  font-family: var(--font-display);
-  font-size: 9px;
-  font-weight: 800;
-  color: #64748B;
-  text-transform: uppercase;
-}
-
-.metric-value {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--color-purple);
-}
-
-.simulator-layout {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 16px;
   flex: 1;
+  gap: 16px;
+  min-height: 420px;
   margin-bottom: 12px;
-  min-height: 380px;
 }
 
-.sim-viewport {
-  background: linear-gradient(180deg, #F8FAFC 0%, #EDE9FE 100%);
+/* Left main workbench desk */
+.workbench-viewport {
+  flex: 1.3;
+  background: linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 100%);
   border: 2.5px solid var(--color-plum);
   border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 0 20px rgba(45, 20, 75, 0.05);
+  box-shadow: inset 0 0 25px rgba(45, 20, 75, 0.06);
 }
 
-.sim-controls-panel {
+/* Right interactive tools tray */
+.workbench-tools-tray {
+  flex: 0.7;
   background: var(--color-white);
   border: 2px solid rgba(45, 20, 75, 0.12);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1201,405 +1079,305 @@ body {
   overflow-y: auto;
 }
 
-.panel-section-title {
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--color-plum);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* Interactive Direct-Action Cards in Tray */
+.direct-action-card {
+  background: #F8FAFC;
+  border: 2px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.control-btn-group {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.action-chip-btn {
-  flex: 1;
-  padding: 10px 8px;
-  background: #F1F5F9;
-  border: 1.5px solid #CBD5E1;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--color-plum);
+  gap: 12px;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 
-.action-chip-btn:hover:not(:disabled) {
-  background: var(--color-lavender);
+.direct-action-card:hover:not(.disabled) {
   border-color: var(--color-purple);
-  color: var(--color-purple);
+  background: var(--color-lavender-light);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-.action-chip-btn.active {
+.direct-action-card.active {
   background: var(--color-purple);
   border-color: var(--color-purple);
   color: var(--color-white);
-  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
 }
 
-.action-chip-btn:disabled {
-  opacity: 0.4;
+.direct-action-card.active .action-card-title { color: var(--color-white); }
+.direct-action-card.active .action-card-hint { color: rgba(255, 255, 255, 0.85); }
+
+.direct-action-card.disabled {
+  opacity: 0.45;
   cursor: not-allowed;
+  filter: grayscale(0.8);
 }
 
-/* Titration Rig */
-.titration-rig {
+.action-card-icon { font-size: 26px; }
+.action-card-title { font-family: var(--font-display); font-size: 12px; font-weight: 800; color: var(--color-plum); }
+.action-card-hint { font-size: 10px; color: #64748B; font-weight: 600; margin-top: 1px; }
+
+/* ==========================================================================
+   HIGH-FIDELITY INDUSTRIAL BLAST FURNACE STACK (GAMIFIED 3D VIEW)
+   ========================================================================== */
+.blast-furnace-cutaway {
   position: relative;
-  width: 280px;
-  height: 360px;
+  width: 380px;
+  height: 390px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.stand-post {
-  position: absolute;
-  right: 40px;
-  top: 10px;
-  bottom: 10px;
-  width: 10px;
-  background: #64748B;
+.furnace-outer-shell {
+  position: relative;
+  width: 220px;
+  height: 310px;
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+  clip-path: polygon(25% 0%, 75% 0%, 95% 65%, 82% 100%, 18% 100%, 5% 65%);
+  border: 3px solid #475569;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  overflow: hidden;
+}
+
+/* Clear readable zone badges inside furnace */
+.furnace-zone-banner {
+  z-index: 10;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid #818CF8;
   border-radius: 4px;
+  padding: 3px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
-.stand-base {
+.furnace-zone-banner.top-zone { width: 140px; margin-top: 5px; }
+.furnace-zone-banner.mid-zone { width: 170px; }
+.furnace-zone-banner.hearth-zone { width: 150px; margin-bottom: 8px; border-color: #F59E0B; }
+
+.zone-title {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+}
+
+.zone-sub {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  color: #A5B4FC;
+}
+
+.furnace-zone-banner.hearth-zone .zone-sub { color: #FDE68A; }
+
+/* Internal Fiery Core & Embers */
+.furnace-fiery-core {
   position: absolute;
-  bottom: 0;
-  left: 20px;
-  right: 20px;
-  height: 16px;
-  background: #334155;
-  border-radius: 6px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  inset: 0;
+  background: radial-gradient(circle at 50% 80%, #334155 0%, #0F172A 70%);
+  transition: all 0.6s ease;
+  z-index: 1;
 }
 
-.white-tile {
-  position: absolute;
-  bottom: 16px;
-  left: 45px;
-  width: 130px;
-  height: 10px;
-  background: #FFFFFF;
-  border: 1.5px solid #CBD5E1;
-  border-radius: 3px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.furnace-fiery-core.warm {
+  background: radial-gradient(circle at 50% 75%, #F97316 0%, #C2410C 40%, #1E293B 80%);
 }
 
-.burette-assembly {
-  position: absolute;
-  top: 15px;
-  left: 78px;
-  width: 24px;
-  height: 200px;
-  border: 2px solid rgba(30, 41, 59, 0.8);
-  border-radius: 6px 6px 2px 2px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(2px);
+.furnace-fiery-core.optimal {
+  background: radial-gradient(circle at 50% 70%, #FFFFFF 0%, #FDE047 25%, #F97316 55%, #991B1B 85%);
+  animation: furnaceBlaze 1.5s infinite alternate ease-in-out;
 }
 
-.burette-liquid {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 90%;
-  background: linear-gradient(180deg, rgba(147, 197, 253, 0.4) 0%, rgba(59, 130, 246, 0.6) 100%);
-  border-radius: 0 0 2px 2px;
-  transition: height 0.3s linear;
+.furnace-fiery-core.overheat {
+  background: radial-gradient(circle at 50% 65%, #FFFFFF 0%, #EF4444 40%, #7F1D1D 85%);
+  animation: overheatPulse 0.4s infinite alternate;
 }
 
-.burette-scale {
+@keyframes furnaceBlaze {
+  0% { filter: brightness(1) drop-shadow(0 0 10px #F97316); }
+  100% { filter: brightness(1.25) drop-shadow(0 0 25px #FDE047); }
+}
+
+/* Hopper with interactive charging basket */
+.hopper-charging-deck {
   position: absolute;
   top: 0;
-  bottom: 0;
-  left: 0;
-  width: 8px;
-  border-right: 1px solid rgba(0,0,0,0.3);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 4px 0;
-}
-
-.scale-mark {
-  width: 5px;
-  height: 1px;
-  background: #1E293B;
-}
-
-.stopcock-valve {
-  position: absolute;
-  bottom: -16px;
-  left: -6px;
-  width: 36px;
-  height: 16px;
-  background: #EF4444;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-size: 8px;
-  font-weight: 800;
-  color: white;
-  transition: transform 0.2s ease;
-}
-
-.stopcock-valve.open {
-  transform: rotate(90deg);
-  background: #10B981;
-}
-
-.droplet-stream {
-  position: absolute;
-  bottom: -40px;
-  left: 10px;
-  width: 4px;
-  height: 8px;
-  background: #3B82F6;
-  border-radius: 50%;
-  opacity: 0;
-}
-
-.droplet-stream.dropping {
-  animation: dropFalling 0.6s infinite linear;
-}
-
-@keyframes dropFalling {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(40px); opacity: 0; }
-}
-
-.conical-flask-sim {
-  position: absolute;
-  bottom: 26px;
-  left: 60px;
-  width: 90px;
-  height: 95px;
-  clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
-  background: rgba(255, 255, 255, 0.5);
-  border: 2.5px solid #334155;
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.flask-liquid {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 45px;
-  background: rgba(224, 242, 254, 0.4);
-  transition: background-color 0.8s ease, transform 0.3s ease;
-}
-
-.flask-liquid.colorless { background: rgba(224, 242, 254, 0.4); }
-.flask-liquid.transient-pink { background: rgba(244, 114, 182, 0.35); }
-.flask-liquid.pale-pink { background: rgba(236, 72, 153, 0.65); box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
-.flask-liquid.over-titrated { background: rgba(190, 24, 93, 0.95); box-shadow: 0 0 20px rgba(190, 24, 93, 0.7); }
-
-.swirl-anim { animation: swirlFlask 0.4s ease-in-out infinite alternate; }
-@keyframes swirlFlask { 0% { transform: rotate(-3deg); } 100% { transform: rotate(3deg); } }
-
-/* Smelting Furnace Rig */
-.furnace-rig {
-  position: relative;
-  width: 320px;
-  height: 380px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.furnace-body {
-  position: relative;
-  width: 140px;
-  height: 250px;
-  background: #334155;
-  clip-path: polygon(25% 0%, 75% 0%, 100% 70%, 85% 100%, 15% 100%, 0% 70%);
-  border: 3px solid #1E293B;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  transition: all 0.5s ease;
-}
-
-.furnace-glow-core {
-  position: absolute;
-  width: 110px;
-  height: 180px;
-  border-radius: 50% 50% 20% 20%;
+  width: 130px;
+  height: 35px;
   background: #475569;
-  filter: blur(8px);
-  transition: all 0.5s ease;
-}
-
-.furnace-glow-core.cold { background: #334155; box-shadow: none; }
-.furnace-glow-core.warm { background: radial-gradient(circle, #F97316 0%, #EA580C 70%, transparent 100%); box-shadow: 0 0 25px rgba(249, 115, 22, 0.5); }
-.furnace-glow-core.optimal { background: radial-gradient(circle, #FFFFFF 0%, #FDE047 30%, #F97316 70%, #DC2626 100%); box-shadow: 0 0 45px rgba(253, 224, 71, 0.9); animation: heatPulse 1.2s infinite alternate; }
-.furnace-glow-core.overheat { background: radial-gradient(circle, #FFFFFF 0%, #EF4444 60%, #991B1B 100%); box-shadow: 0 0 50px rgba(239, 68, 68, 1); animation: overheatPulse 0.4s infinite alternate; }
-
-@keyframes heatPulse { 0% { transform: scale(0.96); opacity: 0.9; } 100% { transform: scale(1.04); opacity: 1; } }
-@keyframes overheatPulse { 0% { transform: scale(0.94); } 100% { transform: scale(1.08); filter: blur(12px); } }
-
-.furnace-top-hopper {
-  position: absolute;
-  top: 15px;
-  width: 120px;
-  height: 25px;
-  background: #64748B;
   border: 2px solid #1E293B;
-  border-radius: 4px 4px 0 0;
+  border-radius: 6px 6px 0 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
-  font-family: var(--font-display);
-  font-weight: 800;
-  color: white;
+  z-index: 12;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-.tuyere-blast-pipe {
+.hopper-charging-deck:hover {
+  background: #64748B;
+  border-color: #818CF8;
+}
+
+.hopper-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 900;
+  color: #FFFFFF;
+}
+
+/* Tuyere Air Nozzles with Clickable Lever */
+.tuyere-pipe-assembly {
   position: absolute;
   bottom: 80px;
   left: -20px;
   right: -20px;
-  height: 12px;
+  height: 16px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  z-index: 15;
 }
 
-.tuyere-nozzle {
-  width: 30px;
-  height: 12px;
-  background: #475569;
-  border: 1.5px solid #1E293B;
+.tuyere-pipe {
+  width: 32px;
+  height: 14px;
+  background: #B45309;
+  border: 1.5px solid #78350F;
   border-radius: 3px;
-}
-
-.molten-iron-stream {
-  position: absolute;
-  bottom: 22px;
-  left: 90px;
-  width: 6px;
-  height: 50px;
-  background: #FDE047;
-  border-radius: 3px;
-  box-shadow: 0 0 12px #FDE047;
-  opacity: 0;
-  transform: rotate(20deg);
-  transition: opacity 0.4s ease;
-}
-
-.molten-iron-stream.flowing {
-  opacity: 1;
-  animation: moltenFlow 0.6s infinite linear;
-}
-
-@keyframes moltenFlow {
-  0% { transform: rotate(20deg) translateY(0); }
-  100% { transform: rotate(20deg) translateY(10px); }
-}
-
-.iron-ladle-mold {
-  position: absolute;
-  bottom: 10px;
-  left: 30px;
-  width: 65px;
-  height: 35px;
-  background: #1E293B;
-  border: 2px solid #475569;
-  border-radius: 0 0 10px 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
-  font-size: 9px;
-  font-weight: 800;
-  color: #94A3B8;
-  overflow: hidden;
+  font-size: 7px;
+  color: white;
+  font-weight: bold;
 }
 
-.ladle-molten-fill {
+/* Molten Iron Tap Channel & Ladle Mold */
+.taphole-channel {
+  position: absolute;
+  bottom: 24px;
+  left: 95px;
+  width: 8px;
+  height: 60px;
+  background: #FDE047;
+  border-radius: 4px;
+  transform: rotate(25deg);
+  opacity: 0;
+  z-index: 15;
+  box-shadow: 0 0 16px #FDE047;
+  transition: opacity 0.4s ease;
+}
+
+.taphole-channel.flowing {
+  opacity: 1;
+  animation: moltenPour 0.5s infinite linear;
+}
+
+@keyframes moltenPour {
+  0% { transform: rotate(25deg) translateY(0); }
+  100% { transform: rotate(25deg) translateY(12px); }
+}
+
+.ladle-mold-container {
+  position: absolute;
+  bottom: 8px;
+  left: 30px;
+  width: 75px;
+  height: 42px;
+  background: #1E293B;
+  border: 2px solid #64748B;
+  border-radius: 0 0 14px 14px;
+  z-index: 16;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ladle-liquid-iron {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 0%;
-  background: linear-gradient(180deg, #FDE047 0%, #F97316 100%);
-  box-shadow: 0 0 10px #FDE047;
-  transition: height 1s ease;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FDE047 30%, #F97316 100%);
+  box-shadow: 0 0 15px #FDE047;
+  transition: height 1.2s ease;
 }
 
-.slag-tap-layer {
+.ladle-label {
+  z-index: 2;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 900;
+  color: #CBD5E1;
+}
+
+/* Slag Tap Outlet */
+.slag-tap-box {
   position: absolute;
-  bottom: 50px;
-  right: 35px;
-  width: 65px;
-  height: 25px;
+  bottom: 55px;
+  right: 25px;
   background: #334155;
   border: 1.5px solid #64748B;
   border-radius: 4px;
-  font-size: 9px;
+  padding: 4px 8px;
   font-family: var(--font-display);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #CBD5E1;
+  font-size: 9px;
   font-weight: 800;
+  color: #E2E8F0;
+  z-index: 15;
 }
 
-.temp-slider-container {
+/* Direct Interactive Dropper on Bench */
+.interactive-bench-item {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  background: #F8FAFC;
-  border: 1.5px solid #E2E8F0;
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
+  align-items: center;
+  padding: 8px;
+  border-radius: var(--radius-md);
 }
 
-.temp-slider-header {
-  display: flex;
-  justify-content: space-between;
+.interactive-bench-item:hover {
+  transform: translateY(-4px) scale(1.05);
+  filter: drop-shadow(0 6px 12px rgba(124, 58, 237, 0.25));
+}
+
+.interactive-hint-badge {
+  background: var(--color-purple);
+  color: white;
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 800;
-  color: var(--color-plum);
-}
-
-.temp-range-input {
-  width: 100%;
-  accent-color: var(--color-purple);
-  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  animation: pulseGlow 1.8s infinite;
 }
 
 /* ==========================================================================
    STAGE 5: REPORT & QUICK REVISION
    ========================================================================== */
-.results-hero {
-  text-align: center;
-  margin-bottom: 18px;
-}
+.results-hero { text-align: center; margin-bottom: 18px; }
 
 .congrats-trophy {
   font-size: 42px;
@@ -1689,15 +1467,8 @@ body {
   font-weight: 800;
 }
 
-.reward-chip.xp {
-  background: var(--color-lavender);
-  color: var(--color-purple);
-}
-
-.reward-chip.gold {
-  background: var(--color-gold-light);
-  color: #92400E;
-}
+.reward-chip.xp { background: var(--color-lavender); color: var(--color-purple); }
+.reward-chip.gold { background: var(--color-gold-light); color: #92400E; }
 
 .performance-metrics-list {
   width: 100%;
@@ -1715,14 +1486,8 @@ body {
   font-weight: 700;
 }
 
-.perf-label {
-  color: #64748B;
-}
-
-.perf-val {
-  color: var(--color-plum);
-  font-weight: 800;
-}
+.perf-label { color: #64748B; }
+.perf-val { color: var(--color-plum); font-weight: 800; }
 
 .lab-data-card {
   background: var(--color-white);
@@ -1755,9 +1520,7 @@ body {
   font-size: 9px;
 }
 
-.data-table-container {
-  overflow-x: auto;
-}
+.data-table-container { overflow-x: auto; }
 
 .log-table {
   width: 100%;
@@ -1779,10 +1542,7 @@ body {
   text-transform: uppercase;
 }
 
-.log-table td {
-  font-weight: 700;
-  color: var(--color-plum);
-}
+.log-table td { font-weight: 700; color: var(--color-plum); }
 
 .stage5-actions {
   display: flex;
@@ -1807,9 +1567,7 @@ body {
   animation: fadeIn 0.2s ease;
 }
 
-.modal-backdrop.open {
-  display: flex;
-}
+.modal-backdrop.open { display: flex; }
 
 .modal-card {
   background: var(--color-white);
@@ -1876,17 +1634,13 @@ body {
   justify-content: flex-end;
 }
 
-/* Hurrah Celebration Card */
 .hurrah-card {
   text-align: center;
   padding: 30px 24px;
   max-width: 480px;
 }
 
-.hurrah-confetti {
-  font-size: 40px;
-  margin-bottom: 8px;
-}
+.hurrah-confetti { font-size: 40px; margin-bottom: 8px; }
 
 .hurrah-badge {
   background: var(--color-gold-light);
@@ -1930,20 +1684,9 @@ body {
   margin-bottom: 20px;
 }
 
-.preview-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.preview-item { display: flex; align-items: center; gap: 8px; }
+.hurrah-btn { width: 100%; justify-content: center; padding: 12px; font-size: 15px; }
 
-.hurrah-btn {
-  width: 100%;
-  justify-content: center;
-  padding: 12px;
-  font-size: 15px;
-}
-
-/* Floating Error Toast */
 .error-toast {
   position: fixed;
   bottom: 24px;
@@ -1961,46 +1704,19 @@ body {
   max-width: 360px;
 }
 
-.error-toast.active {
-  display: flex;
-}
-
-.toast-icon {
-  font-size: 24px;
-}
-
-.toast-content strong {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 12px;
-  color: var(--color-red);
-}
-
-.toast-content p {
-  font-size: 11px;
-  color: #475569;
-  font-weight: 600;
-}
+.error-toast.active { display: flex; }
+.toast-icon { font-size: 24px; }
+.toast-content strong { display: block; font-family: var(--font-display); font-size: 12px; color: var(--color-red); }
+.toast-content p { font-size: 11px; color: #475569; font-weight: 600; }
 
 @keyframes slideInToast {
   from { transform: translateX(50px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 
-/* ==========================================================================
-   RESPONSIVE MEDIA QUERIES
-   ========================================================================== */
 @media (max-width: 900px) {
-  .simulator-layout {
-    grid-template-columns: 1fr;
-  }
-  .results-grid {
-    grid-template-columns: 1fr;
-  }
-  .module-tabs .tab-text {
-    display: none;
-  }
-  .step-lbl {
-    display: none;
-  }
+  .sim-interactive-workbench { flex-direction: column; }
+  .results-grid { grid-template-columns: 1fr; }
+  .module-tabs .tab-text { display: none; }
+  .step-lbl { display: none; }
 }
