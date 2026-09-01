@@ -1,7 +1,7 @@
 /**
  * QUESTLY VIRTUAL SCIENCE LAB ENGINE
  * High-fidelity, gamified, multi-module virtual lab simulator.
- * Supports: Acid-Base Titration, Calorimetry & Thermochemistry, Flame Test & Salt Analysis.
+ * Supports: Acid-Base Titration, Smelting & Blast Furnace Metallurgy, Calorimetry, Flame Test.
  */
 
 // ============================================================================
@@ -98,6 +98,24 @@ class LabSoundEngine {
     osc.stop(now + 0.08);
   }
 
+  playFurnaceRoar() {
+    if (!this.enabled) return;
+    this._initCtx();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(90, now);
+    osc.frequency.linearRampToValueAtTime(140, now + 0.4);
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.5);
+  }
+
   playFanfare() {
     if (!this.enabled) return;
     this._initCtx();
@@ -122,7 +140,7 @@ class LabSoundEngine {
 const labSound = new LabSoundEngine();
 
 // ============================================================================
-// 2. MODULE DATABASE (3 COMPLETE LAB MODULES)
+// 2. MODULE DATABASE (TITRATION, SMELTING, CALORIMETRY, FLAME TEST)
 // ============================================================================
 const LAB_MODULES = {
   titration: {
@@ -138,58 +156,53 @@ const LAB_MODULES = {
         principle: {
           tag: 'Chemical Principle',
           heading: 'Neutralization & Equivalence Point',
-          desc: 'A neutralization reaction occurs when stoichiometric amounts of an acid and a base react to form a neutral salt and water. The point at which moles of H⁺ equal moles of OH⁻ is the Equivalence Point.',
+          desc: 'A neutralization reaction occurs when stoichiometric amounts of an acid and a base react to form a neutral salt and water. Moles of H⁺ equal moles of OH⁻ at equivalence.',
           formula: 'HCl(aq) + NaOH(aq) → NaCl(aq) + H₂O(l)   [M₁V₁ = M₂V₂]',
           modalDetails: `
             <h4>1. Theory & Mechanism</h4>
-            <p>Acid-base titration is a quantitative chemical analysis method used to calculate the unknown concentration of an identified analyte. In this lab, we titrate 10.0 mL of Hydrochloric Acid (HCl) against standard 0.1 M Sodium Hydroxide (NaOH).</p>
+            <p>Acid-base titration calculates the unknown concentration of an identified analyte. In this lab, we titrate 10.0 mL of Hydrochloric Acid (HCl) against standard 0.1 M Sodium Hydroxide (NaOH).</p>
             <br>
             <h4>2. Equivalence vs. Endpoint</h4>
-            <p><strong>Equivalence Point:</strong> Theoretical point where stoichiometric equivalents of acid and base neutralize each other (pH = 7.0).</p>
-            <p><strong>Endpoint:</strong> Experimental point indicated by the sharp color change of Phenolphthalein indicator from colorless to faint, permanent pale pink (pH 8.2 - 8.3).</p>
+            <p><strong>Equivalence Point:</strong> Theoretical stoichiometric neutralization (pH = 7.0).</p>
+            <p><strong>Endpoint:</strong> Sharp color change of Phenolphthalein from colorless to faint, permanent pale pink (pH 8.2 - 8.3).</p>
           `
         },
         apparatus: {
           tag: 'Lab Equipment',
           heading: 'Required Apparatus',
-          desc: 'Precision volumetric glassware including a 50 mL graduated Burette, 10 mL Volumetric Pipette, 250 mL Conical Flask, and White Tile.',
+          desc: 'Precision volumetric glassware including a 50 mL graduated Burette, 10 mL Volumetric Pipette, 250 mL Conical Flask, and Retort Stand.',
           tags: ['Burette (50 mL)', 'Pipette (10 mL)', 'Conical Flask (250 mL)', 'Retort Stand & Clamp'],
           modalDetails: `
-            <h4>Volumetric Glassware Purpose:</h4>
+            <h4>Apparatus Utility:</h4>
             <ul>
-              <li><strong>Burette:</strong> Delivers variable, precise volumes of titrant (NaOH) drop by drop.</li>
-              <li><strong>Volumetric Pipette:</strong> Accurately measures exactly 10.0 mL of analyte (HCl).</li>
-              <li><strong>Conical (Erlenmeyer) Flask:</strong> Slanted sides prevent liquid splashing during continuous swirling.</li>
-              <li><strong>White Tile:</strong> Placed under the flask to detect the subtle pale-pink endpoint transition instantly.</li>
+              <li><strong>Burette:</strong> Delivers variable volumes of NaOH drop by drop.</li>
+              <li><strong>Pipette:</strong> Accurately measures 10.0 mL of HCl analyte.</li>
+              <li><strong>Conical Flask:</strong> Prevents splashing during swirling.</li>
+              <li><strong>White Tile:</strong> Enhances pale pink color detection.</li>
             </ul>
           `
         },
         solutions: {
           tag: 'Chemical Reagents',
           heading: 'Required Solutions',
-          desc: 'Standard Hydrochloric Acid (HCl 0.1 M), Sodium Hydroxide (NaOH 0.1 M), and Phenolphthalein Indicator solution.',
+          desc: 'Standard Hydrochloric Acid (HCl 0.1 M), Sodium Hydroxide (NaOH 0.1 M), and Phenolphthalein Indicator.',
           tags: ['0.1 M HCl (Analyte)', '0.1 M NaOH (Titrant)', 'Phenolphthalein Indicator'],
           modalDetails: `
-            <h4>Reagents & Safety:</h4>
-            <ul>
-              <li><strong>0.1 M HCl:</strong> Strong monoprotective acid placed in the conical flask.</li>
-              <li><strong>0.1 M NaOH:</strong> Strong base standard solution loaded in the burette.</li>
-              <li><strong>Phenolphthalein:</strong> Synthetic pH indicator. Colorless in acidic medium (pH < 8.2), vivid pink in basic medium (pH > 10.0). Only 2-3 drops required!</li>
-            </ul>
+            <h4>Reagents:</h4>
+            <p>0.1 M HCl (in flask), 0.1 M NaOH (in burette), and 2 drops of Phenolphthalein indicator.</p>
           `
         },
         procedure: {
           tag: 'Standard Procedure',
           heading: 'Step-by-Step Execution',
-          desc: '1. Rinse & fill burette. 2. Pipette 10 mL HCl into conical flask. 3. Add 2 drops indicator. 4. Dispense titrant until permanent pale pink.',
+          desc: '1. Rinse & fill burette. 2. Pipette 10 mL HCl. 3. Add 2 drops indicator. 4. Dispense titrant until permanent pale pink.',
           modalDetails: `
-            <h4>Laboratory Protocol:</h4>
+            <h4>Protocol:</h4>
             <ol>
-              <li>Fill the burette with 0.1 M NaOH up to the 0.0 mL initial mark, checking for air bubbles in the tip.</li>
-              <li>Pipette exactly 10.0 mL of 0.1 M HCl into the clean conical flask.</li>
-              <li>Add 2 drops of phenolphthalein indicator and swirl the flask. (Remains colorless).</li>
-              <li>Place flask on the white tile beneath the burette tip.</li>
-              <li>Gradually open stopcock to add NaOH while swirling continuously. Near 20.0 mL, add drop-by-drop until a faint permanent pink color persists for 30 seconds.</li>
+              <li>Fill burette with 0.1 M NaOH.</li>
+              <li>Pipette 10.0 mL HCl into conical flask.</li>
+              <li>Add 2 drops of indicator.</li>
+              <li>Dispense titrant while swirling until permanent pale pink persists.</li>
             </ol>
           `
         }
@@ -199,18 +212,18 @@ const LAB_MODULES = {
       { id: 'burette', name: 'Burette', icon: '📏', spec: '50 mL Volumetric', required: true },
       { id: 'conical_flask', name: 'Conical Flask', icon: '⚗️', spec: '250 mL Erlenmeyer', required: true },
       { id: 'pipette', name: 'Pipette', icon: '🧪', spec: '10 mL Volumetric', required: true },
-      { id: 'stand_clamp', name: 'Retort Stand', icon: '📐', spec: 'Heavy Iron Base + Clamp', required: true },
-      { id: 'beaker', name: 'Beaker', icon: '🥛', spec: '100 mL Glass', required: false, wrongDesc: "A Beaker is used for holding bulk liquids, not precision volumetric titration." },
+      { id: 'stand_clamp', name: 'Retort Stand', icon: '📐', spec: 'Heavy Base + Clamp', required: true },
+      { id: 'beaker', name: 'Beaker', icon: '🥛', spec: '100 mL Glass', required: false, wrongDesc: "A Beaker is for holding bulk liquids, not precision titration." },
       { id: 'crucible', name: 'Crucible', icon: '🥣', spec: 'Porcelain High Temp', required: false, wrongDesc: "A Crucible is for heating solids at high temperatures, not titration." },
       { id: 'test_tube', name: 'Test Tube', icon: '🧫', spec: 'Borosilicate 15 mL', required: false, wrongDesc: "Test tubes cannot accommodate continuous swirling for titration." },
-      { id: 'tripod', name: 'Tripod Stand', icon: '🔺', spec: 'Steel Burner Support', required: false, wrongDesc: "Tripod stands are for heating over burners, not titration." }
+      { id: 'tripod', name: 'Tripod Stand', icon: '🔺', spec: 'Steel Burner Support', required: false, wrongDesc: "Tripod stands are for heating, not titration." }
     ],
     cupboardPool: {
       shelfA: [
         { id: 'hcl_01', name: 'Hydrochloric Acid', formula: 'HCl', conc: '0.1 M', hazard: 'Corrosive ⚠️', required: true, shelf: 'A' },
         { id: 'h2so4_conc', name: 'Sulfuric Acid (Conc)', formula: 'H₂SO₄', conc: '18.0 M', hazard: 'Severe Acid 🔥', required: false, shelf: 'A', wrongDesc: "Concentrated H₂SO₄ is too hazardous and not required for 0.1 M titration." },
         { id: 'acetic_acid', name: 'Acetic Acid', formula: 'CH₃COOH', conc: '0.5 M', hazard: 'Weak Acid ⚠️', required: false, shelf: 'A', wrongDesc: "Acetic Acid is a weak organic acid; we require strong 0.1 M HCl." },
-        { id: 'distilled_water', name: 'Distilled Water', formula: 'H₂O', conc: 'Pure', hazard: 'Safe 💧', required: false, shelf: 'A', wrongDesc: "Distilled water is for rinsing, but not the primary analyte reagent." }
+        { id: 'distilled_water', name: 'Distilled Water', formula: 'H₂O', conc: 'Pure', hazard: 'Safe 💧', required: false, shelf: 'A', wrongDesc: "Distilled water is for rinsing, but not the primary analyte." }
       ],
       shelfB: [
         { id: 'naoh_01', name: 'Sodium Hydroxide', formula: 'NaOH', conc: '0.1 M', hazard: 'Caustic Base ⚠️', required: true, shelf: 'B' },
@@ -226,21 +239,127 @@ const LAB_MODULES = {
           <h4>📌 Core Equation & Calculations:</h4>
           <p><code>HCl + NaOH &rarr; NaCl + H₂O</code></p>
           <p>Molarity Formula: <code>M₁ &times; V₁ = M₂ &times; V₂</code></p>
-          <p>Where M₁ = 0.100 M (HCl), V₁ = 10.0 mL, M₂ = 0.100 M (NaOH), V₂ = 10.0 mL.</p>
         </div>
         <div class="rev-block">
           <h4>📌 Indicators & pH Ranges:</h4>
-          <ul>
-            <li><strong>Phenolphthalein:</strong> Colorless (pH < 8.2) &rarr; Faint Pink (pH 8.2 - 10.0) &rarr; Dark Magenta (> 10.0).</li>
-            <li>Ideal Endpoint: A faint, pale pink tint that persists for at least 30 seconds.</li>
-          </ul>
+          <p>Phenolphthalein: Colorless (pH < 8.2) &rarr; Pale Pink (pH 8.2 - 10.0).</p>
+        </div>
+      `
+    }
+  },
+
+  smelting: {
+    id: 'smelting',
+    name: 'Blast Furnace Smelting Lab',
+    subtitle: 'Extract molten iron from Hematite ore (Fe₂O₃) using coke reduction, limestone flux, and thermal regulation.',
+    xpReward: 60,
+    goldReward: 20,
+    concept: {
+      title: 'Pyrometallurgy & Blast Furnace Iron Extraction',
+      subtitle: 'Understand carbon reduction, slag formation, temperature zones, and molten metal tapping.',
+      cards: {
+        principle: {
+          tag: 'Chemical Principle',
+          heading: 'Carbothermic Reduction & Slag Formation',
+          desc: 'Hematite ore (Fe₂O₃) is reduced to molten metallic iron by Carbon Monoxide (CO). Limestone (CaCO₃) decomposes to CaO and reacts with silica impurity (SiO₂) to form molten slag (CaSiO₃).',
+          formula: 'Fe₂O₃ + 3CO → 2Fe(l) + 3CO₂   |   CaO + SiO₂ → CaSiO₃ (Slag)',
+          modalDetails: `
+            <h4>1. Chemical Reaction Zones in Blast Furnace:</h4>
+            <ul>
+              <li><strong>Combustion Zone (1800°C - 2000°C):</strong> Coke burns in hot air blast: <code>C + O₂ → CO₂ + Heat</code>.</li>
+              <li><strong>Reduction Zone (500°C - 900°C):</strong> CO reduces hematite: <code>Fe₂O₃ + 3CO → 2Fe + 3CO₂</code>.</li>
+              <li><strong>Slag Formation Zone (1000°C - 1200°C):</strong> <code>CaCO₃ → CaO + CO₂</code>, then <code>CaO + SiO₂ → CaSiO₃ (Slag)</code>.</li>
+            </ul>
+            <br>
+            <h4>2. Temperature Regulation:</h4>
+            <p><strong>Underheating (< 1100°C):</strong> Iron and slag will solidify inside the hearth, causing fatal furnace freezing.</p>
+            <p><strong>Overheating (> 1800°C):</strong> Damaging refractory brick lining and vaporizing volatile metals.</p>
+            <p><strong>Optimal Hearth Operating Temp:</strong> <strong>1400°C – 1550°C</strong> for pure molten iron separation.</p>
+          `
+        },
+        apparatus: {
+          tag: 'Lab Equipment',
+          heading: 'Required Metallurgy Apparatus',
+          desc: 'Blast Furnace Crucible Rig, Optical Pyrometer (High-Temp Sensor), Tuyere Air Blast Blower, Foundry Tapping Ladle.',
+          tags: ['Blast Furnace Tower', 'Digital Pyrometer', 'Tuyere Blast Nozzle', 'Tapping Ladle'],
+          modalDetails: `
+            <h4>Apparatus Functions:</h4>
+            <ul>
+              <li><strong>Blast Furnace:</strong> Refractory-lined steel stack where ore reduction and melting occur continuously.</li>
+              <li><strong>Optical Pyrometer:</strong> Measures extreme internal hearth temperatures (0°C - 2000°C).</li>
+              <li><strong>Tuyere Nozzles:</strong> Injects pre-heated air/oxygen blasts to ignite the metallurgical coke.</li>
+              <li><strong>Tapping Ladle:</strong> Collects dense molten iron (~1500°C) flowing from the bottom taphole.</li>
+            </ul>
+          `
+        },
+        solutions: {
+          tag: 'Raw Materials & Ores',
+          heading: 'Required Raw Charge',
+          desc: 'Hematite Ore (Fe₂O₃), Metallurgical Coke (C fuel & reducing agent), and Limestone Flux (CaCO₃).',
+          tags: ['Hematite (Fe₂O₃)', 'Metallurgical Coke (C)', 'Limestone Flux (CaCO₃)'],
+          modalDetails: `
+            <h4>Raw Charge Components:</h4>
+            <ul>
+              <li><strong>Hematite (Fe₂O₃):</strong> Primary iron oxide ore to be reduced.</li>
+              <li><strong>Coke (C):</strong> 90% Carbon fuel producing CO reducing gas and intense heat.</li>
+              <li><strong>Limestone (CaCO₃):</strong> Basic flux that binds acidic silica sand impurities (SiO₂) into molten calcium silicate slag.</li>
+            </ul>
+          `
+        },
+        procedure: {
+          tag: 'Standard Procedure',
+          heading: 'Smelting Protocol',
+          desc: '1. Charge ore, coke & flux into hopper. 2. Ignite tuyere hot air. 3. Regulate temp to 1400°C–1500°C. 4. Tap molten iron & slag.',
+          modalDetails: `
+            <h4>Operational Steps:</h4>
+            <ol>
+              <li>Load raw charge (Fe₂O₃ + Coke + CaCO₃) through the double-bell top hopper.</li>
+              <li>Engage the tuyere hot air blast to initiate combustion.</li>
+              <li>Adjust temperature slider to reach optimal smelting zone (1400°C – 1500°C).</li>
+              <li>Open the bottom taphole: observe blazing white-hot molten iron flowing into the ladle mold while lighter slag floats and taps separately!</li>
+            </ol>
+          `
+        }
+      }
+    },
+    apparatusPool: [
+      { id: 'furnace_rig', name: 'Blast Furnace Rig', icon: '🌋', spec: 'Refractory Lined Tower', required: true },
+      { id: 'pyrometer', name: 'Digital Pyrometer', icon: '🌡️', spec: 'Optical 0–2000°C Sensor', required: true },
+      { id: 'tuyere_blower', name: 'Tuyere Blast Nozzle', icon: '💨', spec: 'Oxygen-Air Blower', required: true },
+      { id: 'ladle_mold', name: 'Tapping Ladle', icon: '🪣', spec: 'Cast Iron Ingot Mold', required: true },
+      { id: 'burette', name: 'Burette', icon: '📏', spec: '50 mL Glass', required: false, wrongDesc: "A Burette is for liquid titration and will melt instantly in a furnace!" },
+      { id: 'condenser', name: 'Liebig Condenser', icon: '🧪', spec: 'Glass Distillation Tube', required: false, wrongDesc: "Liebig condensers are for laboratory liquid condensation." },
+      { id: 'filter_paper', name: 'Filter Paper', icon: '📄', spec: 'Paper Filter Disk', required: false, wrongDesc: "Paper incinerates immediately at smelting temperatures." },
+      { id: 'bunsen_burner', name: 'Bunsen Burner', icon: '🔥', spec: 'Small Lab Gas Burner', required: false, wrongDesc: "Bunsen burners only reach ~1000°C; smelting requires industrial tuyere air blasts (>1500°C)." }
+    ],
+    cupboardPool: {
+      shelfA: [
+        { id: 'hematite_ore', name: 'Hematite Ore', formula: 'Fe₂O₃', conc: 'Ore Pellets', hazard: 'Mineral 🪨', required: true, shelf: 'A' },
+        { id: 'metallurgical_coke', name: 'Metallurgical Coke', formula: 'C', conc: '90% Carbon', hazard: 'Fuel 🔥', required: true, shelf: 'A' },
+        { id: 'sodium_metal', name: 'Sodium Metal', formula: 'Na', conc: 'Pure Metal', hazard: 'Explosive 💥', required: false, shelf: 'A', wrongDesc: "Sodium metal reacts violently and explosively with oxygen and moisture!" },
+        { id: 'sulfuric_acid_conc', name: 'Sulfuric Acid', formula: 'H₂SO₄', conc: '18.0 M', hazard: 'Corrosive ⚠️', required: false, shelf: 'A', wrongDesc: "Sulfuric acid is not a raw material for blast furnace smelting." }
+      ],
+      shelfB: [
+        { id: 'limestone_flux', name: 'Limestone Flux', formula: 'CaCO₃', conc: 'Crushed Calcite', hazard: 'Flux 🪨', required: true, shelf: 'B' },
+        { id: 'ethanol_smelt', name: 'Ethanol', formula: 'C₂H₅OH', conc: '95%', hazard: 'Flammable 🔥', required: false, shelf: 'B', wrongDesc: "Ethanol is an organic solvent not used in pyrometallurgy." },
+        { id: 'copper_sulfate_smelt', name: 'Copper Sulfate', formula: 'CuSO₄', conc: 'Hydrated Salt', hazard: 'Sample 🧫', required: false, shelf: 'B', wrongDesc: "We are smelting iron from hematite, not copper salts." },
+        { id: 'acetone_smelt', name: 'Acetone', formula: 'C₃H₆O', conc: 'Pure', hazard: 'Volatile 🔥', required: false, shelf: 'B', wrongDesc: "Acetone is an organic cleaning solvent." }
+      ]
+    },
+    revision: {
+      title: 'Blast Furnace Smelting & Metallurgy Summary',
+      content: `
+        <div class="rev-block">
+          <h4>📌 Core Reactions in Blast Furnace:</h4>
+          <p>1. Combustion: <code>C + O₂ &rarr; CO₂</code> & <code>CO₂ + C &rarr; 2CO</code></p>
+          <p>2. Reduction: <code>Fe₂O₃ + 3CO &rarr; 2Fe(l) + 3CO₂</code></p>
+          <p>3. Slag Fluxing: <code>CaCO₃ &rarr; CaO + CO₂</code>, <code>CaO + SiO₂ &rarr; CaSiO₃ (Molten Slag)</code></p>
         </div>
         <div class="rev-block">
-          <h4>📌 Common Lab Errors to Avoid:</h4>
+          <h4>📌 Key Temperature Operating Windows:</h4>
           <ul>
-            <li>Air bubble trapped in burette nozzle creates false volume readings.</li>
-            <li>Over-titration (adding too much base) results in dark pink overshot error.</li>
-            <li>Not swirling the flask causes localized premature color changes.</li>
+            <li><strong>Optimal Smelting Zone:</strong> 1400°C – 1550°C (Liquefies iron & allows slag to float).</li>
+            <li><strong>Density Separation:</strong> Molten slag ($\rho \approx 2.5\text{ g/cm}^3$) floats above molten iron ($\rho \approx 7.0\text{ g/cm}^3$), preventing re-oxidation.</li>
           </ul>
         </div>
       `
@@ -260,13 +379,11 @@ const LAB_MODULES = {
         principle: {
           tag: 'Chemical Principle',
           heading: 'Exothermic Neutralization & Enthalpy',
-          desc: 'When strong acids and strong bases neutralize, energy is released into the aqueous solution, increasing temperature. q = m · c · ΔT.',
+          desc: 'When strong acids and strong bases neutralize, energy is released into the solution, increasing temperature. q = m · c · ΔT.',
           formula: 'q = m · c · ΔT   |   ΔH_neut ≈ -57.1 kJ/mol',
           modalDetails: `
             <h4>1. Heat of Reaction (q)</h4>
-            <p>In an isolated polystyrene calorimeter cup, heat lost to the surroundings is negligible. The heat generated by the reaction is absorbed by the water:</p>
-            <p><code>q_reaction = -(m_solution &times; c_water &times; &Delta;T)</code></p>
-            <p>Where c = 4.184 J/(g·°C) and density of solution ≈ 1.00 g/mL.</p>
+            <p><code>q = -(m_solution &times; c_water &times; &Delta;T)</code></p>
           `
         },
         apparatus: {
@@ -274,37 +391,20 @@ const LAB_MODULES = {
           heading: 'Calorimeter & Instruments',
           desc: 'Styrofoam calorimeter cup with lid, high-precision digital thermometer, magnetic stirrer, and graduated cylinders.',
           tags: ['Polystyrene Calorimeter', 'Digital Thermometer', 'Stirrer Rod', 'Graduated Cylinder'],
-          modalDetails: `
-            <h4>Apparatus Roles:</h4>
-            <ul>
-              <li><strong>Styrofoam Cup:</strong> Provides high thermal insulation to minimize heat loss.</li>
-              <li><strong>Digital Thermometer:</strong> Measures temperature with 0.1°C precision.</li>
-              <li><strong>Stirrer:</strong> Ensures uniform temperature distribution throughout the solution.</li>
-            </ul>
-          `
+          modalDetails: `<p>Insulated calorimeter prevents heat loss to surroundings.</p>`
         },
         solutions: {
           tag: 'Chemical Reagents',
           heading: 'Required Solutions',
-          desc: '1.0 M Hydrochloric Acid (HCl 50 mL), 1.0 M Sodium Hydroxide (NaOH 50 mL), and Distilled Water.',
+          desc: '1.0 M Hydrochloric Acid (50 mL), 1.0 M Sodium Hydroxide (50 mL), and Distilled Water.',
           tags: ['1.0 M HCl (50 mL)', '1.0 M NaOH (50 mL)', 'Distilled H₂O'],
-          modalDetails: `
-            <h4>Reagent Volumes:</h4>
-            <p>Mixing 50.0 mL of 1.0 M HCl with 50.0 mL of 1.0 M NaOH creates 100.0 g of solution containing 0.050 moles of neutralized water.</p>
-          `
+          modalDetails: `<p>Mixing 50 mL 1.0 M HCl + 50 mL 1.0 M NaOH.</p>`
         },
         procedure: {
           tag: 'Standard Procedure',
           heading: 'Experimental Protocol',
-          desc: '1. Measure initial T₁. 2. Mix 50 mL HCl + 50 mL NaOH in cup. 3. Close lid and stir. 4. Record maximum peak temperature T₂.',
-          modalDetails: `
-            <h4>Procedure Steps:</h4>
-            <ol>
-              <li>Pour 50 mL 1.0 M HCl into the calorimeter cup and record initial temperature T₁ (22.0°C).</li>
-              <li>Quickly add 50 mL 1.0 M NaOH, close the insulated lid, and insert the thermometer probe.</li>
-              <li>Stir gently and record temperature every 5 seconds until peak temperature T₂ is reached.</li>
-            </ol>
-          `
+          desc: '1. Measure initial T₁. 2. Mix 50 mL HCl + 50 mL NaOH. 3. Close lid & stir. 4. Record peak T₂.',
+          modalDetails: `<p>Record temperature every 5 seconds until peak.</p>`
         }
       }
     },
@@ -313,40 +413,28 @@ const LAB_MODULES = {
       { id: 'thermometer', name: 'Digital Thermometer', icon: '🌡️', spec: '±0.1°C Electronic Probe', required: true },
       { id: 'stirrer', name: 'Stirring Rod', icon: '🥢', spec: 'Teflon Thermal Stirrer', required: true },
       { id: 'grad_cylinder', name: 'Graduated Cylinder', icon: '📐', spec: '50 mL Precision Glass', required: true },
-      { id: 'bunsen', name: 'Bunsen Burner', icon: '🔥', spec: 'Gas Flame Burner', required: false, wrongDesc: "Calorimetry measures reaction heat itself; external heat from a burner will ruin data!" },
-      { id: 'filter_paper', name: 'Filter Paper', icon: '📄', spec: 'Whatman No. 1', required: false, wrongDesc: "Filter paper is for gravimetric filtration, not calorimetry." },
-      { id: 'dropper', name: 'Dropper Pipette', icon: '💧', spec: 'Rubber Teat Pipette', required: false, wrongDesc: "We need large graduated cylinders for 50 mL volumes, not small droppers." },
-      { id: 'evaporating_dish', name: 'Evaporating Dish', icon: '🥣', spec: 'Porcelain Flat Base', required: false, wrongDesc: "Evaporating dishes allow heat to escape rapidly into the room." }
+      { id: 'bunsen', name: 'Bunsen Burner', icon: '🔥', spec: 'Gas Flame Burner', required: false, wrongDesc: "External heat from a burner will ruin calorimetry measurements!" },
+      { id: 'filter_paper', name: 'Filter Paper', icon: '📄', spec: 'Whatman No. 1', required: false, wrongDesc: "Filter paper is for filtration, not calorimetry." },
+      { id: 'dropper', name: 'Dropper Pipette', icon: '💧', spec: 'Rubber Teat Pipette', required: false, wrongDesc: "We need graduated cylinders for 50 mL volumes." },
+      { id: 'evaporating_dish', name: 'Evaporating Dish', icon: '🥣', spec: 'Porcelain Flat Base', required: false, wrongDesc: "Evaporating dishes allow heat to escape rapidly." }
     ],
     cupboardPool: {
       shelfA: [
         { id: 'hcl_1m', name: 'Hydrochloric Acid', formula: 'HCl', conc: '1.0 M', hazard: 'Corrosive ⚠️', required: true, shelf: 'A' },
         { id: 'distilled_water_cal', name: 'Distilled Water', formula: 'H₂O', conc: 'Pure', hazard: 'Safe 💧', required: true, shelf: 'A' },
         { id: 'hno3_conc', name: 'Nitric Acid', formula: 'HNO₃', conc: '2.0 M', hazard: 'Oxidizer 🔥', required: false, shelf: 'A', wrongDesc: "Nitric acid has unwanted oxidation side reactions; use 1.0 M HCl." },
-        { id: 'acetone', name: 'Acetone', formula: 'C₃H₆O', conc: 'Pure', hazard: 'Flammable 🔥', required: false, shelf: 'A', wrongDesc: "Acetone is a flammable solvent not used in aqueous calorimetry." }
+        { id: 'acetone', name: 'Acetone', formula: 'C₃H₆O', conc: 'Pure', hazard: 'Flammable 🔥', required: false, shelf: 'A', wrongDesc: "Acetone is not used in aqueous calorimetry." }
       ],
       shelfB: [
         { id: 'naoh_1m', name: 'Sodium Hydroxide', formula: 'NaOH', conc: '1.0 M', hazard: 'Caustic ⚠️', required: true, shelf: 'B' },
-        { id: 'ammonia_sol', name: 'Ammonium Hydroxide', formula: 'NH₄OH', conc: '1.0 M', hazard: 'Weak Base ⚠️', required: false, shelf: 'B', wrongDesc: "NH₄OH is a weak base with incomplete ionization. We need 1.0 M NaOH." },
-        { id: 'copper_sulfate', name: 'Copper Sulfate', formula: 'CuSO₄', conc: '0.5 M', hazard: 'Irritant ⚠️', required: false, shelf: 'B', wrongDesc: "Copper sulfate is not required for acid-base heat of neutralization." },
-        { id: 'glycerol', name: 'Glycerol', formula: 'C₃H₈O₃', conc: 'Pure', hazard: 'Safe 💧', required: false, shelf: 'B', wrongDesc: "Glycerol is a viscous humectant not used in this experiment." }
+        { id: 'ammonia_sol', name: 'Ammonium Hydroxide', formula: 'NH₄OH', conc: '1.0 M', hazard: 'Weak Base ⚠️', required: false, shelf: 'B', wrongDesc: "NH₄OH is a weak base with incomplete ionization." },
+        { id: 'copper_sulfate', name: 'Copper Sulfate', formula: 'CuSO₄', conc: '0.5 M', hazard: 'Irritant ⚠️', required: false, shelf: 'B', wrongDesc: "Copper sulfate is not required for neutralization heat." },
+        { id: 'glycerol', name: 'Glycerol', formula: 'C₃H₈O₃', conc: 'Pure', hazard: 'Safe 💧', required: false, shelf: 'B', wrongDesc: "Glycerol is not used in this experiment." }
       ]
     },
     revision: {
-      title: 'Calorimetry & Heat of Reaction Summary',
-      content: `
-        <div class="rev-block">
-          <h4>📌 Key Thermochemical Equations:</h4>
-          <p>Heat Absorbed: <code>q_sol = m &times; c &times; &Delta;T</code></p>
-          <p><code>m = 100.0 g</code>, <code>c = 4.184 J/g&deg;C</code>, <code>&Delta;T = 28.8 - 22.0 = 6.8&deg;C</code></p>
-          <p><code>q = 100.0 &times; 4.184 &times; 6.8 = 2,845 J = 2.85 kJ</code></p>
-        </div>
-        <div class="rev-block">
-          <h4>📌 Molar Enthalpy (&Delta;H_neut):</h4>
-          <p><code>&Delta;H = -q / n = -2.85 kJ / 0.050 mol = -57.0 kJ/mol</code></p>
-          <p>Consistent with standard literature value of -57.1 kJ/mol for strong acid-strong base pairs.</p>
-        </div>
-      `
+      title: 'Calorimetry Summary',
+      content: `<div class="rev-block"><p>q = mcΔT = 100g × 4.184 × 6.8 = 2.85 kJ</p></div>`
     }
   },
 
@@ -363,51 +451,29 @@ const LAB_MODULES = {
         principle: {
           tag: 'Chemical Principle',
           heading: 'Electronic Excitation & Emission',
-          desc: 'Thermal energy promotes electrons in metal cations to excited energy states. Returning to ground state releases photons of specific wavelength (E = hc/λ).',
+          desc: 'Thermal energy promotes electrons to excited states. Returning to ground state releases photons of specific wavelength (E = hc/λ).',
           formula: 'E = h · ν = (h · c) / λ   [Photon Emission]',
-          modalDetails: `
-            <h4>1. Quantum Mechanism:</h4>
-            <p>When metal salts are vaporized in a high-temperature non-luminous flame, valence electrons absorb thermal energy and jump to higher quantum energy levels (excited state). As they relax back to ground state, they emit light of discrete wavelengths corresponding to the energy difference &Delta;E.</p>
-          `
+          modalDetails: `<p>Discrete wavelengths emitted upon electron relaxation.</p>`
         },
         apparatus: {
           tag: 'Lab Equipment',
           heading: 'Required Apparatus',
           desc: 'Bunsen Burner with adjustable air-collar, Platinum/Nichrome wire loop, Watch Glasses, and Cobalt Blue Glass.',
           tags: ['Bunsen Burner', 'Platinum Wire Loop', 'Watch Glass (x3)', 'Cobalt Blue Glass'],
-          modalDetails: `
-            <h4>Apparatus Utility:</h4>
-            <ul>
-              <li><strong>Bunsen Burner:</strong> Provides clean, hot non-luminous blue flame (up to 1200°C).</li>
-              <li><strong>Platinum Loop:</strong> Chemically unreactive loop that does not impart its own color to the flame.</li>
-              <li><strong>Cobalt Glass:</strong> Filters out the intense yellow sodium emission when analyzing potassium mixtures.</li>
-            </ul>
-          `
+          modalDetails: `<p>Inert platinum loop and high-temperature non-luminous flame.</p>`
         },
         solutions: {
           tag: 'Chemical Reagents',
           heading: 'Required Reagents & Salts',
           desc: 'Concentrated Hydrochloric Acid (HCl for loop cleaning), Sodium Chloride (NaCl), Copper Sulfate (CuSO₄), Strontium Chloride (SrCl₂).',
           tags: ['Conc. HCl (Cleaning)', 'NaCl (Sodium Salt)', 'CuSO₄ (Copper Salt)', 'SrCl₂ (Strontium Salt)'],
-          modalDetails: `
-            <h4>Reagents & Cleaning:</h4>
-            <p>Concentrated HCl converts metal salts to volatile metal chlorides, which vaporize readily in the flame. Dipping into clean HCl purifies the loop between tests.</p>
-          `
+          modalDetails: `<p>Conc HCl forms volatile metal chlorides.</p>`
         },
         procedure: {
           tag: 'Standard Procedure',
           heading: 'Execution Protocol',
-          desc: '1. Clean loop in conc. HCl until no flame color. 2. Dip loop in sample salt. 3. Place in hottest blue cone of flame. 4. Observe color.',
-          modalDetails: `
-            <h4>Standard Flame Colors:</h4>
-            <ul>
-              <li><strong>Sodium (Na⁺):</strong> Intense Persistent Golden Yellow (589 nm)</li>
-              <li><strong>Strontium (Sr²⁺):</strong> Brilliant Crimson Red (650 nm)</li>
-              <li><strong>Copper (Cu²⁺):</strong> Dazzling Turquoise Green-Blue (510 nm)</li>
-              <li><strong>Potassium (K⁺):</strong> Delicate Lilac Violet (766 nm)</li>
-              <li><strong>Barium (Ba²⁺):</strong> Apple Green (553 nm)</li>
-            </ul>
-          `
+          desc: '1. Clean loop in conc. HCl. 2. Dip in sample salt. 3. Place in hottest blue cone of flame. 4. Observe color.',
+          modalDetails: `<p>Na⁺: Golden Yellow, Sr²⁺: Crimson, Cu²⁺: Turquoise.</p>`
         }
       }
     },
@@ -416,43 +482,28 @@ const LAB_MODULES = {
       { id: 'platinum_loop', name: 'Platinum Loop', icon: '🦯', spec: 'Nichrome/Pt Inert Wire', required: true },
       { id: 'watch_glass', name: 'Watch Glasses', icon: '🥏', spec: 'Porcelain / Glass Dish', required: true },
       { id: 'cobalt_glass', name: 'Cobalt Blue Glass', icon: '🟦', spec: 'Optical Spectral Filter', required: true },
-      { id: 'burette', name: 'Burette', icon: '📏', spec: '50 mL Glass', required: false, wrongDesc: "Burettes are for liquid volumetric titration, not flame tests!" },
-      { id: 'condenser', name: 'Liebig Condenser', icon: '🧪', spec: 'Distillation Tube', required: false, wrongDesc: "Liebig condensers are for condensing vapor in distillation rigs." },
-      { id: 'mortar_pestle', name: 'Mortar & Pestle', icon: '🥣', spec: 'Agate Grinder', required: false, wrongDesc: "Salts are already finely powdered in their sample dishes." },
-      { id: 'separating_funnel', name: 'Separating Funnel', icon: '🔻', spec: 'Pear Shaped 250 mL', required: false, wrongDesc: "Separating funnels are for immiscible liquid extractions." }
+      { id: 'burette', name: 'Burette', icon: '📏', spec: '50 mL Glass', required: false, wrongDesc: "Burettes are for liquid titration, not flame tests!" },
+      { id: 'condenser', name: 'Liebig Condenser', icon: '🧪', spec: 'Distillation Tube', required: false, wrongDesc: "Liebig condensers are for distillation." },
+      { id: 'mortar_pestle', name: 'Mortar & Pestle', icon: '🥣', spec: 'Agate Grinder', required: false, wrongDesc: "Salts are already finely powdered." },
+      { id: 'separating_funnel', name: 'Separating Funnel', icon: '🔻', spec: 'Pear Shaped 250 mL', required: false, wrongDesc: "Separating funnels are for immiscible liquids." }
     ],
     cupboardPool: {
       shelfA: [
         { id: 'conc_hcl_flame', name: 'Hydrochloric Acid (Conc)', formula: 'HCl', conc: '12.0 M', hazard: 'Volatilizer ⚠️', required: true, shelf: 'A' },
         { id: 'nacl_salt', name: 'Sodium Chloride', formula: 'NaCl', conc: 'AR Powder', hazard: 'Salt 🧂', required: true, shelf: 'A' },
         { id: 'srcl2_salt', name: 'Strontium Chloride', formula: 'SrCl₂', conc: 'Pure Salt', hazard: 'Sample 🧫', required: true, shelf: 'A' },
-        { id: 'lead_nitrate', name: 'Lead Nitrate', formula: 'Pb(NO₃)₂', conc: 'Toxic Solid', hazard: 'Toxic ☠️', required: false, shelf: 'A', wrongDesc: "Lead compounds produce toxic heavy metal fumes when burned!" }
+        { id: 'lead_nitrate', name: 'Lead Nitrate', formula: 'Pb(NO₃)₂', conc: 'Toxic Solid', hazard: 'Toxic ☠️', required: false, shelf: 'A', wrongDesc: "Lead produces toxic heavy metal fumes when burned!" }
       ],
       shelfB: [
         { id: 'cuso4_salt', name: 'Copper(II) Sulfate', formula: 'CuSO₄', conc: 'Anhydrous', hazard: 'Sample 🧫', required: true, shelf: 'B' },
-        { id: 'kcl_salt', name: 'Potassium Chloride', formula: 'KCl', conc: 'Salt', hazard: 'Sample 🧫', required: false, shelf: 'B', wrongDesc: "We already have sufficient test samples (NaCl, SrCl₂, CuSO₄)." },
+        { id: 'kcl_salt', name: 'Potassium Chloride', formula: 'KCl', conc: 'Salt', hazard: 'Sample 🧫', required: false, shelf: 'B', wrongDesc: "We already have sufficient test samples." },
         { id: 'hexane', name: 'n-Hexane', formula: 'C₆H₁₄', conc: 'Solvent', hazard: 'Flammable 🔥', required: false, shelf: 'B', wrongDesc: "Hexane creates an uncontrollable flash fire near open burners!" },
-        { id: 'silver_nitrate', name: 'Silver Nitrate', formula: 'AgNO₃', conc: '0.1 M', hazard: 'Staining ⚠️', required: false, shelf: 'B', wrongDesc: "Silver nitrate is for halide precipitation, not flame analysis." }
+        { id: 'silver_nitrate', name: 'Silver Nitrate', formula: 'AgNO₃', conc: '0.1 M', hazard: 'Staining ⚠️', required: false, shelf: 'B', wrongDesc: "Silver nitrate is for precipitation tests." }
       ]
     },
     revision: {
-      title: 'Flame Test & Cation Spectroscopy Summary',
-      content: `
-        <div class="rev-block">
-          <h4>📌 Characteristic Flame Colors:</h4>
-          <ul>
-            <li><strong>Na⁺ (Sodium):</strong> Golden Yellow (589 nm) — extremely sensitive.</li>
-            <li><strong>Sr²⁺ (Strontium):</strong> Crimson Red (650 nm).</li>
-            <li><strong>Cu²⁺ (Copper):</strong> Green-Blue / Turquoise (510 nm).</li>
-            <li><strong>K⁺ (Potassium):</strong> Lilac / Pale Violet (766 nm) — viewed through cobalt glass.</li>
-            <li><strong>Ba²⁺ (Barium):</strong> Apple Green (553 nm).</li>
-          </ul>
-        </div>
-        <div class="rev-block">
-          <h4>📌 Loop Cleaning Protocol:</h4>
-          <p>Dip wire in concentrated HCl and heat in non-luminous flame until the wire imparts zero color.</p>
-        </div>
-      `
+      title: 'Flame Test Summary',
+      content: `<div class="rev-block"><p>Na⁺: Yellow (589 nm), Sr²⁺: Crimson (650 nm), Cu²⁺: Green-Blue (510 nm).</p></div>`
     }
   }
 };
@@ -469,11 +520,9 @@ class LabStateManager {
     this.stage3Mistakes = 0;
     this.stage4Mistakes = 0;
 
-    // Selections
     this.selectedApparatus = new Set();
     this.selectedCupboard = new Set();
 
-    // Experiment specific state
     this.expState = {};
     this.initExpState();
   }
@@ -511,14 +560,24 @@ class LabStateManager {
   initExpState() {
     if (this.currentModuleId === 'titration') {
       this.expState = {
-        buretteVolume: 0.0, // mL added
-        flaskVolume: 10.0,   // mL in flask
+        buretteVolume: 0.0,
+        flaskVolume: 10.0,
         hasIndicator: false,
         stopcockOpen: false,
-        flowMode: 'stop', // stop, drip, flow
-        swirling: false,
-        endpointReached: false,
-        overTitrated: false
+        flowMode: 'stop',
+        endpointReached: false
+      };
+    } else if (this.currentModuleId === 'smelting') {
+      this.expState = {
+        chargedOre: false,
+        chargedCoke: false,
+        chargedFlux: false,
+        tuyereBlastOn: false,
+        temperature: 600, // °C
+        reactionRate: 0,
+        slagTapped: false,
+        ironTapped: false,
+        smeltingComplete: false
       };
     } else if (this.currentModuleId === 'calorimetry') {
       this.expState = {
@@ -526,18 +585,13 @@ class LabStateManager {
         baseAdded: false,
         lidClosed: false,
         stirring: false,
-        currentTemp: 22.0,
-        peakTemp: 28.8,
-        reactionComplete: false
+        currentTemp: 22.0
       };
     } else if (this.currentModuleId === 'flametest') {
       this.expState = {
         burnerOn: true,
-        airVentOpen: true, // blue flame
-        loopClean: true,
-        currentSample: null,
-        flameColor: 'blue',
-        spectrumActive: false
+        airVentOpen: true,
+        currentSample: null
       };
     }
   }
@@ -571,7 +625,6 @@ function initUrlParams() {
 }
 
 function bindGlobalEvents() {
-  // Sound Toggle
   const soundBtn = document.getElementById('btnSoundToggle');
   soundBtn.addEventListener('click', () => {
     labSound.enabled = !labSound.enabled;
@@ -579,9 +632,8 @@ function bindGlobalEvents() {
     labSound.playClick();
   });
 
-  // Module Tabs
   document.querySelectorAll('.module-tab').forEach(tab => {
-    tab.addEventListener('click', (e) => {
+    tab.addEventListener('click', () => {
       const modId = tab.dataset.module;
       if (modId !== state.currentModuleId) {
         labSound.playClick();
@@ -591,7 +643,6 @@ function bindGlobalEvents() {
     });
   });
 
-  // Stage Steppers
   document.querySelectorAll('.step-pill').forEach(pill => {
     pill.addEventListener('click', () => {
       const targetStage = parseInt(pill.dataset.stage, 10);
@@ -602,38 +653,32 @@ function bindGlobalEvents() {
     });
   });
 
-  // Stage 1: Finish Concept -> Hurrah Modal
   document.getElementById('btnFinishConcept').addEventListener('click', () => {
     labSound.playSuccess();
     openHurrahModal();
   });
 
-  // Hurrah Modal Go -> Stage 2
   document.getElementById('btnHurrahGo').addEventListener('click', () => {
     labSound.playClick();
     closeHurrahModal();
     goToStage(2);
   });
 
-  // Stage 2: Proceed -> Stage 3
   document.getElementById('btnProceedStage2').addEventListener('click', () => {
     labSound.playClick();
     goToStage(3);
   });
 
-  // Stage 3: Proceed -> Stage 4
   document.getElementById('btnProceedStage3').addEventListener('click', () => {
     labSound.playClick();
     goToStage(4);
   });
 
-  // Stage 4: Finish Exp -> Stage 5
   document.getElementById('btnFinishExperiment').addEventListener('click', () => {
     labSound.playFanfare();
     goToStage(5);
   });
 
-  // Stage 5 Actions
   document.getElementById('btnOpenRevisionModal').addEventListener('click', () => {
     labSound.playClick();
     openRevisionModal();
@@ -652,10 +697,9 @@ function bindGlobalEvents() {
       score: state.calculateFinalScore(),
       stars: state.calculateFinalScore() >= 85 ? 3 : 2
     });
-    alert('🎉 Congratulations! Lab completion recorded in Questly profile!');
+    alert('🎉 Congratulations! Lab completed and saved in Questly profile!');
   });
 
-  // Back to modules
   document.getElementById('btnBackToModules').addEventListener('click', () => {
     labSound.playClick();
     sendQuestlyEvent('navigate_back', {});
@@ -671,7 +715,6 @@ function goToStage(stageNum) {
   const targetView = document.getElementById(`stage${stageNum}`);
   if (targetView) targetView.classList.add('active');
 
-  // Update Stepper UI
   document.querySelectorAll('.step-pill').forEach(p => {
     const s = parseInt(p.dataset.stage, 10);
     p.classList.remove('active', 'completed');
@@ -679,13 +722,11 @@ function goToStage(stageNum) {
     else if (s < stageNum) p.classList.add('completed');
   });
 
-  // Notify parent Flutter view
   sendQuestlyEvent('stage_complete', {
     stage: stageNum - 1,
     moduleId: state.currentModuleId
   });
 
-  // Render specific stage details
   if (stageNum === 2) renderStage2();
   else if (stageNum === 3) renderStage3();
   else if (stageNum === 4) renderStage4();
@@ -695,22 +736,18 @@ function goToStage(stageNum) {
 function renderCurrentModule() {
   const mod = state.moduleData;
 
-  // Header Title & Active Tab
   document.getElementById('currentModuleName').textContent = mod.name;
   document.querySelectorAll('.module-tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.module === state.currentModuleId);
   });
 
-  // Stage 1 Concept Cards
   document.getElementById('stage1Title').textContent = mod.concept.title;
   document.getElementById('stage1Subtitle').textContent = mod.concept.subtitle;
   
-  // Card 1
   document.getElementById('principleHeading').textContent = mod.concept.cards.principle.heading;
   document.getElementById('principleDesc').textContent = mod.concept.cards.principle.desc;
   document.getElementById('principleFormula').innerHTML = `<code>${mod.concept.cards.principle.formula}</code>`;
 
-  // Card 2
   document.getElementById('apparatusHeading').textContent = mod.concept.cards.apparatus.heading;
   document.getElementById('apparatusSummary').textContent = mod.concept.cards.apparatus.desc;
   const appTagsContainer = document.getElementById('apparatusTags');
@@ -722,23 +759,20 @@ function renderCurrentModule() {
     appTagsContainer.appendChild(span);
   });
 
-  // Card 3
   document.getElementById('solutionsHeading').textContent = mod.concept.cards.solutions.heading;
   document.getElementById('solutionsSummary').textContent = mod.concept.cards.solutions.desc;
   const solTagsContainer = document.getElementById('solutionsTags');
   solTagsContainer.innerHTML = '';
   mod.concept.cards.solutions.tags.forEach(t => {
     const span = document.createElement('span');
-    span.className = 'mini-tag reagent';
+    span.className = `mini-tag ${state.currentModuleId === 'smelting' ? 'mineral' : 'reagent'}`;
     span.textContent = t;
     solTagsContainer.appendChild(span);
   });
 
-  // Card 4
   document.getElementById('procedureHeading').textContent = mod.concept.cards.procedure.heading;
   document.getElementById('procedureSummary').textContent = mod.concept.cards.procedure.desc;
 
-  // Go to Stage 1 initially
   goToStage(state.currentStage);
 }
 
@@ -751,7 +785,6 @@ function renderStage2() {
   const checklist = document.getElementById('apparatusTargetPills');
   const tracker = document.getElementById('apparatusTracker');
   const proceedBtn = document.getElementById('btnProceedStage2');
-  const feedback = document.getElementById('apparatusFeedback');
 
   grid.innerHTML = '';
   checklist.innerHTML = '';
@@ -760,7 +793,6 @@ function renderStage2() {
   tracker.textContent = `${state.selectedApparatus.size} / ${requiredItems.length}`;
   proceedBtn.disabled = state.selectedApparatus.size < requiredItems.length;
 
-  // Render Target Checklist
   requiredItems.forEach(item => {
     const pill = document.createElement('div');
     const isFound = state.selectedApparatus.has(item.id);
@@ -770,7 +802,6 @@ function renderStage2() {
     checklist.appendChild(pill);
   });
 
-  // Render Selection Cards
   mod.apparatusPool.forEach(item => {
     const card = document.createElement('div');
     const isSelected = state.selectedApparatus.has(item.id);
@@ -800,14 +831,13 @@ function handleApparatusClick(item, cardEl) {
   const requiredCount = mod.apparatusPool.filter(a => a.required).length;
 
   if (item.required) {
-    if (state.selectedApparatus.has(item.id)) return; // Already picked
+    if (state.selectedApparatus.has(item.id)) return;
 
     labSound.playSuccess();
     state.selectedApparatus.add(item.id);
     cardEl.classList.add('selected');
     cardEl.classList.remove('wrong');
 
-    // Update Checklist Pill
     const pill = document.getElementById(`pill-app-${item.id}`);
     if (pill) {
       pill.className = 'target-pill found';
@@ -821,16 +851,14 @@ function handleApparatusClick(item, cardEl) {
     if (state.selectedApparatus.size === requiredCount) {
       labSound.playFanfare();
       proceedBtn.disabled = false;
-      feedback.innerHTML = `<span class="fb-icon">🎉</span><span class="fb-text">All required apparatus gathered! Click Proceed to Cupboard.</span>`;
+      feedback.innerHTML = `<span class="fb-icon">🎉</span><span class="fb-text">All required equipment gathered! Click Proceed to Storage.</span>`;
     }
   } else {
-    // WRONG APPARATUS PICKED
     labSound.playError();
     state.stage2Mistakes++;
     cardEl.classList.add('wrong');
     
-    // Voice / Toast notice
-    showErrorToast(`❌ Incorrect: ${item.name}`, item.wrongDesc || `This apparatus is not required for ${mod.name}.`);
+    showErrorToast(`❌ Incorrect: ${item.name}`, item.wrongDesc || `Not required for this stage.`);
 
     feedback.className = 'live-feedback-box error';
     feedback.innerHTML = `<span class="fb-icon">❌</span><span class="fb-text"><strong>${item.name}:</strong> ${item.wrongDesc || 'Not required for this experiment.'}</span>`;
@@ -843,7 +871,7 @@ function handleApparatusClick(item, cardEl) {
 }
 
 // ============================================================================
-// 7. STAGE 3: CHEMICAL CUPBOARD (WITH SOUND & RED X)
+// 7. STAGE 3: CHEMICAL & ORE STORAGE CUPBOARD
 // ============================================================================
 function renderStage3() {
   const mod = state.moduleData;
@@ -862,7 +890,6 @@ function renderStage3() {
   tracker.textContent = `${state.selectedCupboard.size} / ${requiredReagents.length}`;
   proceedBtn.disabled = state.selectedCupboard.size < requiredReagents.length;
 
-  // Render Target Checklist
   requiredReagents.forEach(item => {
     const pill = document.createElement('div');
     const isFound = state.selectedCupboard.has(item.id);
@@ -872,15 +899,8 @@ function renderStage3() {
     checklist.appendChild(pill);
   });
 
-  // Render Shelf A
-  mod.cupboardPool.shelfA.forEach(item => {
-    rowA.appendChild(createBottleElement(item));
-  });
-
-  // Render Shelf B
-  mod.cupboardPool.shelfB.forEach(item => {
-    rowB.appendChild(createBottleElement(item));
-  });
+  mod.cupboardPool.shelfA.forEach(item => rowA.appendChild(createBottleElement(item)));
+  mod.cupboardPool.shelfB.forEach(item => rowB.appendChild(createBottleElement(item)));
 }
 
 function createBottleElement(item) {
@@ -889,7 +909,9 @@ function createBottleElement(item) {
   bottle.className = `chemical-bottle ${isPicked ? 'picked' : ''}`;
   bottle.id = `bottle-${item.id}`;
 
-  const liquidColor = item.shelf === 'A' ? 'rgba(59, 130, 246, 0.45)' : 'rgba(236, 72, 153, 0.35)';
+  const liquidColor = state.currentModuleId === 'smelting' 
+    ? (item.id === 'hematite_ore' ? '#78350F' : (item.id === 'metallurgical_coke' ? '#1E293B' : '#CBD5E1'))
+    : (item.shelf === 'A' ? 'rgba(59, 130, 246, 0.45)' : 'rgba(236, 72, 153, 0.35)');
 
   bottle.innerHTML = `
     <div class="bottle-visual">
@@ -905,7 +927,7 @@ function createBottleElement(item) {
     </div>
     <div class="wrong-overlay">
       <div class="cross-icon">❌</div>
-      <div class="wrong-text">Wrong Chemical!</div>
+      <div class="wrong-text">Wrong Material!</div>
     </div>
   `;
 
@@ -936,21 +958,20 @@ function handleBottleClick(item, bottleEl) {
     }
 
     feedback.className = 'live-feedback-box success';
-    feedback.innerHTML = `<span class="fb-icon">✔</span><span class="fb-text">Selected <strong>${item.name} (${item.formula})</strong>. Safe and verified!</span>`;
+    feedback.innerHTML = `<span class="fb-icon">✔</span><span class="fb-text">Loaded <strong>${item.name} (${item.formula})</strong> into charge carrier!</span>`;
     tracker.textContent = `${state.selectedCupboard.size} / ${requiredCount}`;
 
     if (state.selectedCupboard.size === requiredCount) {
       labSound.playFanfare();
       proceedBtn.disabled = false;
-      feedback.innerHTML = `<span class="fb-icon">🎉</span><span class="fb-text">All necessary chemical reagents collected! Proceed to Experiment.</span>`;
+      feedback.innerHTML = `<span class="fb-icon">🎉</span><span class="fb-text">All raw materials collected! Proceed to Experiment Workbench.</span>`;
     }
   } else {
-    // WRONG BOTTLE SELECTED
     labSound.playError();
     state.stage3Mistakes++;
     bottleEl.classList.add('wrong');
 
-    showErrorToast(`❌ Wrong Reagent: ${item.name}`, item.wrongDesc || `Do not select this reagent.`);
+    showErrorToast(`❌ Wrong Material: ${item.name}`, item.wrongDesc || `Do not select this item.`);
 
     feedback.className = 'live-feedback-box error';
     feedback.innerHTML = `<span class="fb-icon">❌</span><span class="fb-text"><strong>${item.name}:</strong> ${item.wrongDesc}</span>`;
@@ -972,11 +993,245 @@ function renderStage4() {
 
   if (state.currentModuleId === 'titration') {
     renderTitrationSim();
+  } else if (state.currentModuleId === 'smelting') {
+    renderSmeltingSim();
   } else if (state.currentModuleId === 'calorimetry') {
     renderCalorimetrySim();
   } else if (state.currentModuleId === 'flametest') {
     renderFlameTestSim();
   }
+}
+
+// ----------------------------------------------------------------------------
+// SMELTING EXPERIMENT SIMULATION (BLAST FURNACE & TEMP REGULATION)
+// ----------------------------------------------------------------------------
+function renderSmeltingSim() {
+  const metrics = document.getElementById('expMetrics');
+  metrics.innerHTML = `
+    <div class="metric-card">
+      <span class="metric-label">Hearth Pyrometer</span>
+      <span class="metric-value" id="smeltTempVal" style="color: #F97316;">600 °C</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-label">Thermal Zone</span>
+      <span class="metric-value" id="smeltZoneVal" style="color: #EF4444;">Too Cold ❄️</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-label">Molten Iron Yield</span>
+      <span class="metric-value" id="smeltYieldVal">0.0%</span>
+    </div>
+  `;
+
+  const viewport = document.getElementById('simViewport');
+  viewport.innerHTML = `
+    <div class="furnace-rig">
+      <div class="furnace-top-hopper" id="furnaceHopper">📥 Hopper</div>
+      <div class="furnace-body" id="furnaceBody">
+        <div class="furnace-glow-core cold" id="furnaceGlow"></div>
+        <div style="z-index: 2; font-family: var(--font-display); font-size: 11px; font-weight: 800; color: #FFFFFF; text-shadow: 0 2px 4px rgba(0,0,0,0.8);" id="furnaceStatusText">
+          EMPTY CHARGE
+        </div>
+      </div>
+      <div class="tuyere-blast-pipe">
+        <div class="tuyere-nozzle" title="Left Tuyere"></div>
+        <div class="tuyere-nozzle" title="Right Tuyere"></div>
+      </div>
+      <div class="molten-iron-stream" id="moltenIronStream"></div>
+      <div class="iron-ladle-mold">
+        <div class="ladle-molten-fill" id="ladleFill"></div>
+        <span style="z-index: 2;">Iron Mold</span>
+      </div>
+      <div class="slag-tap-layer" id="slagTapBadge">Slag: 0%</div>
+    </div>
+  `;
+
+  const controls = document.getElementById('simControlsPanel');
+  controls.innerHTML = `
+    <div class="panel-section-title">🧱 1. CHARGE RAW MATERIALS</div>
+    <div class="control-btn-group">
+      <button class="action-chip-btn" id="btnChargeOre">
+        <span>🪨 Load Fe₂O₃ Ore</span>
+      </button>
+      <button class="action-chip-btn" id="btnChargeCoke" disabled>
+        <span>🔥 Load Coke (C)</span>
+      </button>
+      <button class="action-chip-btn" id="btnChargeFlux" disabled>
+        <span>🧪 Load CaCO₃ Flux</span>
+      </button>
+    </div>
+
+    <div class="panel-section-title" style="margin-top: 10px;">💨 2. TUYERE BLAST & TEMPERATURE REGULATION</div>
+    <div class="control-btn-group">
+      <button class="action-chip-btn" id="btnToggleBlast" disabled>
+        <span>🌬️ Turn ON Air Blast</span>
+      </button>
+    </div>
+
+    <div class="temp-slider-container" style="margin-top: 6px;">
+      <div class="temp-slider-header">
+        <span>Regulate Blast Furnace Temp:</span>
+        <strong id="sliderTempDisplay">600 °C</strong>
+      </div>
+      <input type="range" id="tempRangeSlider" class="temp-range-input" min="300" max="2000" step="25" value="600" disabled>
+    </div>
+
+    <div class="panel-section-title" style="margin-top: 10px;">🌋 3. TAP MOLTEN METAL & SLAG</div>
+    <div class="control-btn-group">
+      <button class="primary-btn" id="btnTapIron" style="width: 100%; justify-content: center;" disabled>
+        <span>🪣 Tap Molten Iron & Slag</span>
+      </button>
+    </div>
+  `;
+
+  bindSmeltingEvents();
+}
+
+function bindSmeltingEvents() {
+  const btnOre = document.getElementById('btnChargeOre');
+  const btnCoke = document.getElementById('btnChargeCoke');
+  const btnFlux = document.getElementById('btnChargeFlux');
+  const btnBlast = document.getElementById('btnToggleBlast');
+  const slider = document.getElementById('tempRangeSlider');
+  const sliderDisplay = document.getElementById('sliderTempDisplay');
+  const btnTap = document.getElementById('btnTapIron');
+  const btnFinish = document.getElementById('btnFinishExperiment');
+  const glow = document.getElementById('furnaceGlow');
+  const statusText = document.getElementById('furnaceStatusText');
+
+  btnOre.addEventListener('click', () => {
+    labSound.playClick();
+    state.expState.chargedOre = true;
+    btnOre.disabled = true;
+    btnOre.classList.add('active');
+    btnCoke.disabled = false;
+    statusText.textContent = 'ORE LOADED (Fe₂O₃)';
+    updateExpFeedback('Hematite ore added to top hopper. Now add metallurgical coke!');
+  });
+
+  btnCoke.addEventListener('click', () => {
+    labSound.playClick();
+    state.expState.chargedCoke = true;
+    btnCoke.disabled = true;
+    btnCoke.classList.add('active');
+    btnFlux.disabled = false;
+    statusText.textContent = 'ORE + COKE CHARGED';
+    updateExpFeedback('Coke loaded. Add limestone (CaCO₃) flux to remove silica impurities!');
+  });
+
+  btnFlux.addEventListener('click', () => {
+    labSound.playSuccess();
+    state.expState.chargedFlux = true;
+    btnFlux.disabled = true;
+    btnFlux.classList.add('active');
+    btnBlast.disabled = false;
+    statusText.textContent = 'CHARGE COMPLETE (READY)';
+    updateExpFeedback('All materials charged! Engage the tuyere hot air blast to initiate combustion.');
+  });
+
+  btnBlast.addEventListener('click', () => {
+    labSound.playFurnaceRoar();
+    state.expState.tuyereBlastOn = true;
+    btnBlast.disabled = true;
+    btnBlast.classList.add('active');
+    btnBlast.innerHTML = '<span>💨 Tuyere Blast ACTIVE 🟢</span>';
+    slider.disabled = false;
+    btnTap.disabled = false;
+
+    glow.className = 'furnace-glow-core warm';
+    statusText.textContent = 'BURNING COKE (CO₂/CO)';
+    updateExpFeedback('Air blast active! Use the temperature slider to regulate the blast furnace to optimal smelting range.');
+  });
+
+  slider.addEventListener('input', (e) => {
+    const temp = parseInt(e.target.value, 10);
+    state.expState.temperature = temp;
+    sliderDisplay.textContent = `${temp} °C`;
+    document.getElementById('smeltTempVal').textContent = `${temp} °C`;
+
+    const zoneVal = document.getElementById('smeltZoneVal');
+
+    if (temp < 1100) {
+      glow.className = 'furnace-glow-core cold';
+      zoneVal.textContent = 'Too Cold ❄️';
+      zoneVal.style.color = '#EF4444';
+      statusText.textContent = 'LOW HEAT (NO REDUCTION)';
+    } else if (temp >= 1100 && temp < 1350) {
+      glow.className = 'furnace-glow-core warm';
+      zoneVal.textContent = 'Pre-Heating 🔥';
+      zoneVal.style.color = '#F97316';
+      statusText.textContent = 'REDUCING Fe₂O₃ → FeO';
+    } else if (temp >= 1350 && temp <= 1600) {
+      glow.className = 'furnace-glow-core optimal';
+      zoneVal.textContent = 'Optimal Smelting 🌟';
+      zoneVal.style.color = '#10B981';
+      statusText.textContent = 'MOLTEN IRON (Fe) & SLAG';
+    } else {
+      glow.className = 'furnace-glow-core overheat';
+      zoneVal.textContent = 'DANGEROUS OVERHEAT ⚠️';
+      zoneVal.style.color = '#DC2626';
+      statusText.textContent = 'REFRACTORY LINING AT RISK!';
+    }
+  });
+
+  btnTap.addEventListener('click', () => {
+    const temp = state.expState.temperature;
+
+    if (temp < 1200) {
+      labSound.playError();
+      state.stage4Mistakes++;
+      openTempAlert(
+        '❄️ Temperature Too Low!',
+        `At ${temp}°C, the reduction of hematite cannot complete and slag remains solid rock! The taphole cannot flow.`,
+        '1400 °C - 1550 °C (Molten Smelting Zone)'
+      );
+      updateHeaderScore();
+      return;
+    } else if (temp > 1750) {
+      labSound.playError();
+      state.stage4Mistakes++;
+      openTempAlert(
+        '🔥 Temperature Excessively High!',
+        `At ${temp}°C, the furnace is severely overheated! Refractory bricks are melting and metallic vapors are escaping violently.`,
+        '1400 °C - 1550 °C (Safe High Efficiency Zone)'
+      );
+      updateHeaderScore();
+      return;
+    }
+
+    // Optimal Smelting Execution
+    labSound.playFanfare();
+    state.expState.ironTapped = true;
+    btnTap.disabled = true;
+
+    // Show Molten Iron Stream & Ladle Fill Animation
+    const stream = document.getElementById('moltenIronStream');
+    const ladleFill = document.getElementById('ladleFill');
+    const slagBadge = document.getElementById('slagTapBadge');
+
+    stream.classList.add('flowing');
+    ladleFill.style.height = '100%';
+    slagBadge.textContent = 'Slag Tapped ✔';
+    slagBadge.style.background = '#065F46';
+    slagBadge.style.color = '#34D399';
+
+    document.getElementById('smeltYieldVal').textContent = '98.5%';
+    statusText.textContent = 'PURE MOLTEN IRON TAPPED!';
+
+    updateExpFeedback('🎉 SUCCESS! White-hot molten iron (Fe) tapped into ingot mold, and lighter slag separated cleanly!');
+    btnFinish.disabled = false;
+  });
+}
+
+function openTempAlert(title, message, optimal) {
+  document.getElementById('tempAlertTitle').textContent = title;
+  document.getElementById('tempAlertMsg').textContent = message;
+  document.getElementById('tempAlertOptimal').textContent = optimal;
+  document.getElementById('modalTempAlert').classList.add('open');
+}
+
+function closeTempAlert() {
+  labSound.playClick();
+  document.getElementById('modalTempAlert').classList.remove('open');
 }
 
 // ----------------------------------------------------------------------------
@@ -1178,12 +1433,10 @@ function dispenseTitrant(amount) {
   state.expState.buretteVolume = Math.min(50.0, state.expState.buretteVolume + amount);
   const vol = state.expState.buretteVolume;
 
-  // Update Burette liquid UI
   const liquidBar = document.getElementById('buretteLiquidBar');
   const pct = Math.max(10, 90 - (vol / 50.0) * 80);
   if (liquidBar) liquidBar.style.height = `${pct}%`;
 
-  // Update Metrics
   const buretteVal = document.getElementById('titrBuretteVal');
   const phVal = document.getElementById('titrPhVal');
   const colorVal = document.getElementById('titrColorVal');
@@ -1192,7 +1445,6 @@ function dispenseTitrant(amount) {
 
   if (buretteVal) buretteVal.textContent = `${vol.toFixed(1)} mL`;
 
-  // Dynamic pH & Color Model
   let calcPh = 1.0;
   if (vol < 18.0) {
     calcPh = 1.0 + (vol / 18.0) * 2.0;
@@ -1206,7 +1458,6 @@ function dispenseTitrant(amount) {
 
   if (phVal) phVal.textContent = calcPh.toFixed(1);
 
-  // Color change logic
   if (flaskLiquid && state.expState.hasIndicator) {
     if (vol < 19.5) {
       flaskLiquid.className = 'flask-liquid colorless';
@@ -1338,7 +1589,6 @@ function bindCalorimetryEvents() {
     btnStir.classList.add('active');
     document.getElementById('calorStatus').textContent = 'Stirring... Exothermic reaction in progress! 📈';
 
-    // Animate Temperature Rise
     let temp = 22.0;
     const interval = setInterval(() => {
       temp += 0.2;
@@ -1472,7 +1722,6 @@ function renderStage5() {
   const finalScore = state.calculateFinalScore();
   document.getElementById('finalScoreVal').textContent = `${finalScore}%`;
 
-  // Stars
   const starsContainer = document.getElementById('starsDisplay');
   starsContainer.innerHTML = '';
   const starCount = finalScore >= 85 ? 3 : (finalScore >= 70 ? 2 : 1);
@@ -1483,12 +1732,10 @@ function renderStage5() {
     starsContainer.appendChild(s);
   }
 
-  // Performance Breakdown
   document.getElementById('apparatusPerf').textContent = state.stage2Mistakes === 0 ? '100% (No Mistakes)' : `${state.stage2Mistakes} Mistakes`;
   document.getElementById('cupboardPerf').textContent = state.stage3Mistakes === 0 ? '100% (No Mistakes)' : `${state.stage3Mistakes} Mistakes`;
-  document.getElementById('simPerf').textContent = state.stage4Mistakes === 0 ? 'Perfect Accuracy' : 'Completed with Retries';
+  document.getElementById('simPerf').textContent = state.stage4Mistakes === 0 ? 'Optimal Performance' : 'Completed with Retries';
 
-  // Data Table Summary Log
   const tableContainer = document.getElementById('reportDataTable');
   if (state.currentModuleId === 'titration') {
     tableContainer.innerHTML = `
@@ -1498,6 +1745,17 @@ function renderStage5() {
         <tr><td>Volume of 0.1 M NaOH</td><td>${state.expState.buretteVolume.toFixed(1)} mL</td><td>20.0 mL</td></tr>
         <tr><td>Calculated Molarity (M₂)</td><td>0.100 M</td><td>0.100 M</td></tr>
         <tr><td>Indicator Transition</td><td>Colorless &rarr; Pale Pink</td><td>pH 8.2 Endpoint</td></tr>
+      </table>
+    `;
+  } else if (state.currentModuleId === 'smelting') {
+    tableContainer.innerHTML = `
+      <table class="log-table">
+        <tr><th>Parameter</th><th>Observed Measurement</th><th>Target Status</th></tr>
+        <tr><td>Furnace Operating Temp</td><td>${state.expState.temperature} °C</td><td>1400°C - 1550°C (Optimal)</td></tr>
+        <tr><td>Primary Ore Reduced</td><td>Hematite (Fe₂O₃)</td><td>100% Charged</td></tr>
+        <tr><td>Reducing Gas Agent</td><td>Carbon Monoxide (CO)</td><td>Active Oxidation</td></tr>
+        <tr><td>Slag Formed & Separated</td><td>Calcium Silicate (CaSiO₃)</td><td>Clean Separation ✔</td></tr>
+        <tr><td>Molten Iron Yield</td><td>98.5%</td><td>Poured into Ingot Mold ✔</td></tr>
       </table>
     `;
   } else if (state.currentModuleId === 'calorimetry') {
@@ -1522,7 +1780,6 @@ function renderStage5() {
     `;
   }
 
-  // Auto pop revision modal if desired or available
   renderRevisionContent();
 }
 

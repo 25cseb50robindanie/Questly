@@ -30,6 +30,10 @@
           <span class="tab-icon">⚗️</span>
           <span class="tab-text">Titration</span>
         </button>
+        <button class="module-tab" data-module="smelting">
+          <span class="tab-icon">🌋</span>
+          <span class="tab-text">Smelting</span>
+        </button>
         <button class="module-tab" data-module="calorimetry">
           <span class="tab-icon">🔥</span>
           <span class="tab-text">Calorimetry</span>
@@ -85,10 +89,10 @@
             <div class="card-icon-bubble">📖</div>
             <div class="card-content">
               <span class="card-tag">Chemical Principle</span>
-              <h3 id="principleHeading">Neutralization & Equivalence Point</h3>
-              <p id="principleDesc">An acid reacts with a base quantitatively to form salt and water. At the stoichiometric equivalence point, moles of H⁺ equal moles of OH⁻.</p>
+              <h3 id="principleHeading">Core Principle</h3>
+              <p id="principleDesc">Explanation of the chemical reactions and thermodynamic principles.</p>
               <div class="formula-box" id="principleFormula">
-                <code>HCl(aq) + NaOH(aq) &rarr; NaCl(aq) + H<sub>2</sub>O(l)</code>
+                <code>Reaction Equation</code>
               </div>
             </div>
             <button class="card-info-btn" onclick="openConceptModal('principle')">Learn More 🔍</button>
@@ -100,31 +104,22 @@
             <div class="card-content">
               <span class="card-tag">Lab Equipment</span>
               <h3 id="apparatusHeading">Required Apparatus</h3>
-              <p id="apparatusSummary">Burette with stand, Pipette (10 mL), Conical Flask (250 mL), Beakers, Funnel & Dropper.</p>
-              <div class="tags-row" id="apparatusTags">
-                <span class="mini-tag">Burette</span>
-                <span class="mini-tag">Pipette</span>
-                <span class="mini-tag">Conical Flask</span>
-                <span class="mini-tag">Funnel</span>
-              </div>
+              <p id="apparatusSummary">Summary of essential glassware and instruments.</p>
+              <div class="tags-row" id="apparatusTags"></div>
             </div>
             <button class="card-info-btn" onclick="openConceptModal('apparatus')">View Items 🔍</button>
           </div>
 
-          <!-- Card 3: Solutions Required -->
+          <!-- Card 3: Solutions / Raw Materials -->
           <div class="concept-card" id="cardSolutions">
             <div class="card-icon-bubble">🫙</div>
             <div class="card-content">
-              <span class="card-tag">Chemical Reagents</span>
-              <h3 id="solutionsHeading">Required Solutions</h3>
-              <p id="solutionsSummary">0.1 M Standard Hydrochloric Acid (HCl), 0.1 M Sodium Hydroxide (NaOH), Phenolphthalein Indicator.</p>
-              <div class="tags-row" id="solutionsTags">
-                <span class="mini-tag reagent">0.1 M HCl</span>
-                <span class="mini-tag reagent">0.1 M NaOH</span>
-                <span class="mini-tag reagent">Phenolphthalein</span>
-              </div>
+              <span class="card-tag">Reagents & Raw Materials</span>
+              <h3 id="solutionsHeading">Required Materials</h3>
+              <p id="solutionsSummary">Chemical compounds and ores required for this experiment.</p>
+              <div class="tags-row" id="solutionsTags"></div>
             </div>
-            <button class="card-info-btn" onclick="openConceptModal('solutions')">View Reagents 🔍</button>
+            <button class="card-info-btn" onclick="openConceptModal('solutions')">View Materials 🔍</button>
           </div>
 
           <!-- Card 4: Procedure & Steps -->
@@ -133,7 +128,7 @@
             <div class="card-content">
               <span class="card-tag">Standard Procedure</span>
               <h3 id="procedureHeading">Step-by-Step Procedure</h3>
-              <p id="procedureSummary">1. Rinse & fill burette. 2. Pipette 10 mL analyte. 3. Add 2 drops indicator. 4. Titrate dropwise until faint permanent pink.</p>
+              <p id="procedureSummary">Stepwise execution protocol to achieve optimal reaction results.</p>
               <div class="steps-progress-mini">
                 <span class="step-dot active">1</span>
                 <span class="step-line"></span>
@@ -166,7 +161,7 @@
           <div class="banner-text">
             <div class="stage-tag">STAGE 2 • APPARATUS SELECTION</div>
             <h2>Equip Your Laboratory Workbench</h2>
-            <p>Select all the required apparatus for this experiment. Watch out: choosing incorrect equipment triggers an error notice and penalizes your first-attempt score!</p>
+            <p>Select all the required equipment. Choosing incorrect items triggers an ❌ error notice and penalizes your credit score!</p>
           </div>
           <div class="target-tracker">
             <span>Selected:</span>
@@ -177,20 +172,16 @@
         <!-- Target Needed Checklist -->
         <div class="target-checklist-container">
           <div class="checklist-title">Required Equipment Checklist:</div>
-          <div class="checklist-pills" id="apparatusTargetPills">
-            <!-- Dynamic pills inserted via JS -->
-          </div>
+          <div class="checklist-pills" id="apparatusTargetPills"></div>
         </div>
 
         <!-- Workbench Selection Grid -->
-        <div class="apparatus-shelf-grid" id="apparatusGrid">
-          <!-- Generated dynamically in JS -->
-        </div>
+        <div class="apparatus-shelf-grid" id="apparatusGrid"></div>
 
         <div class="stage-footer">
           <div id="apparatusFeedback" class="live-feedback-box info">
             <span class="fb-icon">💡</span>
-            <span class="fb-text">Click an apparatus to add it to your workbench setup.</span>
+            <span class="fb-text">Click an item to add it to your workbench setup.</span>
           </div>
           <button id="btnProceedStage2" class="primary-btn" disabled>
             <span>Proceed to Chemical Cupboard</span>
@@ -203,38 +194,36 @@
       <section id="stage3" class="stage-view">
         <div class="stage-banner">
           <div class="banner-text">
-            <div class="stage-tag">STAGE 3 • CHEMICAL REAGENT CUPBOARD</div>
-            <h2>Pick the Correct Solutions from the Cupboard</h2>
-            <p>Carefully read the chemical labels on the bottles. If you pick the wrong reagent or wrong concentration, an ❌ mark with error sound will be displayed!</p>
+            <div class="stage-tag">STAGE 3 • CHEMICAL & RAW MATERIAL CUPBOARD</div>
+            <h2>Pick the Correct Solutions & Ores from Storage</h2>
+            <p>Carefully read the chemical formulas and labels. If you pick the wrong reagent, an ❌ mark with error sound will appear!</p>
           </div>
           <div class="target-tracker">
-            <span>Reagents Picked:</span>
+            <span>Materials Picked:</span>
             <strong id="cupboardTracker">0 / 3</strong>
           </div>
         </div>
 
         <!-- Target Needed Reagents -->
         <div class="target-checklist-container">
-          <div class="checklist-title">Required Chemical Reagents:</div>
-          <div class="checklist-pills" id="cupboardTargetPills">
-            <!-- Dynamic pills inserted via JS -->
-          </div>
+          <div class="checklist-title">Required Materials Checklist:</div>
+          <div class="checklist-pills" id="cupboardTargetPills"></div>
         </div>
 
         <!-- 3D-Style Lab Cupboard with Shelves -->
         <div class="cupboard-container">
           <div class="cupboard-header-bar">
-            <span>🚪 CHEMICAL STORAGE CABINET • ACID & BASE SAFEGUARD</span>
+            <span>🚪 CHEMICAL & MINERAL STORAGE CABINET</span>
             <span class="vent-status">Ventilation: ACTIVE 🟢</span>
           </div>
           
           <div class="cupboard-shelf" id="shelfTop">
-            <div class="shelf-label">SHELF A: ACIDS & REAGENTS</div>
+            <div class="shelf-label">SHELF A: ACIDS, ORES & CARBON SOURCES</div>
             <div class="bottles-row" id="shelfRowA"></div>
           </div>
 
           <div class="cupboard-shelf" id="shelfBottom">
-            <div class="shelf-label">SHELF B: BASES, INDICATORS & SOLVENTS</div>
+            <div class="shelf-label">SHELF B: BASES, FLUXES, SALTS & INDICATORS</div>
             <div class="bottles-row" id="shelfRowB"></div>
           </div>
         </div>
@@ -242,7 +231,7 @@
         <div class="stage-footer">
           <div id="cupboardFeedback" class="live-feedback-box info">
             <span class="fb-icon">💡</span>
-            <span class="fb-text">Inspect the chemical labels carefully and select the 3 required solutions.</span>
+            <span class="fb-text">Inspect the labels carefully and select the required materials.</span>
           </div>
           <button id="btnProceedStage3" class="primary-btn" disabled>
             <span>Enter Hands-On Experiment</span>
@@ -256,31 +245,25 @@
         <div class="stage-banner exp-banner">
           <div class="banner-text">
             <div class="stage-tag">STAGE 4 • HANDS-ON EXPERIMENT SIMULATION</div>
-            <h2 id="expTitle">Acid–Base Titration Simulation</h2>
-            <p id="expSubtitle">Operate the stopcock to dispense titrant dropwise into the conical flask. Detect the subtle pink color change at the exact equivalence point!</p>
+            <h2 id="expTitle">Experiment Simulation</h2>
+            <p id="expSubtitle">Conduct the experiment, regulate controls and temperature, and observe real-time physical & chemical changes!</p>
           </div>
-          <div class="exp-metrics-bar" id="expMetrics">
-            <!-- Dynamic experiment metrics (Burette reading, Temp, Flame status, pH) -->
-          </div>
+          <div class="exp-metrics-bar" id="expMetrics"></div>
         </div>
 
         <!-- Dynamic Lab Simulator Canvas / Viewport -->
         <div class="simulator-layout">
           <!-- Simulation Interactive Bench -->
-          <div class="sim-viewport" id="simViewport">
-            <!-- Rendered by JS according to current active module (Titration, Calorimetry, Flame Test) -->
-          </div>
+          <div class="sim-viewport" id="simViewport"></div>
 
           <!-- Simulation Control Desk & Instruments -->
-          <div class="sim-controls-panel" id="simControlsPanel">
-            <!-- Dynamic Controls inserted via JS -->
-          </div>
+          <div class="sim-controls-panel" id="simControlsPanel"></div>
         </div>
 
         <div class="stage-footer exp-footer">
           <div id="expFeedback" class="live-feedback-box info">
             <span class="fb-icon">🧪</span>
-            <span class="fb-text" id="expFeedbackText">Follow the lab steps on the control panel to conduct your experiment.</span>
+            <span class="fb-text" id="expFeedbackText">Follow the steps on the control panel to conduct your experiment.</span>
           </div>
           <button id="btnFinishExperiment" class="primary-btn" disabled>
             <span>Analyze Results & View Report</span>
@@ -329,7 +312,7 @@
               </div>
               <div class="perf-item">
                 <span class="perf-label">Simulation Accuracy (Stage 4):</span>
-                <span class="perf-val" id="simPerf">Optimal Endpoint Reached</span>
+                <span class="perf-val" id="simPerf">Optimal Operation</span>
               </div>
             </div>
           </div>
@@ -340,9 +323,7 @@
               <span>📋 EXPERIMENT SUMMARY LOG</span>
               <span class="verified-badge">VERIFIED ✔</span>
             </div>
-            <div class="data-table-container" id="reportDataTable">
-              <!-- Rendered dynamically -->
-            </div>
+            <div class="data-table-container" id="reportDataTable"></div>
           </div>
         </div>
 
@@ -376,11 +357,11 @@
           </div>
           <div class="preview-item">
             <span class="item-icon">2️⃣</span>
-            <span>Retrieve exact chemical solutions from the cupboard.</span>
+            <span>Retrieve exact chemical solutions from storage.</span>
           </div>
           <div class="preview-item">
             <span class="item-icon">3️⃣</span>
-            <span>Run the titration and catch the precise endpoint!</span>
+            <span>Execute the experiment and regulate temperature precisely!</span>
           </div>
         </div>
         <button id="btnHurrahGo" class="primary-btn hurrah-btn">
@@ -399,12 +380,25 @@
           </div>
           <button class="modal-close-btn" onclick="closeConceptModal()">&times;</button>
         </div>
-        <div class="modal-body" id="conceptModalBody">
-          <!-- Dynamic concept details -->
-        </div>
+        <div class="modal-body" id="conceptModalBody"></div>
         <div class="modal-footer">
           <button class="primary-btn" onclick="closeConceptModal()">Got it! 👍</button>
         </div>
+      </div>
+    </div>
+
+    <!-- ================= MODAL: TEMPERATURE ADVISORY POPUP ================= -->
+    <div id="modalTempAlert" class="modal-backdrop">
+      <div class="modal-card" style="max-width: 480px; text-align: center; padding: 24px;">
+        <div id="tempAlertIcon" style="font-size: 40px; margin-bottom: 8px;">⚠️</div>
+        <span id="tempAlertBadge" class="modal-badge" style="color: #EF4444; font-size: 11px;">TEMPERATURE ERROR</span>
+        <h3 id="tempAlertTitle" style="font-family: var(--font-display); font-size: 20px; font-weight: 800; margin: 8px 0; color: #2D144B;">Temperature Too Low!</h3>
+        <p id="tempAlertMsg" style="font-size: 13px; color: #64748B; margin-bottom: 14px;">At 700°C, the reduction of hematite cannot take place and slag solidifies.</p>
+        <div style="background: #EEF2FF; border: 1.5px solid #818CF8; border-radius: 8px; padding: 12px; margin-bottom: 18px; text-align: left;">
+          <strong style="color: #4338CA; font-size: 12px; display: block; margin-bottom: 4px;">🎯 Required Optimal Operating Temperature:</strong>
+          <span id="tempAlertOptimal" style="font-family: var(--font-mono); font-weight: 800; font-size: 14px; color: #1E1B4B;">1400 °C - 1500 °C (Molten Smelting Zone)</span>
+        </div>
+        <button class="primary-btn" style="width: 100%; justify-content: center;" onclick="closeTempAlert()">Adjust Temperature Now 🔧</button>
       </div>
     </div>
 
@@ -414,13 +408,11 @@
         <div class="modal-header">
           <div class="modal-title-group">
             <span class="modal-badge">EXAM REVISION</span>
-            <h3 id="revisionTitle">⚡ Quick Revision: Acid–Base Titration</h3>
+            <h3 id="revisionTitle">⚡ Quick Revision</h3>
           </div>
           <button class="modal-close-btn" onclick="closeRevisionModal()">&times;</button>
         </div>
-        <div class="modal-body" id="revisionModalBody">
-          <!-- Rendered dynamically -->
-        </div>
+        <div class="modal-body" id="revisionModalBody"></div>
         <div class="modal-footer">
           <button class="primary-btn" onclick="closeRevisionModal()">Close Revision Sheet</button>
         </div>
@@ -432,7 +424,7 @@
       <div class="toast-icon">❌</div>
       <div class="toast-content">
         <strong id="toastTitle">Incorrect Item!</strong>
-        <p id="toastMessage">That is a Beaker. We need a Burette for this stage.</p>
+        <p id="toastMessage">That item is not required for this experiment.</p>
       </div>
     </div>
 
