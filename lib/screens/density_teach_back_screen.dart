@@ -96,10 +96,15 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
       });
     } else {
       try {
+        final lang = LocalizationService.currentLanguage;
+        final langCode = lang == 'ta'
+            ? 'ta-IN'
+            : (lang == 'hi' ? 'hi-IN' : (lang == 'or' ? 'or-IN' : 'en-US'));
+
         _speechRecognition = SpeechRecognitionHelper.create();
         if (_speechRecognition != null) {
           _speechRecognition.start(
-            langCode: 'en-US',
+            langCode: langCode,
             continuous: true,
             interimResults: true,
             onStart: () {

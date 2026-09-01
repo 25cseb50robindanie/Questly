@@ -54,20 +54,26 @@ class WhisperVoiceService extends ChangeNotifier {
   int get recordSeconds => _recordSeconds;
 
   String get _serverUrl {
-    return Locator.storageService.getString('whisper_server_url') ?? 'http://localhost:8000';
+    return Locator.storageService.getString('whisper_server_url') ?? 'http://127.0.0.1:8080';
   }
 
-  /// Checks if the Python Whisper service is online
+  /// Checks if the whisper.cpp server or local whisper service is online
   Future<bool> isServerAvailable() async {
     try {
-      final res = await http.get(Uri.parse('$_serverUrl/health')).timeout(const Duration(milliseconds: 1500));
-      return res.statusCode == 200;
+      // Check standard health endpoint or root of whisper.cpp server
+      final res = await http.get(Uri.parse('$_serverUrl/health')).timeout(const Duration(milliseconds: 1200));
+      if (res.statusCode == 200) return true;
+    } catch (_) {}
+
+    try {
+      final res = await http.get(Uri.parse(_serverUrl)).timeout(const Duration(milliseconds: 1200));
+      return res.statusCode == 200 || res.statusCode == 404 || res.statusCode == 405;
     } catch (_) {
       return false;
     }
   }
 
-  /// Transcribes audio bytes using the Python Whisper service
+  /// Transcribes audio bytes using the whisper.cpp server (/inference or /transcribe)
   Future<String?> transcribeAudio({
     required Uint8List audioBytes,
     String format = 'wav',
@@ -78,8 +84,36 @@ class WhisperVoiceService extends ChangeNotifier {
 
     try {
       final activeLang = language ?? LocalizationService.currentLanguage;
-      final base64Audio = base64Encode(audioBytes);
 
+      // 1. Try official whisper.cpp /inference multipart endpoint
+      try {
+        final uri = Uri.parse('$_serverUrl/inference');
+        final request = http.MultipartRequest('POST', uri);
+        request.fields['temperature'] = '0.0';
+        request.fields['response_format'] = 'json';
+        request.fields['language'] = activeLang;
+
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'file',
+            audioBytes,
+            filename: 'audio.$format',
+          ),
+        );
+
+        final streamed = await request.send().timeout(const Duration(seconds: 15));
+        final response = await http.Response.fromStream(streamed);
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          if (data is Map && data.containsKey('text')) {
+            return (data['text'] as String).trim();
+          }
+        }
+      } catch (_) {}
+
+      // 2. Try JSON /transcribe-base64 endpoint
+      final base64Audio = base64Encode(audioBytes);
       final response = await http.post(
         Uri.parse('$_serverUrl/transcribe-base64'),
         headers: {'Content-Type': 'application/json'},
@@ -88,7 +122,7 @@ class WhisperVoiceService extends ChangeNotifier {
           'format': format,
           'language': activeLang,
         }),
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -104,7 +138,7 @@ class WhisperVoiceService extends ChangeNotifier {
     return null;
   }
 
-  /// Evaluates student Teach-Back explanation using Whisper AI evaluator
+  /// Evaluates student Teach-Back explanation using Whisper AI evaluator or local fallback
   Future<TeachBackEvaluation?> evaluateTeachBack({
     required String moduleId,
     required String transcript,
@@ -122,30 +156,63 @@ class WhisperVoiceService extends ChangeNotifier {
           'language': activeLang,
           'topic_title': topicTitle ?? 'Density & Buoyancy',
         }),
-      ).timeout(const Duration(seconds: 8));
+      ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         return TeachBackEvaluation.fromJson(data);
       }
     } catch (e) {
-      debugPrint('[WhisperVoiceService TeachBack Error] $e');
+      debugPrint('[WhisperVoiceService TeachBack Server Error] $e');
     }
 
-    // Local fallback evaluation rule engine if Python server is offline
-    return _localFallbackEvaluation(transcript, activeLang);
+    // Local fallback evaluation rule engine
+    return _localFallbackEvaluation(moduleId, transcript, activeLang);
   }
 
-  TeachBackEvaluation _localFallbackEvaluation(String transcript, String lang) {
+  TeachBackEvaluation _localFallbackEvaluation(String moduleId, String transcript, String lang) {
     final text = transcript.toLowerCase();
-    final hasMass = text.contains('mass') || text.contains('weight');
-    final hasVol = text.contains('volume') || text.contains('space');
-    final hasFormula = text.contains('density') || text.contains('divide');
-    final hasFloat = text.contains('float') || text.contains('sink') || text.contains('water');
 
     int score = 40;
     List<String> found = [];
     List<String> missing = [];
+    String title;
+    String body;
+
+    if (moduleId.contains('fraction')) {
+      final hasParts = text.contains('part') || text.contains('equal') || text.contains('share');
+      final hasNumDenom = text.contains('numerator') || text.contains('denominator') || text.contains('top') || text.contains('bottom');
+      final hasWhole = text.contains('whole') || text.contains('total') || text.contains('divide');
+      final hasEquivalent = text.contains('equivalent') || text.contains('equal') || text.contains('same');
+
+      if (hasParts) { score += 15; found.add('equal_parts'); } else { missing.add('equal_parts'); }
+      if (hasNumDenom) { score += 15; found.add('numerator_denominator'); } else { missing.add('numerator_denominator'); }
+      if (hasWhole) { score += 15; found.add('whole_concept'); } else { missing.add('whole_concept'); }
+      if (hasEquivalent) { score += 15; found.add('equivalent_fractions'); } else { missing.add('equivalent_fractions'); }
+
+      final isPassed = score >= 60;
+      title = isPassed ? 'Masterful Explanation!' : 'Good Effort! Keep Explaining.';
+      body = isPassed
+          ? 'You brilliantly explained how fractions represent equal parts of a whole and how numerators & denominators work!'
+          : 'Remember to mention that the numerator is the selected parts and the denominator is the total equal parts of the whole!';
+
+      return TeachBackEvaluation(
+        masteryScore: score,
+        isPassed: isPassed,
+        stars: score >= 85 ? 3 : (score >= 65 ? 2 : 1),
+        feedbackTitle: title,
+        feedbackBody: body,
+        conceptsIdentified: found,
+        missingConcepts: missing,
+        dendyMood: isPassed ? 'success' : 'thinking',
+      );
+    }
+
+    // Default: Density & Buoyancy
+    final hasMass = text.contains('mass') || text.contains('weight') || text.contains('heavy') || text.contains('atoms');
+    final hasVol = text.contains('volume') || text.contains('space') || text.contains('size');
+    final hasFormula = text.contains('density') || text.contains('divide') || text.contains('packed');
+    final hasFloat = text.contains('float') || text.contains('sink') || text.contains('water') || text.contains('buoyan');
 
     if (hasMass) { score += 15; found.add('mass'); } else { missing.add('mass'); }
     if (hasVol) { score += 15; found.add('volume'); } else { missing.add('volume'); }
@@ -155,10 +222,10 @@ class WhisperVoiceService extends ChangeNotifier {
     final isPassed = score >= 60;
     final stars = score >= 85 ? 3 : (score >= 65 ? 2 : 1);
 
-    String title = isPassed ? 'Fantastic Teaching!' : 'Good Attempt! Add More Details.';
-    String body = isPassed
+    title = isPassed ? 'Fantastic Teaching!' : 'Good Attempt! Add More Details.';
+    body = isPassed
         ? 'You clearly explained how mass and volume determine whether an object floats or sinks!'
-        : 'Try mentioning the density formula (mass / volume) and how water displacement creates buoyant force.';
+        : 'Try mentioning the density formula (mass ÷ volume) and how water displacement creates buoyant force.';
 
     return TeachBackEvaluation(
       masteryScore: score,
@@ -172,4 +239,3 @@ class WhisperVoiceService extends ChangeNotifier {
     );
   }
 }
-
