@@ -1,2882 +1,1736 @@
-/* =========================================================
-   ZUNO VIRTUAL CHEMISTRY LAB
-   COMPLETE CSS
-   Supports:
-   - Stage 1: Apparatus Selection
-   - Stage 2: Chemical/Solution Selection
-   - Stage 3 transition
-   - Correct/Wrong feedback
-   - Bottle status
-   - Popup
-   - Mobile responsive layout
-========================================================= */
+/* ==========================================================================
+   QUESTLY VIRTUAL LAB DESIGN SYSTEM
+   Modern, Gamified, High-Fidelity Scientific Simulation Stylesheet
+   ========================================================================== */
 
+:root {
+  --font-display: 'Fredoka', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-/* =========================================================
-   GLOBAL RESET
-========================================================= */
+  /* Questly Color Palette */
+  --color-plum: #2D144B;
+  --color-plum-dark: #1F0D33;
+  --color-purple: #7C3AED;
+  --color-purple-light: #8B5CF6;
+  --color-lavender: #E0E7FF;
+  --color-lavender-light: #EEF2FF;
+  --color-cream: #F8FAFC;
+  --color-white: #FFFFFF;
+  --color-gold: #F59E0B;
+  --color-gold-light: #FDE68A;
+  --color-green: #10B981;
+  --color-green-light: #D1FAE5;
+  --color-red: #EF4444;
+  --color-red-light: #FEE2E2;
+  --color-blue: #0284C7;
+  --color-blue-light: #E0F2FE;
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  /* Card & Shadow Tokens */
+  --shadow-sm: 0 2px 8px rgba(45, 20, 75, 0.06);
+  --shadow-md: 0 4px 14px rgba(45, 20, 75, 0.1);
+  --shadow-lg: 0 10px 25px rgba(45, 20, 75, 0.15);
+  --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.25);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
 }
 
-html {
-    scroll-behavior: smooth;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background: #eef3f8;
-    color: #172033;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-
-/* =========================================================
-   COMMON
-========================================================= */
-
-.hidden {
-    display: none !important;
-}
-
-button {
-    font-family: inherit;
-}
-
-button:focus {
-    outline: none;
-}
-
-
-/* =========================================================
-   TOP BAR
-========================================================= */
-
-.top-bar {
-    background: #173b57;
-    color: white;
-
-    padding: 15px 20px;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    gap: 15px;
-}
-
-.top-bar h1 {
-    font-size: 21px;
-    margin-bottom: 4px;
-}
-
-.top-bar p {
-    font-size: 13px;
-    opacity: 0.8;
-}
-
-
-/* =========================================================
-   PROGRESS BOX
-========================================================= */
-
-.progress-box {
-    background: rgba(255,255,255,0.15);
-
-    padding: 8px 12px;
-
-    border-radius: 10px;
-
-    text-align: center;
-
-    min-width: 75px;
-}
-
-.progress-box span {
-    display: block;
-    font-size: 11px;
-}
-
-.progress-box strong {
-    font-size: 15px;
-}
-
-
-/* =========================================================
-   EXPERIMENT HEADER
-========================================================= */
-
-.experiment-header {
-    background: white;
-
-    padding: 18px;
-
-    border-bottom: 1px solid #dce3eb;
-}
-
-.experiment-header h2 {
-    color: #173b57;
-
-    font-size: 22px;
-
-    margin-bottom: 7px;
-}
-
-.experiment-header p {
-    color: #657386;
-
-    font-size: 14px;
-
-    line-height: 1.5;
-}
-
-
-/* =========================================================
-   REQUIRED APPARATUS SECTION
-========================================================= */
-
-.required-section {
-    background: white;
-
-    padding: 15px 18px;
-
-    border-bottom: 1px solid #e1e6eb;
-}
-
-.required-section h3 {
-    font-size: 15px;
-
-    margin-bottom: 10px;
-
-    color: #26374a;
-}
-
-.required-list {
-    display: flex;
-
-    gap: 8px;
-
-    flex-wrap: wrap;
-}
-
-.required-item {
-    background: #e9eef4;
-
-    border: 2px solid #cbd5df;
-
-    padding: 7px 11px;
-
-    border-radius: 20px;
-
-    font-size: 13px;
-
-    transition: 0.25s ease;
-}
-
-
-/* Correctly selected required item */
-
-.required-item.selected {
-    background: #d9f7e5;
-
-    border-color: #28a745;
-
-    color: #176b31;
-
-    transform: scale(1.02);
-}
-
-
-/* =========================================================
-   LAB AREA
-========================================================= */
-
-.lab-area {
-    padding: 18px;
-}
-
-.lab-table {
-    background: #c99762;
-
-    min-height: 420px;
-
-    border-radius: 18px;
-
-    padding: 18px;
-
-    box-shadow:
-        0 8px 20px rgba(0,0,0,0.15);
-
-    position: relative;
-}
-
-
-/* =========================================================
-   TABLE TITLE
-========================================================= */
-
-.table-title {
-    color: white;
-
-    font-size: 18px;
-
-    font-weight: bold;
-
-    margin-bottom: 20px;
-
-    text-align: center;
-
-    text-shadow:
-        0 1px 2px rgba(0,0,0,0.3);
-}
-
-
-/* =========================================================
-   APPARATUS GRID
-========================================================= */
-
-.apparatus-container {
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(105px, 1fr));
-
-    gap: 15px;
-}
-
-
-/* =========================================================
-   APPARATUS CARD
-========================================================= */
-
-.apparatus {
-    background: white;
-
-    min-height: 125px;
-
-    border-radius: 15px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
-    align-items: center;
-
-    padding: 10px;
-
-    border: 3px solid transparent;
-
-    cursor: pointer;
-
-    touch-action: manipulation;
-
-    user-select: none;
-
-    transition:
-        transform 0.2s ease,
-        border-color 0.2s ease,
-        background 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-
-/* Hover */
-
-.apparatus:hover {
-    transform: translateY(-4px);
-
-    box-shadow:
-        0 6px 15px rgba(0,0,0,0.15);
-}
-
-
-/* Click */
-
-.apparatus:active {
-    transform: scale(0.94);
-}
-
-
-/* =========================================================
-   APPARATUS ICON
-========================================================= */
-
-.apparatus-icon {
-    font-size: 47px;
-
-    margin-bottom: 7px;
-
-    line-height: 1;
-}
-
-
-/* =========================================================
-   APPARATUS NAME
-========================================================= */
-
-.apparatus-name {
-    font-weight: bold;
-
-    font-size: 13px;
-
-    text-align: center;
-
-    color: #172033;
-}
-
-
-/* =========================================================
-   CORRECT APPARATUS
-========================================================= */
-
-.apparatus.correct {
-    border-color: #28a745;
-
-    background: #e8f8ed;
-
-    box-shadow:
-        0 0 0 2px rgba(40,167,69,0.08);
-}
-
-.apparatus.correct::after {
-    content: "✓ Correct";
-
-    color: #218838;
-
-    font-size: 11px;
-
-    margin-top: 5px;
-
-    font-weight: bold;
-}
-
-
-/* =========================================================
-   WRONG APPARATUS
-========================================================= */
-
-.apparatus.wrong {
-    border-color: #dc3545;
-
-    background: #ffe8eb;
-
-    animation: shake 0.35s;
-}
-
-.apparatus.wrong::after {
-    content: "✕ Wrong";
-
-    color: #c82333;
-
-    font-size: 11px;
-
-    margin-top: 5px;
-
-    font-weight: bold;
-}
-
-
-/* =========================================================
-   SHAKE ANIMATION
-========================================================= */
-
-@keyframes shake {
-
-    0% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-6px);
-    }
-
-    50% {
-        transform: translateX(6px);
-    }
-
-    75% {
-        transform: translateX(-4px);
-    }
-
-    100% {
-        transform: translateX(0);
-    }
-
-}
-
-
-/* =========================================================
-   FEEDBACK
-========================================================= */
-
-.feedback {
-    margin: 12px 18px;
-
-    padding: 12px;
-
-    border-radius: 10px;
-
-    font-size: 14px;
-
-    font-weight: bold;
-
-    text-align: center;
-
-    transition: 0.2s ease;
-}
-
-
-/* Correct feedback */
-
-.feedback.correct-feedback {
-    background: #d9f7e5;
-
-    color: #176b31;
-
-    border: 1px solid #a9e6bd;
-}
-
-
-/* Wrong feedback */
-
-.feedback.wrong-feedback {
-    background: #ffe1e5;
-
-    color: #a51d2a;
-
-    border: 1px solid #f5b7bf;
-}
-
-
-/* =========================================================
-   BOTTOM SECTION
-========================================================= */
-
-.bottom-section {
-    padding: 10px 18px 25px;
-
-    text-align: center;
-}
-
-
-/* =========================================================
-   NEXT BUTTON
-========================================================= */
-
-.next-button {
-    width: 100%;
-
-    max-width: 500px;
-
-    padding: 15px;
-
-    border: none;
-
-    border-radius: 12px;
-
-    font-size: 16px;
-
-    font-weight: bold;
-
-    background: #28a745;
-
-    color: white;
-
-    cursor: pointer;
-
-    transition:
-        transform 0.2s ease,
-        background 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-
-/* Enabled */
-
-.next-button:not(.disabled):hover {
-    background: #218838;
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 5px 12px rgba(40,167,69,0.25);
-}
-
-
-/* Disabled */
-
-.next-button.disabled,
-.next-button:disabled {
-    background: #aeb8c2;
-
-    cursor: not-allowed;
-
-    box-shadow: none;
-}
-
-
-/* =========================================================
-   STAGE 1 SUCCESS POPUP
-========================================================= */
-
-.popup-overlay {
-    position: fixed;
-
-    inset: 0;
-
-    background: rgba(0,0,0,0.65);
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    padding: 20px;
-
-    z-index: 1000;
-}
-
-
-/* =========================================================
-   POPUP
-========================================================= */
-
-.popup {
-    background: white;
-
-    width: 100%;
-
-    max-width: 400px;
-
-    border-radius: 20px;
-
-    padding: 30px 20px;
-
-    text-align: center;
-
-    animation: popupIn 0.25s ease;
-
-    box-shadow:
-        0 15px 40px rgba(0,0,0,0.25);
-}
-
-
-/* =========================================================
-   POPUP SUCCESS ICON
-========================================================= */
-
-.success-icon {
-    width: 65px;
-
-    height: 65px;
-
-    margin: auto;
-
-    border-radius: 50%;
-
-    background: #d9f7e5;
-
-    color: #28a745;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    font-size: 40px;
-
-    font-weight: bold;
-
-    margin-bottom: 15px;
-}
-
-
-/* =========================================================
-   POPUP TEXT
-========================================================= */
-
-.popup h2 {
-    margin-bottom: 8px;
-
-    color: #173b57;
-}
-
-.popup p {
-    color: #657386;
-
-    margin-bottom: 20px;
-
-    line-height: 1.5;
-}
-
-
-/* =========================================================
-   POPUP BUTTON
-========================================================= */
-
-.popup button {
-    width: 100%;
-
-    padding: 13px;
-
-    border: none;
-
-    border-radius: 10px;
-
-    background: #173b57;
-
-    color: white;
-
-    font-size: 15px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    transition: 0.2s ease;
-}
-
-.popup button:hover {
-    background: #0f2c42;
-
-    transform: translateY(-2px);
-}
-
-
-/* =========================================================
-   POPUP ANIMATION
-========================================================= */
-
-@keyframes popupIn {
-
-    from {
-        opacity: 0;
-
-        transform: scale(0.85);
-    }
-
-    to {
-        opacity: 1;
-
-        transform: scale(1);
-    }
-
-}
-
-
-/* =========================================================
-   STAGE 2
-========================================================= */
-
-#stage2-section {
-    width: 100%;
-
-    padding-bottom: 30px;
-}
-
-
-/* =========================================================
-   STAGE 2 LAB CABINET
-========================================================= */
-
-.lab-cabinet-wrapper {
-    background: #3e2723;
-
-    border: 12px solid #2d1a15;
-
-    border-radius: 8px;
-
-    padding: 20px;
-
-    width: 85%;
-
-    margin: 30px auto;
-
-    box-shadow:
-        inset 0 0 40px rgba(0,0,0,0.8),
-        0 10px 20px rgba(0,0,0,0.5);
-
-    position: relative;
-}
-
-
-/* =========================================================
-   CABINET TITLE
-========================================================= */
-
-.lab-cabinet-wrapper::before {
-    content: "🧪 CHEMICAL STORAGE";
-
-    display: block;
-
-    color: #fff;
-
-    text-align: center;
-
-    font-size: 15px;
-
-    font-weight: bold;
-
-    margin-bottom: 25px;
-
-    letter-spacing: 1px;
-}
-
-
-/* =========================================================
-   CABINET SHELF
-========================================================= */
-
-.cabinet-shelf {
-    display: flex;
-
-    justify-content: space-around;
-
-    align-items: flex-end;
-
-    flex-wrap: wrap;
-
-    gap: 35px;
-
-    background: rgba(255,255,255,0.05);
-
-    border-bottom: 14px solid #5d4037;
-
-    padding: 20px 15px 5px;
-
-    margin-bottom: 35px;
-
-    min-height: 150px;
-
-    position: relative;
-
-    box-shadow:
-        0 4px 5px rgba(0,0,0,0.4);
-}
-
-
-/* Last shelf */
-
-.cabinet-shelf:last-child {
-    margin-bottom: 0;
-}
-
-
-/* =========================================================
-   GLASS BOTTLE
-========================================================= */
-
-.lab-glass-bottle {
-    width: 55px;
-
-    height: 90px;
-
-    background: rgba(220,240,250,0.3);
-
-    border: 2px solid rgba(255,255,255,0.6);
-
-    border-radius: 6px 6px 12px 12px;
-
-    position: relative;
-
-    cursor: pointer;
-
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        opacity 0.2s ease;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: flex-end;
-
-    align-items: center;
-
-    user-select: none;
-
-    touch-action: manipulation;
-
-    -webkit-user-select: none;
-}
-
-
-/* =========================================================
-   BOTTLE NECK
-========================================================= */
-
-.lab-glass-bottle::before {
-    content: '';
-
-    position: absolute;
-
-    top: -12px;
-
-    width: 20px;
-
-    height: 12px;
-
-    background: inherit;
-
-    border: 2px solid rgba(255,255,255,0.6);
-
-    border-bottom: none;
-
-    border-radius: 4px 4px 0 0;
-}
-
-
-/* =========================================================
-   BOTTLE CAP
-========================================================= */
-
-.lab-glass-bottle::after {
-    content: '';
-
-    position: absolute;
-
-    top: -18px;
-
-    width: 16px;
-
-    height: 8px;
-
-    background: #616161;
-
-    border-radius: 2px;
-
-    z-index: 2;
-}
-
-
-/* =========================================================
-   BOTTLE HOVER
-========================================================= */
-
-.lab-glass-bottle:hover {
-    transform: translateY(-5px);
-
-    box-shadow:
-        0 5px 15px rgba(255,255,255,0.2);
-}
-
-
-/* =========================================================
-   BOTTLE ACTIVE
-========================================================= */
-
-.lab-glass-bottle:active {
-    cursor: grabbing;
-
-    transform: scale(1.05);
-
-    opacity: 0.8;
-}
-
-
-/* =========================================================
-   BOTTLE CONTENT
-========================================================= */
-
-.lab-glass-bottle * {
-    pointer-events: none !important;
-}
-
-
-/* =========================================================
-   REALISTIC CHEMICAL LIQUID
-========================================================= */
-
-.chemical-liquid {
-    width: 100%;
-
-    border-radius: 0 0 10px 10px;
-
-    position: absolute;
-
-    bottom: 0;
-
-    left: 0;
-
-    opacity: 0.75;
-
-    pointer-events: none;
-}
-
-
-/* =========================================================
-   LIQUID COLORS
-========================================================= */
-
-.liquid-clear {
-    height: 65%;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,0.2),
-            rgba(240,248,255,0.8)
-        );
-}
-
-
-.liquid-amber {
-    height: 70%;
-
-    background:
-        linear-gradient(
-            180deg,
-            #d84315,
-            #bf360c
-        );
-}
-
-
-.liquid-blue {
-    height: 60%;
-
-    background:
-        linear-gradient(
-            180deg,
-            #2196f3,
-            #0d47a1
-        );
-}
-
-
-.liquid-pink {
-    height: 55%;
-
-    background:
-        linear-gradient(
-            180deg,
-            #e91e63,
-            #880e4f
-        );
-}
-
-
-/* =========================================================
-   BOTTLE LABEL
-========================================================= */
-
-.bottle-label {
-    background: #fffdf0;
-
-    color: #1a1a1a;
-
-    font-family:
-        'Courier New',
-        Courier,
-        monospace;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-    text-align: center;
-
-    padding: 3px 2px;
-
-    width: 85%;
-
-    border: 1px solid #ccc;
-
-    border-radius: 2px;
-
-    margin-bottom: 12px;
-
-    z-index: 10;
-
-    box-shadow:
-        1px 1px 3px rgba(0,0,0,0.2);
-
-    word-break: break-word;
-
-    line-height: 1.1;
-
-    pointer-events: none;
-}
-
-
-/* =========================================================
-   CORRECT BOTTLE
-========================================================= */
-
-.lab-glass-bottle.solution-correct {
-    border-color: #28a745;
-
-    box-shadow:
-        0 0 0 3px rgba(40,167,69,0.25),
-        0 6px 18px rgba(40,167,69,0.25);
-
-    transform: translateY(-5px);
-}
-
-
-/* =========================================================
-   WRONG BOTTLE
-========================================================= */
-
-.lab-glass-bottle.solution-wrong {
-    border-color: #dc3545;
-
-    box-shadow:
-        0 0 0 3px rgba(220,53,69,0.2);
-
-    animation: bottleShake 0.35s;
-}
-
-
-/* =========================================================
-   BOTTLE SHAKE
-========================================================= */
-
-@keyframes bottleShake {
-
-    0% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-5px);
-    }
-
-    50% {
-        transform: translateX(5px);
-    }
-
-    75% {
-        transform: translateX(-4px);
-    }
-
-    100% {
-        transform: translateX(0);
-    }
-
-}
-
-
-/* =========================================================
-   BOTTLE STATUS OVERLAY
-========================================================= */
-
-.bottle-status-overlay {
-    position: absolute;
-
-    top: 50%;
-
-    left: 50%;
-
-    transform:
-        translate(-50%, -50%);
-
-    font-size: 32px;
-
-    font-weight: bold;
-
-    z-index: 100;
-
-    pointer-events: none;
-
-    user-select: none;
-
-    animation:
-        bottleStatusPop 0.3s ease-out;
-}
-
-
-/* =========================================================
-   BOTTLE STATUS ANIMATION
-========================================================= */
-
-@keyframes bottleStatusPop {
-
-    0% {
-        transform:
-            translate(-50%, -50%)
-            scale(0);
-    }
-
-    70% {
-        transform:
-            translate(-50%, -50%)
-            scale(1.15);
-    }
-
-    100% {
-        transform:
-            translate(-50%, -50%)
-            scale(1);
-    }
-
-}
-
-
-/* =========================================================
-   STAGE 2 DROP/TABLE AREA
-========================================================= */
-
-#table-drop-zone {
-    margin: 40px auto;
-
-    border: 3px dashed #5d4037;
-
-    background: #fafafa;
-
-    padding: 35px;
-
-    width: 70%;
-
-    border-radius: 12px;
-
-    font-weight: bold;
-
-    color: #5d4037;
-
-    text-align: center;
-
-    transition:
-        background 0.3s ease,
-        border-color 0.3s ease,
-        transform 0.2s ease;
-
-    min-height: 100px;
-}
-
-
-/* =========================================================
-   TABLE DROP ZONE HOVER
-========================================================= */
-
-#table-drop-zone.drag-over {
-    background-color: #e0f7fa;
-
-    border-color: #00acc1;
-}
-
-
-/* =========================================================
-   STAGE 2 COMPLETION
-========================================================= */
-
-#stage2-next-container {
-    margin: 30px auto;
-
-    padding: 20px;
-
-    width: 60%;
-
-    max-width: 600px;
-
-    background: #e8f5e9;
-
-    border: 2px dashed #2e7d32;
-
-    border-radius: 12px;
-
-    text-align: center;
-
-    animation:
-        stageCompletionIn 0.4s ease;
-}
-
-
-/* =========================================================
-   STAGE 2 COMPLETION ANIMATION
-========================================================= */
+  font-family: var(--font-body);
+  background-color: #F1F5F9;
+  color: var(--color-plum);
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Base App Container */
+.lab-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: var(--color-cream);
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(0,0,0,0.08);
+}
+
+/* ==========================================================================
+   HEADER BAR & NAVIGATION
+   ========================================================================== */
+.lab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: var(--color-white);
+  border-bottom: 2px solid rgba(45, 20, 75, 0.08);
+  box-shadow: var(--shadow-sm);
+  z-index: 20;
+  gap: 12px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-btn {
+  background: #F3F4F6;
+  border: 1.5px solid rgba(45, 20, 75, 0.15);
+  border-radius: var(--radius-sm);
+  color: var(--color-plum);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: var(--color-lavender);
+  border-color: var(--color-purple);
+  transform: translateY(-1px);
+}
+
+.lab-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.lab-badge {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--color-purple);
+}
+
+.lab-title-group h1 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-plum);
+  line-height: 1.1;
+}
+
+/* Module Tabs */
+.module-tabs {
+  display: flex;
+  background: #F1F5F9;
+  padding: 4px;
+  border-radius: var(--radius-md);
+  gap: 4px;
+  border: 1px solid rgba(45, 20, 75, 0.08);
+}
+
+.module-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  color: #64748B;
+  transition: all 0.2s ease;
+}
 
-@keyframes stageCompletionIn {
-
-    from {
-        opacity: 0;
-
-        transform:
-            translateY(15px)
-            scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-
-        transform:
-            translateY(0)
-            scale(1);
-    }
-
-}
-
-
-/* =========================================================
-   STAGE 2 NEXT BUTTON
-========================================================= */
-
-#stage2-next-btn {
-    background: #2e7d32;
-
-    color: white;
-
-    border: none;
-
-    padding: 12px 25px;
-
-    border-radius: 7px;
-
-    font-size: 16px;
-
-    cursor: pointer;
-
-    font-weight: bold;
-
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-
-#stage2-next-btn:hover {
-    background: #256b29;
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 5px 12px rgba(46,125,50,0.25);
-}
-
-
-#stage2-next-btn:active {
-    transform: scale(0.96);
-}
-
-
-/* =========================================================
-   STAGE 3
-========================================================= */
-
-#stage3-section {
-    width: 100%;
-
-    padding: 20px 18px 40px;
-}
-
-
-/* =========================================================
-   STAGE 3 BASIC CARD
-========================================================= */
-
-#stage3-section > * {
-    max-width: 900px;
-
-    margin-left: auto;
-
-    margin-right: auto;
-}
-
-
-/* =========================================================
-   ACCESSIBILITY
-========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-
-        animation-duration: 0.01ms !important;
-
-        animation-iteration-count: 1 !important;
-
-        transition-duration: 0.01ms !important;
-
-        scroll-behavior: auto !important;
-    }
-
-}
-
-
-/* =========================================================
-   TABLET
-========================================================= */
-
-@media (max-width: 800px) {
-
-    .lab-cabinet-wrapper {
-        width: 92%;
-
-        padding: 15px;
-
-        border-width: 9px;
-    }
-
-    .cabinet-shelf {
-        gap: 28px;
-
-        min-height: 140px;
-    }
-
-    #table-drop-zone {
-        width: 85%;
-    }
-
-    #stage2-next-container {
-        width: 80%;
-    }
-
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 600px) {
-
-    /* -------------------------
-       TOP BAR
-    ------------------------- */
-
-    .top-bar {
-        padding: 13px 14px;
-
-        align-items: center;
-    }
-
-    .top-bar h1 {
-        font-size: 18px;
-    }
-
-    .top-bar p {
-        font-size: 11px;
-    }
-
-    .progress-box {
-        padding: 7px 9px;
-
-        min-width: 65px;
-    }
-
-    .progress-box span {
-        font-size: 9px;
-    }
-
-    .progress-box strong {
-        font-size: 13px;
-    }
-
-
-    /* -------------------------
-       EXPERIMENT HEADER
-    ------------------------- */
-
-    .experiment-header {
-        padding: 15px;
-    }
-
-    .experiment-header h2 {
-        font-size: 19px;
-    }
-
-    .experiment-header p {
-        font-size: 13px;
-    }
-
-
-    /* -------------------------
-       REQUIRED
-    ------------------------- */
-
-    .required-section {
-        padding: 13px 14px;
-    }
-
-    .required-item {
-        font-size: 12px;
-
-        padding: 6px 9px;
-    }
-
-
-    /* -------------------------
-       LAB
-    ------------------------- */
-
-    .lab-area {
-        padding: 12px;
-    }
-
-    .lab-table {
-        min-height: 380px;
-
-        padding: 12px;
-
-        border-radius: 15px;
-    }
-
-    .table-title {
-        font-size: 16px;
-
-        margin-bottom: 15px;
-    }
-
-
-    /* -------------------------
-       APPARATUS
-    ------------------------- */
-
-    .apparatus-container {
-        grid-template-columns:
-            repeat(2, 1fr);
-
-        gap: 10px;
-    }
-
-    .apparatus {
-        min-height: 115px;
-
-        border-radius: 13px;
-    }
-
-    .apparatus-icon {
-        font-size: 40px;
-    }
-
-    .apparatus-name {
-        font-size: 12px;
-    }
-
-
-    /* -------------------------
-       FEEDBACK
-    ------------------------- */
-
-    .feedback {
-        margin: 10px 12px;
-
-        font-size: 13px;
-    }
-
-
-    /* -------------------------
-       STAGE 2 CABINET
-    ------------------------- */
-
-    .lab-cabinet-wrapper {
-        width: 94%;
-
-        border-width: 7px;
-
-        padding: 12px;
-
-        margin: 20px auto;
-    }
-
-    .lab-cabinet-wrapper::before {
-        font-size: 12px;
-
-        margin-bottom: 20px;
-    }
-
-
-    /* -------------------------
-       SHELF
-    ------------------------- */
-
-    .cabinet-shelf {
-        gap: 28px 20px;
-
-        padding: 18px 8px 5px;
-
-        min-height: 145px;
-
-        margin-bottom: 25px;
-    }
-
-
-    /* -------------------------
-       BOTTLES
-    ------------------------- */
-
-    .lab-glass-bottle {
-        width: 50px;
-
-        height: 82px;
-    }
-
-    .lab-glass-bottle::before {
-        width: 18px;
-
-        height: 11px;
-
-        top: -11px;
-    }
-
-    .lab-glass-bottle::after {
-        width: 14px;
-
-        height: 7px;
-
-        top: -17px;
-    }
-
-    .bottle-label {
-        font-size: 8px;
-
-        width: 88%;
-
-        margin-bottom: 10px;
-    }
-
-    .bottle-status-overlay {
-        font-size: 27px;
-    }
-
-
-    /* -------------------------
-       DROP ZONE
-    ------------------------- */
-
-    #table-drop-zone {
-        width: 92%;
-
-        padding: 25px 15px;
-
-        margin: 25px auto;
-
-        min-height: 90px;
-    }
-
-
-    /* -------------------------
-       STAGE 2 COMPLETE
-    ------------------------- */
-
-    #stage2-next-container {
-        width: 92%;
-
-        padding: 17px;
-    }
-
-    #stage2-next-btn {
-        width: 100%;
-
-        font-size: 14px;
-
-        padding: 12px 15px;
-    }
-
-
-    /* -------------------------
-       STAGE 3
-    ------------------------- */
-
-    #stage3-section {
-        padding: 15px 12px 30px;
-    }
-
-}
-
-
-/* =========================================================
-   VERY SMALL PHONES
-========================================================= */
-
-@media (max-width: 380px) {
-
-    .top-bar h1 {
-        font-size: 16px;
-    }
-
-    .progress-box {
-        min-width: 58px;
-    }
-
-    .apparatus-icon {
-        font-size: 36px;
-    }
-
-    .apparatus-name {
-        font-size: 11px;
-    }
-
-    .lab-cabinet-wrapper {
-        width: 96%;
-
-        padding: 9px;
-    }
-
-    .cabinet-shelf {
-        gap: 24px 14px;
-    }
-
-    .lab-glass-bottle {
-        width: 46px;
-
-        height: 78px;
-    }
-
-}
-/* =========================================================
-   STAGE 3
-========================================================= */
-
-.stage3-progress {
-    background: white;
-    margin: 20px auto;
-    padding: 18px;
-    width: 90%;
-    max-width: 800px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-}
-
-.stage3-progress strong {
-    display: block;
-    margin-bottom: 12px;
-    color: #173b57;
-}
-
-.stage3-required-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.stage3-required-item {
-    background: #e9eef4;
-    border: 2px solid #cbd5df;
-    padding: 8px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    transition: 0.2s;
-}
-
-.stage3-required-item.selected {
-    background: #d9f7e5;
-    border-color: #28a745;
-    color: #176b31;
-}
-
-.stage3-lab {
-    background: #c99762;
-    width: 90%;
-    max-width: 900px;
-    margin: 20px auto;
-    padding: 25px;
-    border-radius: 18px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-.stage3-title {
-    color: white;
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 25px;
-}
-
-.stage3-equipment-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-}
-
-.stage3-equipment {
-    background: white;
-    min-height: 150px;
-    border-radius: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-    border: 3px solid transparent;
-    transition: 0.2s;
-}
-
-.stage3-equipment:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-}
-
-.stage3-equipment:active {
-    transform: scale(0.94);
-}
-
-.stage3-icon {
-    font-size: 50px;
-    margin-bottom: 10px;
-}
-
-.stage3-name {
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.stage3-correct {
-    border-color: #28a745;
-    background: #e8f8ed;
-}
-
-.stage3-correct::after {
-    content: "✓ Correct";
-    color: #218838;
-    font-size: 12px;
-    margin-top: 6px;
-}
-
-.stage3-wrong {
-    border-color: #dc3545;
-    background: #ffe8eb;
-    animation: shake 0.35s;
+.module-tab:hover {
+  color: var(--color-purple);
+  background: rgba(255, 255, 255, 0.6);
 }
 
-.stage3-wrong::after {
-    content: "✕ Wrong";
-    color: #c82333;
-    font-size: 12px;
-    margin-top: 6px;
+.module-tab.active {
+  background: var(--color-purple);
+  color: var(--color-white);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
 }
 
-.stage3-feedback {
-    margin: 20px auto;
-    padding: 13px;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: bold;
-    max-width: 600px;
+/* Stage Stepper */
+.stage-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.stage3-feedback-correct {
-    background: #d9f7e5;
-    color: #176b31;
+.step-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: var(--color-white);
+  border: 1.5px solid rgba(45, 20, 75, 0.15);
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.stage3-feedback-wrong {
-    background: #ffe1e5;
-    color: #a51d2a;
+.step-pill:hover {
+  border-color: var(--color-purple);
+  color: var(--color-purple);
 }
 
-.stage3-action-area {
-    background: white;
-    margin-top: 20px;
-    padding: 25px;
-    border-radius: 15px;
-    text-align: center;
+.step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #E2E8F0;
+  font-size: 10px;
+  color: var(--color-plum);
 }
 
-.stage3-action-area p {
-    color: #657386;
-    font-size: 15px;
+.step-pill.active {
+  background: var(--color-purple);
+  border-color: var(--color-purple);
+  color: var(--color-white);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
 }
 
-.measuring-card {
-    text-align: center;
+.step-pill.active .step-num {
+  background: var(--color-white);
+  color: var(--color-purple);
+  font-weight: 800;
 }
 
-.measuring-icon {
-    font-size: 55px;
-    margin-bottom: 10px;
+.step-pill.completed {
+  background: var(--color-green-light);
+  border-color: var(--color-green);
+  color: var(--color-green);
 }
 
-.measuring-card h3 {
-    color: #173b57;
-    margin-bottom: 10px;
+.step-pill.completed .step-num {
+  background: var(--color-green);
+  color: var(--color-white);
 }
 
-.measuring-card p {
-    color: #657386;
-    margin-bottom: 20px;
+/* Header Stats */
+.header-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.stage3-action-button {
-    background: #2e7d32;
-    color: white;
-    border: none;
-    padding: 13px 25px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: var(--color-white);
+  border: 1.5px solid rgba(45, 20, 75, 0.12);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
 }
 
-.stage3-action-button:hover {
-    background: #256b29;
-    transform: translateY(-2px);
+.score-pill {
+  color: var(--color-green);
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
-.volume-options {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
+.xp-pill {
+  color: var(--color-gold);
+  border-color: rgba(245, 158, 11, 0.3);
 }
 
-.volume-option {
-    background: #eef3f8;
-    border: 2px solid #cbd5df;
-    padding: 12px 22px;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
+/* ==========================================================================
+   WORKSPACE & STAGE VIEWS
+   ========================================================================== */
+.lab-workspace {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+  padding: 16px 24px;
 }
 
-.volume-option:hover {
-    background: #dce8f2;
+.stage-view {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  animation: fadeIn 0.3s ease;
 }
 
-.volume-correct {
-    background: #d9f7e5 !important;
-    border-color: #28a745 !important;
-    color: #176b31;
+.stage-view.active {
+  display: flex;
 }
 
-.volume-wrong {
-    background: #ffe1e5 !important;
-    border-color: #dc3545 !important;
-    animation: shake 0.35s;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.volume-feedback {
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: bold;
+/* ==========================================================================
+   STAGE 1: CONCEPT & THEORY CARDS
+   ========================================================================== */
+.concept-hero {
+  margin-bottom: 16px;
 }
 
-.volume-feedback-correct {
-    background: #d9f7e5;
-    color: #176b31;
+.concept-badge-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
 }
 
-.volume-feedback-wrong {
-    background: #ffe1e5;
-    color: #a51d2a;
+.stage-tag {
+  background: var(--color-lavender);
+  color: var(--color-purple);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }
 
-.stage3-complete-card {
-    background: white;
-    width: 90%;
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+.difficulty-tag {
+  background: var(--color-green-light);
+  color: var(--color-green);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
 }
 
-.stage3-complete-icon {
-    width: 70px;
-    height: 70px;
-    margin: 0 auto 15px;
-    border-radius: 50%;
-    background: #d9f7e5;
-    color: #28a745;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    font-weight: bold;
+.concept-hero h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-plum);
 }
 
-.stage3-complete-card h2 {
-    color: #173b57;
-    margin-bottom: 10px;
+.concept-subtitle {
+  font-size: 13px;
+  color: #64748B;
+  font-weight: 600;
+  max-width: 800px;
 }
 
-.stage3-complete-card p {
-    color: #657386;
-    line-height: 1.5;
-    margin-bottom: 20px;
+.concept-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-
-/* =========================================================
-   STAGE 3 MOBILE
-========================================================= */
-
-@media (max-width: 600px) {
-
-    .stage3-progress {
-        width: 94%;
-        padding: 15px;
-    }
-
-    .stage3-required-list {
-        gap: 7px;
-    }
-
-    .stage3-required-item {
-        font-size: 11px;
-        padding: 6px 9px;
-    }
-
-    .stage3-lab {
-        width: 94%;
-        padding: 15px;
-    }
-
-    .stage3-title {
-        font-size: 17px;
-    }
-
-    .stage3-equipment-container {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-
-    .stage3-equipment {
-        min-height: 125px;
-    }
-
-    .stage3-icon {
-        font-size: 40px;
-    }
-
-    .stage3-name {
-        font-size: 12px;
-    }
-
-    .volume-options {
-        flex-direction: column;
-    }
-
-    .volume-option {
-        width: 100%;
-    }
-
-    .stage3-complete-card {
-        width: 94%;
-        padding: 25px 18px;
-    }
-
-}
-/* =====================================================
-   ZUNO VIRTUAL CHEMISTRY LAB
-   STAGE 4 CSS
-===================================================== */
-
-
-/* =====================================================
-   STAGE 4 MAIN SECTION
-===================================================== */
-
-#stage4-section {
-    padding: 20px;
-    background: #eef3f8;
-    min-height: 100vh;
-}
-
-
-/* =====================================================
-   HEADER
-===================================================== */
-
-.stage4-header {
-    background: white;
-    padding: 22px;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    border-left: 6px solid #173b57;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.stage4-header h2 {
-    color: #173b57;
-    margin-bottom: 8px;
-    font-size: 23px;
-}
-
-.stage4-header p {
-    color: #657386;
-    font-size: 14px;
-}
-
-
-/* =====================================================
-   INSTRUCTION
-===================================================== */
-
-.stage4-instruction {
-    background: #fff8e1;
-    border: 2px solid #ffca28;
-    padding: 18px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-}
-
-.stage4-instruction h3 {
-    color: #795548;
-    margin-bottom: 8px;
-}
-
-.stage4-instruction p {
-    color: #5d4037;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-
-/* =====================================================
-   TITRATION LAB
-===================================================== */
-
-.titration-lab {
-    background: #c99762;
-    min-height: 470px;
-
-    border-radius: 18px;
-
-    padding: 35px 25px;
-
-    display: flex;
-
-    justify-content: space-evenly;
-
-    align-items: flex-start;
-
-    position: relative;
-
-    box-shadow:
-        0 8px 20px rgba(0,0,0,0.2);
-}
-
-
-/* =====================================================
-   BURETTE AREA
-===================================================== */
-
-.burette-area {
-    width: 180px;
-
-    text-align: center;
-
-    position: relative;
+.concept-card {
+  background: var(--color-white);
+  border: 2px solid rgba(45, 20, 75, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+  position: relative;
 }
-
-.burette-area h3 {
-    color: white;
-    margin-bottom: 18px;
+
+.concept-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-purple);
+  box-shadow: var(--shadow-md);
 }
-
-
-/* =====================================================
-   BURETTE
-===================================================== */
-
-.burette {
-    width: 45px;
 
-    height: 300px;
-
-    margin: auto;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(255,255,255,0.3),
-            rgba(255,255,255,0.8),
-            rgba(255,255,255,0.3)
-        );
-
-    border: 3px solid #dce3eb;
-
-    border-radius: 8px;
-
-    position: relative;
-
-    overflow: visible;
-
-    box-shadow:
-        inset 0 0 8px rgba(0,0,0,0.2);
+.card-icon-bubble {
+  font-size: 26px;
+  width: 44px;
+  height: 44px;
+  background: var(--color-lavender-light);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.card-tag {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-purple);
+  letter-spacing: 0.5px;
+}
+
+.concept-card h3 {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-plum);
+  margin: 2px 0 6px;
+}
+
+.concept-card p {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+
+.formula-box {
+  background: #1E1B4B;
+  color: #A5B4FC;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.mini-tag {
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  color: var(--color-plum);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.mini-tag.reagent {
+  background: var(--color-blue-light);
+  border-color: #BAE6FD;
+  color: var(--color-blue);
+}
+
+.steps-progress-mini {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748B;
+}
+
+.step-dot.active {
+  background: var(--color-purple);
+  color: var(--color-white);
+}
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: #CBD5E1;
+}
+
+.card-info-btn {
+  margin-top: auto;
+  background: var(--color-lavender-light);
+  border: 1.5px solid var(--color-lavender);
+  color: var(--color-purple);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-info-btn:hover {
+  background: var(--color-purple);
+  border-color: var(--color-purple);
+  color: var(--color-white);
+}
+
+/* Action Bar */
+.stage-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--color-white);
+  border: 2px solid rgba(45, 20, 75, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-top: auto;
+}
+
+.guide-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.guide-icon {
+  font-size: 18px;
+}
+
+/* Primary Button */
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-purple);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.primary-btn:hover:not(:disabled) {
+  background: #6D28D9;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
+}
+
+.primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-white);
+  color: var(--color-plum);
+  border: 2px solid rgba(45, 20, 75, 0.15);
+  border-radius: var(--radius-md);
+  padding: 10px 18px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.secondary-btn:hover {
+  background: var(--color-lavender-light);
+  border-color: var(--color-purple);
+  color: var(--color-purple);
+}
+
+.pulse-anim {
+  animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.5); }
+  70% { box-shadow: 0 0 0 12px rgba(124, 58, 237, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+}
+
+/* ==========================================================================
+   STAGE 2 & 3: COMMON BANNER & SHELVES
+   ========================================================================== */
+.stage-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.banner-text h2 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-plum);
+  margin-top: 2px;
+}
+
+.banner-text p {
+  font-size: 12px;
+  color: #64748B;
+  font-weight: 600;
+}
+
+.target-tracker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-white);
+  border: 2px solid var(--color-purple);
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--color-purple);
+}
+
+.target-checklist-container {
+  background: var(--color-white);
+  border: 1.5px solid rgba(45, 20, 75, 0.1);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.checklist-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--color-plum);
+}
+
+.checklist-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.target-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #F1F5F9;
+  border: 1.5px dashed #CBD5E1;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  transition: all 0.2s ease;
+}
+
+.target-pill.found {
+  background: var(--color-green-light);
+  border: 1.5px solid var(--color-green);
+  color: var(--color-green);
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   STAGE 2: APPARATUS SELECTION GRID
+   ========================================================================== */
+.apparatus-shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.apparatus-card {
+  background: var(--color-white);
+  border: 2px solid rgba(45, 20, 75, 0.12);
+  border-radius: var(--radius-md);
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.apparatus-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-purple);
+  box-shadow: var(--shadow-md);
+}
+
+.apparatus-card .app-icon {
+  font-size: 38px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  transition: transform 0.2s ease;
+}
+
+.apparatus-card:hover .app-icon {
+  transform: scale(1.1);
+}
+
+.apparatus-card .app-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-plum);
+  line-height: 1.2;
+}
+
+.apparatus-card .app-spec {
+  font-size: 10px;
+  color: #64748B;
+  font-weight: 600;
+  margin-top: 3px;
+}
+
+/* Selected state */
+.apparatus-card.selected {
+  background: var(--color-green-light);
+  border-color: var(--color-green);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+}
+
+.apparatus-card.selected::after {
+  content: '✔ SELECTED';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: var(--color-green);
+  color: var(--color-white);
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Wrong Shake & ❌ overlay */
+.apparatus-card.wrong {
+  border-color: var(--color-red) !important;
+  background: var(--color-red-light) !important;
+  animation: shakeAnim 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.apparatus-card.wrong .wrong-overlay {
+  display: flex !important;
+}
+
+.wrong-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: rgba(239, 68, 68, 0.85);
+  border-radius: calc(var(--radius-md) - 2px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  padding: 6px;
+  z-index: 5;
+  animation: fadeIn 0.2s ease;
+}
+
+.wrong-overlay .cross-icon {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.wrong-overlay .wrong-text {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+  margin-top: 4px;
+}
+
+@keyframes shakeAnim {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(3px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* ==========================================================================
+   STAGE 3: 3D-STYLE LAB CUPBOARD
+   ========================================================================== */
+.cupboard-container {
+  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+  border: 4px solid #334155;
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  box-shadow: inset 0 0 25px rgba(0,0,0,0.5), var(--shadow-lg);
+  margin-bottom: 16px;
+}
+
+.cupboard-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #94A3B8;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid #334155;
+  margin-bottom: 12px;
+}
+
+.vent-status {
+  color: #34D399;
+  font-size: 10px;
+}
+
+.cupboard-shelf {
+  background: rgba(15, 23, 42, 0.6);
+  border: 2px solid #334155;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-bottom: 12px;
+  position: relative;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.cupboard-shelf::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: #475569;
+  border-radius: 0 0 4px 4px;
+}
+
+.shelf-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 800;
+  color: #64748B;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.bottles-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+/* Glass Bottle Card */
+.chemical-bottle {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-md);
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 130px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chemical-bottle:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #818CF8;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+}
+
+.bottle-visual {
+  position: relative;
+  width: 50px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.bottle-glass {
+  width: 44px;
+  height: 60px;
+  border: 2.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 6px 6px 10px 10px;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.bottle-cap {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 8px;
+  background: #94A3B8;
+  border-radius: 3px 3px 0 0;
+  border: 1px solid #CBD5E1;
+}
+
+.liquid-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 65%;
+  background: rgba(14, 165, 233, 0.5);
+  transition: height 0.3s ease;
+}
+
+.bottle-label-box {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 4px;
+  padding: 4px 6px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.bottle-formula {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.bottle-conc {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-purple);
+}
+
+.bottle-name-sub {
+  font-size: 8px;
+  color: #64748B;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Picked bottle state */
+.chemical-bottle.picked {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: var(--color-green);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+}
+
+.chemical-bottle.picked::after {
+  content: '✔ READY';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--color-green);
+  color: var(--color-white);
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* Wrong Cupboard Bottle Shake & ❌ */
+.chemical-bottle.wrong {
+  border-color: var(--color-red) !important;
+  background: rgba(239, 68, 68, 0.25) !important;
+  animation: shakeAnim 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.chemical-bottle.wrong .wrong-overlay {
+  display: flex !important;
+}
+
+/* ==========================================================================
+   LIVE FEEDBACK BOX (FOOTER)
+   ========================================================================== */
+.stage-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--color-white);
+  border: 2px solid rgba(45, 20, 75, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-top: auto;
+}
+
+.live-feedback-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  max-width: 65%;
+}
+
+.live-feedback-box.info {
+  color: var(--color-purple);
+}
+
+.live-feedback-box.success {
+  color: var(--color-green);
+}
+
+.live-feedback-box.error {
+  color: var(--color-red);
+}
+
+/* ==========================================================================
+   STAGE 4: EXPERIMENT SIMULATOR LAYOUT
+   ========================================================================== */
+.exp-banner {
+  margin-bottom: 12px;
+}
+
+.exp-metrics-bar {
+  display: flex;
+  gap: 10px;
+}
+
+.metric-card {
+  background: var(--color-white);
+  border: 1.5px solid rgba(45, 20, 75, 0.12);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  min-width: 90px;
+}
+
+.metric-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 800;
+  color: #64748B;
+  text-transform: uppercase;
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-purple);
+}
+
+.simulator-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 16px;
+  flex: 1;
+  margin-bottom: 12px;
+  min-height: 380px;
+}
+
+/* Left: Interactive Canvas Bench */
+.sim-viewport {
+  background: linear-gradient(180deg, #F8FAFC 0%, #EDE9FE 100%);
+  border: 2.5px solid var(--color-plum);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 20px rgba(45, 20, 75, 0.05);
+}
+
+/* Right: Controls & Instruments Desk */
+.sim-controls-panel {
+  background: var(--color-white);
+  border: 2px solid rgba(45, 20, 75, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  overflow-y: auto;
+}
+
+.panel-section-title {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--color-plum);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.control-btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-chip-btn {
+  flex: 1;
+  padding: 10px 8px;
+  background: #F1F5F9;
+  border: 1.5px solid #CBD5E1;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--color-plum);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.action-chip-btn:hover:not(:disabled) {
+  background: var(--color-lavender);
+  border-color: var(--color-purple);
+  color: var(--color-purple);
+  transform: translateY(-2px);
+}
+
+.action-chip-btn.active {
+  background: var(--color-purple);
+  border-color: var(--color-purple);
+  color: var(--color-white);
+  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+}
+
+.action-chip-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Titration Visual Elements (SVG & DOM) */
+.titration-rig {
+  position: relative;
+  width: 280px;
+  height: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stand-post {
+  position: absolute;
+  right: 40px;
+  top: 10px;
+  bottom: 10px;
+  width: 10px;
+  background: #64748B;
+  border-radius: 4px;
+}
+
+.stand-base {
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 16px;
+  background: #334155;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.white-tile {
+  position: absolute;
+  bottom: 16px;
+  left: 45px;
+  width: 130px;
+  height: 10px;
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.burette-assembly {
+  position: absolute;
+  top: 15px;
+  left: 78px;
+  width: 24px;
+  height: 200px;
+  border: 2px solid rgba(30, 41, 59, 0.8);
+  border-radius: 6px 6px 2px 2px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(2px);
 }
-
-
-/* =====================================================
-   BURETTE LIQUID
-===================================================== */
 
 .burette-liquid {
-    position: absolute;
-
-    left: 4px;
-
-    right: 4px;
-
-    bottom: 4px;
-
-    height: 85%;
-
-    background:
-        linear-gradient(
-            180deg,
-            #e53935,
-            #b71c1c
-        );
-
-    border-radius: 0 0 4px 4px;
-
-    opacity: 0.8;
-
-    transition: height 0.4s;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90%;
+  background: linear-gradient(180deg, rgba(147, 197, 253, 0.4) 0%, rgba(59, 130, 246, 0.6) 100%);
+  border-radius: 0 0 2px 2px;
+  transition: height 0.3s linear;
 }
-
-
-/* =====================================================
-   BURETTE SCALE
-===================================================== */
 
 .burette-scale {
-    position: absolute;
-
-    left: 55px;
-
-    top: 0;
-
-    height: 100%;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: space-between;
-
-    color: white;
-
-    font-size: 11px;
-
-    font-weight: bold;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  border-right: 1px solid rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px 0;
 }
 
-
-/* =====================================================
-   BURETTE TAP
-===================================================== */
-
-.burette-tap {
-    margin-top: 15px;
-
-    width: 55px;
-
-    height: 35px;
-
-    border: none;
-
-    border-radius: 8px;
-
-    background: #455a64;
-
-    color: white;
-
-    cursor: pointer;
-
-    font-size: 18px;
-
-    box-shadow:
-        0 3px 6px rgba(0,0,0,0.25);
+.scale-mark {
+  width: 5px;
+  height: 1px;
+  background: #1E293B;
 }
 
-.burette-tap:active {
-    transform: scale(0.92);
+.stopcock-valve {
+  position: absolute;
+  bottom: -16px;
+  left: -6px;
+  width: 36px;
+  height: 16px;
+  background: #EF4444;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 800;
+  color: white;
+  transition: transform 0.2s ease;
 }
 
-
-/* =====================================================
-   FLASK AREA
-===================================================== */
-
-.flask-area {
-    width: 260px;
-
-    text-align: center;
-
-    position: relative;
+.stopcock-valve.open {
+  transform: rotate(90deg);
+  background: #10B981;
 }
 
-.flask-area h3 {
-    color: white;
-
-    margin-bottom: 25px;
+.droplet-stream {
+  position: absolute;
+  bottom: -40px;
+  left: 10px;
+  width: 4px;
+  height: 8px;
+  background: #3B82F6;
+  border-radius: 50%;
+  opacity: 0;
 }
 
-
-/* =====================================================
-   CONICAL FLASK
-===================================================== */
-
-.titration-flask {
-    width: 190px;
-
-    height: 210px;
-
-    margin: auto;
-
-    position: relative;
-
-    clip-path:
-        polygon(
-            38% 0,
-            62% 0,
-            62% 25%,
-            90% 90%,
-            82% 100%,
-            18% 100%,
-            10% 90%,
-            38% 25%
-        );
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(255,255,255,0.35),
-            rgba(255,255,255,0.75),
-            rgba(255,255,255,0.35)
-        );
-
-    border: 3px solid rgba(255,255,255,0.8);
-
-    overflow: hidden;
-
-    box-shadow:
-        0 8px 15px rgba(0,0,0,0.25);
+.droplet-stream.dropping {
+  animation: dropFalling 0.6s infinite linear;
 }
 
+@keyframes dropFalling {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(40px); opacity: 0; }
+}
 
-/* =====================================================
-   FLASK LIQUID
-===================================================== */
+.conical-flask-sim {
+  position: absolute;
+  bottom: 26px;
+  left: 60px;
+  width: 90px;
+  height: 95px;
+  clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
+  background: rgba(255, 255, 255, 0.5);
+  border: 2.5px solid #334155;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
 
 .flask-liquid {
-    position: absolute;
-
-    left: 10%;
-
-    right: 10%;
-
-    bottom: 0;
-
-    height: 42%;
-
-    background: #f8c8dc;
-
-    transition:
-        background 0.6s,
-        height 0.6s;
-
-    opacity: 0.85;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45px;
+  background: rgba(224, 242, 254, 0.4);
+  transition: background-color 0.8s ease, transform 0.3s ease;
 }
 
-
-/* =====================================================
-   INDICATOR STATUS
-===================================================== */
-
-.indicator-status {
-    margin-top: 18px;
-
-    background: white;
-
-    padding: 10px;
-
-    border-radius: 10px;
-
-    color: #657386;
-
-    font-size: 13px;
-
-    font-weight: bold;
+/* Endpoint Color Classes */
+.flask-liquid.colorless {
+  background: rgba(224, 242, 254, 0.4);
 }
 
-.indicator-status.endpoint-reached {
-    background: #d9f7e5;
-
-    color: #176b31;
-
-    border: 2px solid #28a745;
+.flask-liquid.transient-pink {
+  background: rgba(244, 114, 182, 0.35);
 }
 
-
-/* =====================================================
-   FALLING DROP
-===================================================== */
-
-.solution-drop {
-    position: absolute;
-
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    top: 345px;
-
-    font-size: 24px;
-
-    z-index: 50;
-
-    pointer-events: none;
+.flask-liquid.pale-pink {
+  background: rgba(236, 72, 153, 0.65);
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
 }
 
-.drop-animation {
-    animation:
-        dropFall 0.65s
-        ease-in;
+.flask-liquid.over-titrated {
+  background: rgba(190, 24, 93, 0.95);
+  box-shadow: 0 0 20px rgba(190, 24, 93, 0.7);
 }
 
-
-@keyframes dropFall {
-
-    0% {
-        top: 345px;
-        opacity: 1;
-    }
-
-    100% {
-        top: 480px;
-        opacity: 0;
-    }
-
+.swirl-anim {
+  animation: swirlFlask 0.4s ease-in-out infinite alternate;
 }
 
-
-/* =====================================================
-   DROP COUNTER
-===================================================== */
-
-.drop-counter {
-    background: white;
-
-    max-width: 400px;
-
-    margin: 20px auto;
-
-    padding: 15px;
-
-    border-radius: 12px;
-
-    text-align: center;
-
-    box-shadow:
-        0 4px 10px rgba(0,0,0,0.1);
+@keyframes swirlFlask {
+  0% { transform: rotate(-3deg); }
+  100% { transform: rotate(3deg); }
 }
 
-.drop-counter span {
-    color: #657386;
-
-    font-size: 14px;
-
-    margin-right: 10px;
+/* ==========================================================================
+   STAGE 5: REPORT & QUICK REVISION
+   ========================================================================== */
+.results-hero {
+  text-align: center;
+  margin-bottom: 18px;
 }
 
-.drop-counter strong {
-    color: #173b57;
-
-    font-size: 20px;
+.congrats-trophy {
+  font-size: 42px;
+  line-height: 1;
+  margin-bottom: 6px;
+  animation: bounceTrophy 1.5s infinite ease-in-out;
 }
 
-
-/* =====================================================
-   FEEDBACK
-===================================================== */
-
-.stage4-feedback {
-    max-width: 600px;
-
-    margin: 15px auto;
-
-    padding: 14px;
-
-    border-radius: 10px;
-
-    text-align: center;
-
-    font-weight: bold;
+@keyframes bounceTrophy {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
-.stage4-feedback-correct {
-    background: #d9f7e5;
-
-    color: #176b31;
-
-    border: 1px solid #28a745;
+.results-hero h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-plum);
 }
 
-.stage4-feedback-wrong {
-    background: #ffe1e5;
-
-    color: #a51d2a;
-
-    border: 1px solid #dc3545;
+.results-hero p {
+  font-size: 13px;
+  color: #64748B;
+  font-weight: 600;
 }
 
-
-/* =====================================================
-   ACTION AREA
-===================================================== */
-
-.stage4-action-area {
-    text-align: center;
-
-    margin: 20px auto;
-
-    max-width: 600px;
+.results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-.stage4-button {
-    border: none;
-
-    background: #173b57;
-
-    color: white;
-
-    padding: 14px 25px;
-
-    border-radius: 10px;
-
-    font-size: 16px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 4px 8px rgba(0,0,0,0.2);
-
-    transition: 0.2s;
+.result-summary-card {
+  background: var(--color-white);
+  border: 2px solid rgba(45, 20, 75, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
 }
 
-.stage4-button:hover {
-    transform: translateY(-2px);
+.stars-row {
+  display: flex;
+  gap: 6px;
+  font-size: 32px;
+  color: #E2E8F0;
+  margin-bottom: 6px;
 }
 
-.stage4-button:active {
-    transform: scale(0.95);
+.star.filled {
+  color: var(--color-gold);
+  text-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
 }
 
-.titration-instruction {
-    color: #173b57;
-
-    font-weight: bold;
-
-    margin-bottom: 12px;
+.big-score {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 900;
+  color: var(--color-green);
+  line-height: 1;
 }
 
-
-/* =====================================================
-   COMPLETE CARD
-===================================================== */
-
-.stage4-complete-card {
-    background: white;
-
-    max-width: 550px;
-
-    margin: 35px auto;
-
-    padding: 30px 20px;
-
-    border-radius: 18px;
-
-    text-align: center;
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,0.15);
-
-    animation:
-        completePop 0.4s ease;
+.score-caption {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748B;
+  text-transform: uppercase;
+  margin-bottom: 12px;
 }
 
-
-@keyframes completePop {
-
-    0% {
-        transform: scale(0.8);
-
-        opacity: 0;
-    }
-
-    100% {
-        transform: scale(1);
-
-        opacity: 1;
-    }
-
+.rewards-earned-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-
-.stage4-complete-icon {
-    width: 70px;
-
-    height: 70px;
-
-    margin: auto;
-
-    margin-bottom: 15px;
-
-    border-radius: 50%;
-
-    background: #d9f7e5;
-
-    color: #28a745;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 42px;
-
-    font-weight: bold;
+.reward-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
 }
 
-.stage4-complete-card h2 {
-    color: #173b57;
-
-    margin-bottom: 10px;
+.reward-chip.xp {
+  background: var(--color-lavender);
+  color: var(--color-purple);
 }
 
-.stage4-complete-card p {
-    color: #657386;
-
-    line-height: 1.5;
-
-    margin-bottom: 15px;
+.reward-chip.gold {
+  background: var(--color-gold-light);
+  color: #92400E;
 }
 
-
-/* =====================================================
-   RESULT BOX
-===================================================== */
-
-.result-box {
-    background: #eef3f8;
-
-    border-radius: 12px;
-
-    padding: 15px;
-
-    margin: 20px 0;
-
-    text-align: left;
+.performance-metrics-list {
+  width: 100%;
+  border-top: 1.5px solid #F1F5F9;
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.result-box strong {
-    color: #173b57;
-
-    display: block;
-
-    margin-bottom: 8px;
+.perf-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
 }
 
-.result-box p {
-    margin: 5px 0;
-
-    font-size: 14px;
+.perf-label {
+  color: #64748B;
 }
 
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media (max-width: 600px) {
-
-    #stage4-section {
-        padding: 12px;
-    }
-
-    .stage4-header h2 {
-        font-size: 20px;
-    }
-
-    .titration-lab {
-        min-height: 550px;
-
-        padding: 25px 10px;
-
-        flex-direction: column;
-
-        align-items: center;
-
-        gap: 45px;
-    }
-
-    .burette-area {
-        width: 150px;
-    }
-
-    .flask-area {
-        width: 100%;
-    }
-
-    .titration-flask {
-        width: 160px;
-
-        height: 180px;
-    }
-
-    .solution-drop {
-        top: 330px;
-    }
-
-}
-/* =====================================================
-   STAGE 5 : FINAL RESULT
-===================================================== */
-
-.stage5-section {
-    min-height: 100vh;
-    padding: 40px 20px;
-    background: linear-gradient(
-        135deg,
-        #eef7ff,
-        #f8f4ff
-    );
-    box-sizing: border-box;
+.perf-val {
+  color: var(--color-plum);
+  font-weight: 800;
 }
 
-
-.stage5-container {
-    width: min(900px, 95%);
-    margin: auto;
-    text-align: center;
+/* Summary Log Sheet */
+.lab-data-card {
+  background: var(--color-white);
+  border: 2px solid rgba(45, 20, 75, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
 }
 
-
-/* Trophy */
-
-.stage5-trophy {
-    font-size: 80px;
-    margin-bottom: 10px;
-    animation: trophyBounce 1.5s ease-in-out infinite;
+.card-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--color-plum);
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid #F1F5F9;
+  margin-bottom: 12px;
 }
 
-
-@keyframes trophyBounce {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-10px);
-    }
-
+.verified-badge {
+  background: var(--color-green-light);
+  color: var(--color-green);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 9px;
 }
 
-
-.stage5-container h1 {
-    font-size: 38px;
-    margin: 10px 0;
+.data-table-container {
+  overflow-x: auto;
 }
 
-
-.stage5-subtitle {
-    font-size: 18px;
-    line-height: 1.6;
-    margin-bottom: 30px;
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
 }
 
-
-/* =====================================================
-   SCORE CARD
-===================================================== */
-
-.stage5-score-card {
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    margin-bottom: 25px;
+.log-table th, .log-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #F1F5F9;
 }
 
-
-.stage5-score-title {
-    font-size: 20px;
-    font-weight: bold;
+.log-table th {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748B;
+  text-transform: uppercase;
 }
 
-
-.stage5-score {
-    font-size: 64px;
-    font-weight: bold;
-    margin: 10px;
+.log-table td {
+  font-weight: 700;
+  color: var(--color-plum);
 }
 
-
-.stage5-stars {
-    font-size: 25px;
-    margin: 10px;
+.stage5-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-
-/* =====================================================
-   SUMMARY
-===================================================== */
-
-.stage5-summary-card,
-.stage5-learning-card {
-    background: white;
-    padding: 25px;
-    border-radius: 18px;
-    margin-bottom: 25px;
-    text-align: left;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+/* ==========================================================================
+   MODAL WINDOWS & POPUPS
+   ========================================================================== */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
 }
 
-
-.stage5-summary-card h2,
-.stage5-learning-card h2 {
-    text-align: center;
-    margin-bottom: 20px;
+.modal-backdrop.open {
+  display: flex;
 }
 
-
-.stage5-summary-list {
-    display: grid;
-    grid-template-columns: repeat(
-        2,
-        1fr
-    );
-    gap: 12px;
+.modal-card {
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  max-width: 580px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUpModal 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-
-.stage5-summary-item {
-    padding: 15px;
-    border-radius: 12px;
-    background: #f4f8fc;
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
+@keyframes slideUpModal {
+  from { transform: translateY(20px) scale(0.95); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-
-.stage5-summary-item span {
-    font-weight: 500;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1.5px solid #F1F5F9;
 }
 
-
-.stage5-summary-item strong {
-    text-align: right;
+.modal-badge {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--color-purple);
+  text-transform: uppercase;
 }
 
-
-/* =====================================================
-   LEARNING POINTS
-===================================================== */
-
-.learning-point {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin: 15px 0;
+.modal-title-group h3 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-plum);
 }
 
-
-.learning-point span {
-    font-size: 20px;
-    font-weight: bold;
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #94A3B8;
+  cursor: pointer;
 }
 
-
-.learning-point p {
-    margin: 0;
-    line-height: 1.5;
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 60vh;
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.55;
 }
 
-
-/* =====================================================
-   FINAL MESSAGE
-===================================================== */
-
-.stage5-message {
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 18px;
-    margin-bottom: 25px;
-    font-size: 22px;
-    font-weight: bold;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+.modal-footer {
+  padding: 12px 20px;
+  background: #F8FAFC;
+  border-top: 1.5px solid #F1F5F9;
+  display: flex;
+  justify-content: flex-end;
 }
 
-
-.stage5-message p {
-    font-size: 16px;
-    font-weight: normal;
-    margin-top: 10px;
+/* Hurrah Celebration Card */
+.hurrah-card {
+  text-align: center;
+  padding: 30px 24px;
+  max-width: 480px;
 }
 
-
-/* =====================================================
-   BUTTON
-===================================================== */
-
-.stage5-buttons {
-    display: flex;
-    justify-content: center;
+.hurrah-confetti {
+  font-size: 40px;
+  margin-bottom: 8px;
 }
 
-
-.stage5-button {
-    border: none;
-    padding: 14px 28px;
-    border-radius: 12px;
-    font-size: 17px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s;
+.hurrah-badge {
+  background: var(--color-gold-light);
+  color: #92400E;
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
+  margin-bottom: 10px;
 }
 
-
-.stage5-button:hover {
-    transform: scale(1.05);
+.hurrah-card h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--color-plum);
+  margin-bottom: 8px;
 }
 
+.hurrah-card p {
+  font-size: 13px;
+  color: #64748B;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
 
-/* =====================================================
-   MOBILE
-===================================================== */
+.hurrah-task-preview {
+  background: var(--color-lavender-light);
+  border: 1.5px solid var(--color-lavender);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-plum);
+  margin-bottom: 20px;
+}
 
-@media (max-width: 600px) {
+.preview-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-    .stage5-container h1 {
-        font-size: 30px;
-    }
+.hurrah-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 12px;
+  font-size: 15px;
+}
 
+/* Floating Error Toast */
+.error-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #FFFFFF;
+  border: 2px solid var(--color-red);
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  box-shadow: var(--shadow-lg);
+  display: none;
+  align-items: center;
+  gap: 12px;
+  z-index: 200;
+  animation: slideInToast 0.3s ease;
+  max-width: 360px;
+}
 
-    .stage5-trophy {
-        font-size: 65px;
-    }
+.error-toast.active {
+  display: flex;
+}
 
+.toast-icon {
+  font-size: 24px;
+}
 
-    .stage5-summary-list {
-        grid-template-columns: 1fr;
-    }
+.toast-content strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--color-red);
+}
 
+.toast-content p {
+  font-size: 11px;
+  color: #475569;
+  font-weight: 600;
+}
 
-    .stage5-summary-item {
-        flex-direction: column;
-        gap: 5px;
-    }
+@keyframes slideInToast {
+  from { transform: translateX(50px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
 
-
-    .stage5-summary-item strong {
-        text-align: left;
-    }
-
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES
+   ========================================================================== */
+@media (max-width: 900px) {
+  .simulator-layout {
+    grid-template-columns: 1fr;
+  }
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+  .module-tabs .tab-text {
+    display: none;
+  }
+  .step-lbl {
+    display: none;
+  }
 }
