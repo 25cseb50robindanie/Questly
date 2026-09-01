@@ -112,9 +112,9 @@ class CurriculumRetriever {
     // Sort descending by score
     scoredChunks.sort((a, b) => b.score.compareTo(a.score));
 
-    // If query didn't match any specific keywords, return top fallback chunks
+    // If query didn't match any specific keywords or concepts, return empty
     if (scoredChunks.isEmpty) {
-      return pkg.chunks.take(topK).toList();
+      return [];
     }
 
     return scoredChunks.take(topK).map((sc) => sc.chunk).toList();
