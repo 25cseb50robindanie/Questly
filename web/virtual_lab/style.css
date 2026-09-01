@@ -576,7 +576,7 @@ body {
 }
 
 /* ==========================================================================
-   STAGE 2 & 3: COMMON BANNER & SHELVES
+   STAGE 2: REALISTIC APPARATUS CARDS & SVGs
    ========================================================================== */
 .stage-banner {
   display: flex;
@@ -660,13 +660,10 @@ body {
   font-weight: 800;
 }
 
-/* ==========================================================================
-   STAGE 2: APPARATUS SELECTION GRID
-   ========================================================================== */
 .apparatus-shelf-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
   margin-bottom: 16px;
 }
 
@@ -686,23 +683,29 @@ body {
 }
 
 .apparatus-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   border-color: var(--color-purple);
   box-shadow: var(--shadow-md);
 }
 
-.apparatus-card .app-icon {
-  font-size: 38px;
-  height: 52px;
+.real-svg-container {
+  width: 90px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 8px;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s ease;
 }
 
-.apparatus-card:hover .app-icon {
-  transform: scale(1.1);
+.real-apparatus-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+.apparatus-card:hover .real-svg-container {
+  transform: scale(1.08);
 }
 
 .apparatus-card .app-name {
@@ -727,7 +730,7 @@ body {
 }
 
 .apparatus-card.selected::after {
-  content: '✔ SELECTED';
+  content: '✔ READY';
   position: absolute;
   top: 6px;
   right: 6px;
@@ -754,7 +757,7 @@ body {
   display: none;
   position: absolute;
   inset: 0;
-  background: rgba(239, 68, 68, 0.88);
+  background: rgba(239, 68, 68, 0.9);
   border-radius: calc(var(--radius-md) - 2px);
   flex-direction: column;
   align-items: center;
@@ -787,7 +790,7 @@ body {
 }
 
 /* ==========================================================================
-   STAGE 3: 3D-STYLE LAB CUPBOARD
+   STAGE 3: 3D-STYLE LAB CUPBOARD & REALISTIC BOTTLES
    ========================================================================== */
 .cupboard-container {
   background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
@@ -863,7 +866,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 130px;
+  width: 140px;
   cursor: pointer;
   position: relative;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -876,36 +879,51 @@ body {
   box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
 
+/* Glass Bottle Structure */
 .bottle-visual {
   position: relative;
-  width: 50px;
-  height: 70px;
+  width: 52px;
+  height: 72px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   margin-bottom: 6px;
 }
 
+.bottle-cap {
+  width: 22px;
+  height: 8px;
+  background: #334155;
+  border-radius: 3px 3px 0 0;
+  border: 1px solid #64748B;
+}
+
+.bottle-neck {
+  width: 14px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.3);
+  border-left: 1.5px solid rgba(255, 255, 255, 0.8);
+  border-right: 1.5px solid rgba(255, 255, 255, 0.8);
+}
+
 .bottle-glass {
-  width: 44px;
-  height: 60px;
-  border: 2.5px solid rgba(255, 255, 255, 0.7);
-  border-radius: 6px 6px 10px 10px;
+  width: 46px;
+  height: 54px;
+  border: 2.5px solid rgba(255, 255, 255, 0.8);
+  border-radius: 6px 6px 8px 8px;
   position: relative;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 6px rgba(255,255,255,0.3);
 }
 
-.bottle-cap {
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 18px;
-  height: 8px;
-  background: #94A3B8;
-  border-radius: 3px 3px 0 0;
-  border: 1px solid #CBD5E1;
+.amber-glass-bottle .bottle-glass {
+  border-color: rgba(217, 119, 6, 0.9);
+  background: rgba(180, 83, 9, 0.3);
+}
+
+.amber-glass-bottle .bottle-cap {
+  background: #1E1B4B;
 }
 
 .liquid-fill {
@@ -913,12 +931,81 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 65%;
-  background: rgba(14, 165, 233, 0.5);
+  height: 70%;
   transition: height 0.3s ease;
 }
 
-.bottle-label-box {
+.glass-reflection-streak {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  bottom: 4px;
+  width: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 2px;
+}
+
+/* Mineral Jars */
+.mineral-jar-visual {
+  position: relative;
+  width: 54px;
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.jar-lid {
+  width: 46px;
+  height: 8px;
+  background: #64748B;
+  border-radius: 3px;
+  border: 1px solid #94A3B8;
+}
+
+.jar-glass-body {
+  width: 50px;
+  height: 60px;
+  border: 2.5px solid rgba(255, 255, 255, 0.8);
+  border-radius: 4px 4px 8px 8px;
+  overflow: hidden;
+  position: relative;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ore-pellets-fill.hematite {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80%;
+  background: radial-gradient(circle, #78350F 20%, #451A03 80%);
+  box-shadow: inset 0 0 10px #000;
+}
+
+.ore-pellets-fill.coke {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 85%;
+  background: radial-gradient(circle, #334155 20%, #0F172A 80%);
+  box-shadow: inset 0 0 10px #000;
+}
+
+.ore-pellets-fill.limestone {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80%;
+  background: radial-gradient(circle, #FFFFFF 20%, #CBD5E1 80%);
+  box-shadow: inset 0 0 8px #94A3B8;
+}
+
+/* Authentic Chemical Label Styling */
+.real-lab-label {
   background: #FFFFFF;
   border: 1px solid #CBD5E1;
   border-radius: 4px;
@@ -926,6 +1013,23 @@ body {
   width: 100%;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  position: relative;
+}
+
+.ghs-hazard-diamond {
+  position: absolute;
+  top: -8px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  background: #FFFFFF;
+  border: 1.5px solid #EF4444;
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 .bottle-formula {
@@ -944,11 +1048,20 @@ body {
 
 .bottle-name-sub {
   font-size: 8px;
-  color: #64748B;
+  color: #475569;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.label-purity, .label-cas {
+  font-size: 7px;
+  color: #64748B;
+  font-family: var(--font-mono);
+  border-top: 1px dotted #E2E8F0;
+  margin-top: 2px;
+  padding-top: 1px;
 }
 
 .chemical-bottle.picked {
@@ -1143,9 +1256,168 @@ body {
   cursor: not-allowed;
 }
 
-/* ==========================================================================
-   SMELTING BLAST FURNACE RIG & SIMULATION GRAPHICS
-   ========================================================================== */
+/* Titration Rig */
+.titration-rig {
+  position: relative;
+  width: 280px;
+  height: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stand-post {
+  position: absolute;
+  right: 40px;
+  top: 10px;
+  bottom: 10px;
+  width: 10px;
+  background: #64748B;
+  border-radius: 4px;
+}
+
+.stand-base {
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 16px;
+  background: #334155;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.white-tile {
+  position: absolute;
+  bottom: 16px;
+  left: 45px;
+  width: 130px;
+  height: 10px;
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.burette-assembly {
+  position: absolute;
+  top: 15px;
+  left: 78px;
+  width: 24px;
+  height: 200px;
+  border: 2px solid rgba(30, 41, 59, 0.8);
+  border-radius: 6px 6px 2px 2px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.burette-liquid {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90%;
+  background: linear-gradient(180deg, rgba(147, 197, 253, 0.4) 0%, rgba(59, 130, 246, 0.6) 100%);
+  border-radius: 0 0 2px 2px;
+  transition: height 0.3s linear;
+}
+
+.burette-scale {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  border-right: 1px solid rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.scale-mark {
+  width: 5px;
+  height: 1px;
+  background: #1E293B;
+}
+
+.stopcock-valve {
+  position: absolute;
+  bottom: -16px;
+  left: -6px;
+  width: 36px;
+  height: 16px;
+  background: #EF4444;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 800;
+  color: white;
+  transition: transform 0.2s ease;
+}
+
+.stopcock-valve.open {
+  transform: rotate(90deg);
+  background: #10B981;
+}
+
+.droplet-stream {
+  position: absolute;
+  bottom: -40px;
+  left: 10px;
+  width: 4px;
+  height: 8px;
+  background: #3B82F6;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.droplet-stream.dropping {
+  animation: dropFalling 0.6s infinite linear;
+}
+
+@keyframes dropFalling {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(40px); opacity: 0; }
+}
+
+.conical-flask-sim {
+  position: absolute;
+  bottom: 26px;
+  left: 60px;
+  width: 90px;
+  height: 95px;
+  clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
+  background: rgba(255, 255, 255, 0.5);
+  border: 2.5px solid #334155;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.flask-liquid {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45px;
+  background: rgba(224, 242, 254, 0.4);
+  transition: background-color 0.8s ease, transform 0.3s ease;
+}
+
+.flask-liquid.colorless { background: rgba(224, 242, 254, 0.4); }
+.flask-liquid.transient-pink { background: rgba(244, 114, 182, 0.35); }
+.flask-liquid.pale-pink { background: rgba(236, 72, 153, 0.65); box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+.flask-liquid.over-titrated { background: rgba(190, 24, 93, 0.95); box-shadow: 0 0 20px rgba(190, 24, 93, 0.7); }
+
+.swirl-anim { animation: swirlFlask 0.4s ease-in-out infinite alternate; }
+@keyframes swirlFlask { 0% { transform: rotate(-3deg); } 100% { transform: rotate(3deg); } }
+
+/* Smelting Furnace Rig */
 .furnace-rig {
   position: relative;
   width: 320px;
@@ -1181,43 +1453,18 @@ body {
   transition: all 0.5s ease;
 }
 
-/* Glow States based on Temp */
-.furnace-glow-core.cold {
-  background: #334155;
-  box-shadow: none;
-}
+.furnace-glow-core.cold { background: #334155; box-shadow: none; }
+.furnace-glow-core.warm { background: radial-gradient(circle, #F97316 0%, #EA580C 70%, transparent 100%); box-shadow: 0 0 25px rgba(249, 115, 22, 0.5); }
+.furnace-glow-core.optimal { background: radial-gradient(circle, #FFFFFF 0%, #FDE047 30%, #F97316 70%, #DC2626 100%); box-shadow: 0 0 45px rgba(253, 224, 71, 0.9); animation: heatPulse 1.2s infinite alternate; }
+.furnace-glow-core.overheat { background: radial-gradient(circle, #FFFFFF 0%, #EF4444 60%, #991B1B 100%); box-shadow: 0 0 50px rgba(239, 68, 68, 1); animation: overheatPulse 0.4s infinite alternate; }
 
-.furnace-glow-core.warm {
-  background: radial-gradient(circle, #F97316 0%, #EA580C 70%, transparent 100%);
-  box-shadow: 0 0 25px rgba(249, 115, 22, 0.5);
-}
-
-.furnace-glow-core.optimal {
-  background: radial-gradient(circle, #FFFFFF 0%, #FDE047 30%, #F97316 70%, #DC2626 100%);
-  box-shadow: 0 0 45px rgba(253, 224, 71, 0.9);
-  animation: heatPulse 1.2s infinite alternate;
-}
-
-.furnace-glow-core.overheat {
-  background: radial-gradient(circle, #FFFFFF 0%, #EF4444 60%, #991B1B 100%);
-  box-shadow: 0 0 50px rgba(239, 68, 68, 1);
-  animation: overheatPulse 0.4s infinite alternate;
-}
-
-@keyframes heatPulse {
-  0% { transform: scale(0.96); opacity: 0.9; }
-  100% { transform: scale(1.04); opacity: 1; }
-}
-
-@keyframes overheatPulse {
-  0% { transform: scale(0.94); }
-  100% { transform: scale(1.08); filter: blur(12px); }
-}
+@keyframes heatPulse { 0% { transform: scale(0.96); opacity: 0.9; } 100% { transform: scale(1.04); opacity: 1; } }
+@keyframes overheatPulse { 0% { transform: scale(0.94); } 100% { transform: scale(1.08); filter: blur(12px); } }
 
 .furnace-top-hopper {
   position: absolute;
   top: 15px;
-  width: 60px;
+  width: 120px;
   height: 25px;
   background: #64748B;
   border: 2px solid #1E293B;
@@ -1225,7 +1472,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: white;
 }
 
 .tuyere-blast-pipe {
@@ -1300,17 +1550,17 @@ body {
   transition: height 1s ease;
 }
 
-/* Slag Layer */
 .slag-tap-layer {
   position: absolute;
   bottom: 50px;
   right: 35px;
-  width: 50px;
+  width: 65px;
   height: 25px;
   background: #334155;
   border: 1.5px solid #64748B;
   border-radius: 4px;
-  font-size: 8px;
+  font-size: 9px;
+  font-family: var(--font-display);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1318,7 +1568,6 @@ body {
   font-weight: 800;
 }
 
-/* Range Slider Styling */
 .temp-slider-container {
   display: flex;
   flex-direction: column;
@@ -1475,7 +1724,6 @@ body {
   font-weight: 800;
 }
 
-/* Summary Log Sheet */
 .lab-data-card {
   background: var(--color-white);
   border: 2px solid rgba(45, 20, 75, 0.12);

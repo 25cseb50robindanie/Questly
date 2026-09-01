@@ -1,6 +1,7 @@
 /**
  * QUESTLY VIRTUAL SCIENCE LAB ENGINE
  * High-fidelity, gamified, multi-module virtual lab simulator.
+ * Features realistic laboratory glassware, authentic chemical labels, GHS hazard diamonds, and blast furnace rigs.
  * Supports: Acid-Base Titration, Smelting & Blast Furnace Metallurgy, Calorimetry, Flame Test.
  */
 
@@ -140,7 +141,372 @@ class LabSoundEngine {
 const labSound = new LabSoundEngine();
 
 // ============================================================================
-// 2. MODULE DATABASE (TITRATION, SMELTING, CALORIMETRY, FLAME TEST)
+// 2. REALISTIC LAB VISUAL ASSET GENERATOR (HIGH-FIDELITY SVGs)
+// ============================================================================
+function getRealisticApparatusSVG(id) {
+  switch (id) {
+    case 'burette':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Stand Rod & Clamp -->
+          <rect x="25" y="10" width="6" height="105" fill="#475569" rx="2"/>
+          <path d="M25 45 L50 45 L52 48 L48 52 L25 50" fill="#334155"/>
+          <circle cx="28" cy="47" r="4" fill="#94A3B8"/>
+          <!-- Burette Glass Body -->
+          <rect x="48" y="15" width="12" height="75" fill="rgba(224, 242, 254, 0.5)" stroke="#334155" stroke-width="1.5" rx="2"/>
+          <!-- Liquid Fill -->
+          <rect x="49" y="35" width="10" height="54" fill="rgba(59, 130, 246, 0.45)" rx="1"/>
+          <!-- Scale Markings -->
+          <line x1="48" y1="25" x2="54" y2="25" stroke="#1E293B" stroke-width="1"/>
+          <line x1="48" y1="35" x2="52" y2="35" stroke="#1E293B" stroke-width="0.8"/>
+          <line x1="48" y1="45" x2="55" y2="45" stroke="#1E293B" stroke-width="1"/>
+          <line x1="48" y1="55" x2="52" y2="55" stroke="#1E293B" stroke-width="0.8"/>
+          <line x1="48" y1="65" x2="55" y2="65" stroke="#1E293B" stroke-width="1"/>
+          <line x1="48" y1="75" x2="52" y2="75" stroke="#1E293B" stroke-width="0.8"/>
+          <!-- Stopcock Valve -->
+          <circle cx="54" cy="93" r="5" fill="#EF4444" stroke="#991B1B" stroke-width="1"/>
+          <rect x="47" y="91" width="14" height="4" fill="#EF4444" rx="1"/>
+          <!-- Jet Nozzle Tip -->
+          <polygon points="52,98 56,98 54,112" fill="rgba(224, 242, 254, 0.7)" stroke="#334155" stroke-width="1"/>
+        </svg>
+      `;
+
+    case 'conical_flask':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Glass Neck & Lip -->
+          <rect x="42" y="15" width="16" height="6" fill="#E2E8F0" stroke="#334155" stroke-width="1.5" rx="2"/>
+          <rect x="44" y="20" width="12" height="25" fill="rgba(241, 245, 249, 0.6)" stroke="#334155" stroke-width="1.5"/>
+          <!-- Flask Body Polygon -->
+          <polygon points="44,45 15,102 85,102 56,45" fill="rgba(224, 242, 254, 0.55)" stroke="#334155" stroke-width="2"/>
+          <!-- Liquid Fill Inside Flask -->
+          <polygon points="32,70 17,100 83,100 68,70" fill="rgba(244, 114, 182, 0.35)"/>
+          <!-- Frosted Volume Marks -->
+          <line x1="40" y1="75" x2="60" y2="75" stroke="rgba(255,255,255,0.8)" stroke-width="1.2"/>
+          <line x1="35" y1="85" x2="65" y2="85" stroke="rgba(255,255,255,0.8)" stroke-width="1.2"/>
+          <line x1="30" y1="95" x2="70" y2="95" stroke="rgba(255,255,255,0.8)" stroke-width="1.2"/>
+          <!-- Glass Reflection Highlight -->
+          <path d="M22 96 L47 48" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      `;
+
+    case 'pipette':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Rubber Pipette Bulb -->
+          <ellipse cx="50" cy="18" rx="10" ry="12" fill="#DC2626" stroke="#991B1B" stroke-width="1.5"/>
+          <rect x="46" y="28" width="8" height="6" fill="#991B1B" rx="1"/>
+          <!-- Top Stem -->
+          <rect x="48" y="34" width="4" height="25" fill="rgba(224, 242, 254, 0.6)" stroke="#334155" stroke-width="1"/>
+          <!-- Calibration Ring -->
+          <line x1="47" y1="48" x2="53" y2="48" stroke="#D97706" stroke-width="1.5"/>
+          <!-- Volumetric Bulb -->
+          <ellipse cx="50" cy="72" rx="9" ry="16" fill="rgba(224, 242, 254, 0.6)" stroke="#334155" stroke-width="1.5"/>
+          <ellipse cx="50" cy="72" rx="7" ry="13" fill="rgba(59, 130, 246, 0.35)"/>
+          <!-- Bottom Delivery Tip -->
+          <polygon points="48,88 52,88 50,114" fill="rgba(224, 242, 254, 0.7)" stroke="#334155" stroke-width="1"/>
+        </svg>
+      `;
+
+    case 'stand_clamp':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Cast Iron Base -->
+          <rect x="15" y="98" width="70" height="12" fill="#1E293B" stroke="#0F172A" stroke-width="1.5" rx="3"/>
+          <ellipse cx="50" cy="98" rx="30" ry="4" fill="#334155"/>
+          <!-- Vertical Steel Rod -->
+          <rect x="25" y="15" width="6" height="85" fill="#94A3B8" stroke="#475569" stroke-width="1" rx="1"/>
+          <!-- 3-Finger Clamp Assembly -->
+          <rect x="23" y="38" width="18" height="8" fill="#475569" rx="2"/>
+          <circle cx="21" cy="42" r="4" fill="#CBD5E1"/>
+          <path d="M40 42 L65 34 L72 38" stroke="#334155" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M40 42 L65 50 L72 46" stroke="#334155" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <!-- Rubber Clamp Sleeves -->
+          <rect x="68" y="32" width="8" height="6" fill="#EF4444" rx="2"/>
+          <rect x="68" y="46" width="8" height="6" fill="#EF4444" rx="2"/>
+        </svg>
+      `;
+
+    case 'beaker':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Spout & Rim -->
+          <path d="M22 30 L18 28 L24 35 L76 35 L76 30 Z" fill="#CBD5E1"/>
+          <!-- Cylindrical Body -->
+          <rect x="24" y="32" width="52" height="68" fill="rgba(224, 242, 254, 0.55)" stroke="#334155" stroke-width="2" rx="3"/>
+          <!-- Liquid Level -->
+          <rect x="26" y="55" width="48" height="43" fill="rgba(14, 165, 233, 0.4)" rx="2"/>
+          <!-- Printed Graduation Markings -->
+          <line x1="60" y1="45" x2="72" y2="45" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+          <text x="50" y="48" fill="#475569" font-size="6" font-family="sans-serif">80ml</text>
+          <line x1="60" y1="60" x2="72" y2="60" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+          <text x="50" y="63" fill="#475569" font-size="6" font-family="sans-serif">50ml</text>
+          <line x1="60" y1="75" x2="72" y2="75" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+          <text x="50" y="78" fill="#475569" font-size="6" font-family="sans-serif">20ml</text>
+        </svg>
+      `;
+
+    case 'furnace_rig':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Double-Bell Charging Top -->
+          <polygon points="35,15 65,15 60,25 40,25" fill="#64748B" stroke="#1E293B" stroke-width="1.5"/>
+          <rect x="42" y="10" width="16" height="6" fill="#475569" rx="1"/>
+          <!-- Blast Furnace Stack & Hearth Body -->
+          <polygon points="40,25 60,25 78,80 70,105 30,105 22,80" fill="#334155" stroke="#0F172A" stroke-width="2"/>
+          <!-- Refractory Lining Heat Window -->
+          <ellipse cx="50" cy="88" rx="14" ry="12" fill="#F97316" filter="drop-shadow(0 0 4px #F97316)"/>
+          <ellipse cx="50" cy="88" rx="8" ry="7" fill="#FDE047"/>
+          <!-- Bustle Pipe & Tuyeres -->
+          <rect x="15" y="76" width="70" height="6" fill="#475569" stroke="#1E293B" stroke-width="1" rx="2"/>
+          <!-- Taphole & Slag Runner -->
+          <polygon points="35,105 20,114 40,114" fill="#EAB308"/>
+          <rect x="60" y="102" width="15" height="4" fill="#64748B"/>
+        </svg>
+      `;
+
+    case 'pyrometer':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Optical Sensor Body -->
+          <rect x="25" y="25" width="50" height="35" fill="#1E293B" stroke="#0F172A" stroke-width="2" rx="4"/>
+          <!-- Lens Barrel -->
+          <rect x="75" y="32" width="14" height="20" fill="#475569" stroke="#1E293B" stroke-width="1.5" rx="2"/>
+          <circle cx="88" cy="42" r="5" fill="#DC2626"/>
+          <!-- Backlit Digital LCD Screen -->
+          <rect x="32" y="32" width="34" height="20" fill="#022C22" stroke="#065F46" stroke-width="1.5" rx="2"/>
+          <text x="35" y="46" fill="#34D399" font-size="8" font-weight="bold" font-family="monospace">1450°C</text>
+          <!-- Ergonomic Handle Grip -->
+          <path d="M35 60 L30 105 L45 105 L50 60 Z" fill="#334155" stroke="#1E293B" stroke-width="1.5"/>
+          <!-- Trigger Button -->
+          <rect x="50" y="65" width="6" height="10" fill="#EF4444" rx="2"/>
+        </svg>
+      `;
+
+    case 'tuyere_blower':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Heavy Cast Flange Base -->
+          <rect x="15" y="40" width="14" height="40" fill="#64748B" stroke="#1E293B" stroke-width="1.5" rx="2"/>
+          <!-- Tapered Copper Blast Pipe -->
+          <polygon points="29,46 80,52 80,68 29,74" fill="#B45309" stroke="#78350F" stroke-width="2"/>
+          <!-- Water-Cooled Jacket Sleeve -->
+          <rect x="42" y="44" width="22" height="32" fill="#D97706" stroke="#92400E" stroke-width="1.5" rx="2"/>
+          <!-- Air Jet Stream -->
+          <path d="M82 54 L96 50 L94 70 L82 66 Z" fill="rgba(56, 189, 248, 0.6)"/>
+        </svg>
+      `;
+
+    case 'ladle_mold':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Steel Ladle Shell -->
+          <path d="M20 40 L28 95 L72 95 L80 40 Z" fill="#334155" stroke="#0F172A" stroke-width="2"/>
+          <!-- Pouring Spout Lip -->
+          <polygon points="18,40 10,32 28,40" fill="#475569" stroke="#0F172A" stroke-width="1"/>
+          <!-- Molten Metal Surface inside Ladle -->
+          <ellipse cx="50" cy="50" rx="26" ry="8" fill="#FDE047" stroke="#F97316" stroke-width="1.5"/>
+          <ellipse cx="50" cy="50" rx="18" ry="4" fill="#FFFFFF"/>
+          <!-- Heavy Suspension Trunnion Bail Handle -->
+          <path d="M22 55 L22 25 L78 25 L78 55" stroke="#64748B" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </svg>
+      `;
+
+    case 'calorimeter':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Outer Insulated Vessel -->
+          <rect x="22" y="35" width="56" height="68" fill="#E2E8F0" stroke="#475569" stroke-width="2" rx="4"/>
+          <!-- Inner Styrofoam Lining -->
+          <rect x="28" y="42" width="44" height="56" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
+          <!-- Insulating Lid Stopper -->
+          <rect x="18" y="28" width="64" height="10" fill="#94A3B8" stroke="#334155" stroke-width="1.5" rx="2"/>
+          <!-- Digital Thermometer Probe Through Lid -->
+          <rect x="36" y="8" width="4" height="60" fill="#DC2626" rx="1"/>
+          <!-- Wire Stirrer Loop -->
+          <path d="M58 12 L58 85 A8 8 0 0 1 50 93 A8 8 0 0 1 42 85" stroke="#64748B" stroke-width="2" fill="none"/>
+        </svg>
+      `;
+
+    case 'thermometer':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Digital Meter Box -->
+          <rect x="25" y="15" width="50" height="35" fill="#F1F5F9" stroke="#334155" stroke-width="2" rx="4"/>
+          <rect x="30" y="22" width="40" height="20" fill="#1E293B" rx="2"/>
+          <text x="33" y="36" fill="#38BDF8" font-size="9" font-family="monospace" font-weight="bold">22.0°C</text>
+          <!-- Braided Cable -->
+          <path d="M50 50 Q60 65 48 78" stroke="#64748B" stroke-width="2" fill="none"/>
+          <!-- Stainless Steel Thermocouple Needle -->
+          <rect x="46" y="78" width="4" height="35" fill="#CBD5E1" stroke="#475569" stroke-width="1" rx="1"/>
+        </svg>
+      `;
+
+    case 'bunsen_burner':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Flame (Hot Blue Cone) -->
+          <polygon points="50,10 40,42 60,42" fill="#38BDF8" opacity="0.85"/>
+          <polygon points="50,18 45,42 55,42" fill="#FFFFFF"/>
+          <!-- Brass Chimney Tube -->
+          <rect x="45" y="42" width="10" height="42" fill="#F59E0B" stroke="#B45309" stroke-width="1.5"/>
+          <!-- Rotating Air-Hole Collar -->
+          <rect x="43" y="72" width="14" height="10" fill="#78350F" rx="1"/>
+          <ellipse cx="50" cy="77" rx="3" ry="2" fill="#000000"/>
+          <!-- Gas Intake Nozzle -->
+          <path d="M55 86 L78 92 L76 98 L55 92 Z" fill="#94A3B8" stroke="#475569" stroke-width="1"/>
+          <!-- Heavy Cast Iron Base -->
+          <polygon points="20,108 80,108 72,94 28,94" fill="#334155" stroke="#0F172A" stroke-width="2"/>
+        </svg>
+      `;
+
+    case 'platinum_loop':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Glass/Aluminum Handle -->
+          <rect x="46" y="10" width="8" height="60" fill="#94A3B8" stroke="#475569" stroke-width="1.5" rx="2"/>
+          <!-- Brass Chuck Collet -->
+          <polygon points="45,70 55,70 53,78 47,78" fill="#F59E0B"/>
+          <!-- Platinum Wire -->
+          <line x1="50" y1="78" x2="50" y2="104" stroke="#E2E8F0" stroke-width="1.8"/>
+          <!-- 2mm Loop Ring -->
+          <circle cx="50" cy="108" r="4" stroke="#E2E8F0" stroke-width="1.8" fill="none"/>
+        </svg>
+      `;
+
+    case 'watch_glass':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Concave Curved Glass Dish -->
+          <path d="M15 65 Q50 90 85 65 Q50 78 15 65 Z" fill="rgba(224, 242, 254, 0.65)" stroke="#64748B" stroke-width="1.5"/>
+          <!-- Chemical Powder Crystals on Glass -->
+          <ellipse cx="50" cy="74" rx="18" ry="6" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
+          <!-- Light Rim Highlights -->
+          <path d="M22 66 Q50 86 78 66" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" fill="none"/>
+        </svg>
+      `;
+
+    case 'cobalt_glass':
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <!-- Royal Cobalt Blue Glass Plate -->
+          <rect x="20" y="25" width="60" height="70" fill="rgba(30, 58, 138, 0.85)" stroke="#1E3A8A" stroke-width="2" rx="3"/>
+          <!-- Refraction Bevel Edges -->
+          <rect x="24" y="29" width="52" height="62" fill="rgba(37, 99, 235, 0.6)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+          <path d="M25 30 L45 90" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      `;
+
+    default:
+      return `
+        <svg viewBox="0 0 100 120" class="real-apparatus-svg">
+          <rect x="20" y="20" width="60" height="80" fill="rgba(224,242,254,0.5)" stroke="#475569" stroke-width="2" rx="4"/>
+          <circle cx="50" cy="60" r="16" fill="#7C3AED" opacity="0.2"/>
+        </svg>
+      `;
+  }
+}
+
+// Realistic Laboratory Chemical Bottle Visual Generator
+function getRealisticBottleHTML(item) {
+  const isOre = item.hazard && item.hazard.includes('Mineral');
+  const isFuel = item.hazard && item.hazard.includes('Fuel');
+  const isFlux = item.hazard && item.hazard.includes('Flux');
+
+  let bottleTypeClass = 'clear-glass-bottle';
+  let fluidGradient = 'rgba(59, 130, 246, 0.45)';
+  let hazardIcon = '⚠️';
+  let hazardColor = '#EF4444';
+
+  if (item.id === 'phenolphthalein' || item.id === 'hno3_conc' || item.id === 'silver_nitrate') {
+    bottleTypeClass = 'amber-glass-bottle';
+    fluidGradient = 'rgba(180, 83, 9, 0.65)';
+  } else if (item.hazard.includes('Corrosive') || item.hazard.includes('Acid')) {
+    hazardIcon = '🧪';
+    hazardColor = '#DC2626';
+    fluidGradient = 'rgba(224, 242, 254, 0.6)';
+  } else if (item.hazard.includes('Flammable')) {
+    hazardIcon = '🔥';
+    hazardColor = '#EA580C';
+    fluidGradient = 'rgba(254, 215, 170, 0.5)';
+  } else if (item.hazard.includes('Toxic')) {
+    hazardIcon = '☠️';
+    hazardColor = '#7F1D1D';
+  }
+
+  // Minerals & Solid Ores
+  if (isOre) {
+    return `
+      <div class="mineral-jar-visual">
+        <div class="jar-lid"></div>
+        <div class="jar-glass-body">
+          <div class="ore-pellets-fill hematite"></div>
+        </div>
+      </div>
+      <div class="bottle-label-box real-lab-label">
+        <div class="ghs-hazard-diamond" style="border-color: #B45309;">🪨</div>
+        <div class="bottle-formula">${item.formula}</div>
+        <div class="bottle-conc">${item.conc}</div>
+        <div class="bottle-name-sub">${item.name}</div>
+        <div class="label-cas">CAS: 1309-37-1</div>
+      </div>
+    `;
+  } else if (isFuel) {
+    return `
+      <div class="mineral-jar-visual">
+        <div class="jar-lid"></div>
+        <div class="jar-glass-body">
+          <div class="ore-pellets-fill coke"></div>
+        </div>
+      </div>
+      <div class="bottle-label-box real-lab-label">
+        <div class="ghs-hazard-diamond" style="border-color: #EF4444;">🔥</div>
+        <div class="bottle-formula">${item.formula}</div>
+        <div class="bottle-conc">${item.conc}</div>
+        <div class="bottle-name-sub">${item.name}</div>
+        <div class="label-cas">CAS: 7440-44-0</div>
+      </div>
+    `;
+  } else if (isFlux) {
+    return `
+      <div class="mineral-jar-visual">
+        <div class="jar-lid"></div>
+        <div class="jar-glass-body">
+          <div class="ore-pellets-fill limestone"></div>
+        </div>
+      </div>
+      <div class="bottle-label-box real-lab-label">
+        <div class="ghs-hazard-diamond" style="border-color: #3B82F6;">🪨</div>
+        <div class="bottle-formula">${item.formula}</div>
+        <div class="bottle-conc">${item.conc}</div>
+        <div class="bottle-name-sub">${item.name}</div>
+        <div class="label-cas">CAS: 471-34-1</div>
+      </div>
+    `;
+  }
+
+  // Standard Chemical Liquid Reagents
+  return `
+    <div class="bottle-visual ${bottleTypeClass}">
+      <div class="bottle-cap"></div>
+      <div class="bottle-neck"></div>
+      <div class="bottle-glass">
+        <div class="liquid-fill" style="background: ${fluidGradient};"></div>
+        <div class="glass-reflection-streak"></div>
+      </div>
+    </div>
+    <div class="bottle-label-box real-lab-label">
+      <div class="ghs-hazard-diamond" style="border-color: ${hazardColor};">${hazardIcon}</div>
+      <div class="bottle-formula">${item.formula}</div>
+      <div class="bottle-conc">${item.conc}</div>
+      <div class="bottle-name-sub">${item.name}</div>
+      <div class="label-purity">ACS Reagent Grade • 99.8%</div>
+    </div>
+  `;
+}
+
+// ============================================================================
+// 3. MODULE DATABASE (TITRATION, SMELTING, CALORIMETRY, FLAME TEST)
 // ============================================================================
 const LAB_MODULES = {
   titration: {
@@ -209,26 +575,26 @@ const LAB_MODULES = {
       }
     },
     apparatusPool: [
-      { id: 'burette', name: 'Burette', icon: '📏', spec: '50 mL Volumetric', required: true },
-      { id: 'conical_flask', name: 'Conical Flask', icon: '⚗️', spec: '250 mL Erlenmeyer', required: true },
-      { id: 'pipette', name: 'Pipette', icon: '🧪', spec: '10 mL Volumetric', required: true },
-      { id: 'stand_clamp', name: 'Retort Stand', icon: '📐', spec: 'Heavy Base + Clamp', required: true },
-      { id: 'beaker', name: 'Beaker', icon: '🥛', spec: '100 mL Glass', required: false, wrongDesc: "A Beaker is for holding bulk liquids, not precision titration." },
-      { id: 'crucible', name: 'Crucible', icon: '🥣', spec: 'Porcelain High Temp', required: false, wrongDesc: "A Crucible is for heating solids at high temperatures, not titration." },
-      { id: 'test_tube', name: 'Test Tube', icon: '🧫', spec: 'Borosilicate 15 mL', required: false, wrongDesc: "Test tubes cannot accommodate continuous swirling for titration." },
-      { id: 'tripod', name: 'Tripod Stand', icon: '🔺', spec: 'Steel Burner Support', required: false, wrongDesc: "Tripod stands are for heating, not titration." }
+      { id: 'burette', name: 'Burette', spec: '50 mL Borosilicate Glass', required: true },
+      { id: 'conical_flask', name: 'Conical Flask', spec: '250 mL Erlenmeyer', required: true },
+      { id: 'pipette', name: 'Volumetric Pipette', spec: '10.0 mL Class A', required: true },
+      { id: 'stand_clamp', name: 'Retort Stand & Clamp', spec: 'Cast Iron Base + Rod', required: true },
+      { id: 'beaker', name: 'Griffin Beaker', spec: '100 mL Pyrex Glass', required: false, wrongDesc: "A Beaker is for holding bulk liquids, not precision volumetric titration." },
+      { id: 'furnace_rig', name: 'Blast Furnace', spec: 'Industrial Smelter', required: false, wrongDesc: "A Blast Furnace is for smelting ores, not liquid titration!" },
+      { id: 'bunsen_burner', name: 'Bunsen Burner', spec: 'Gas Burner', required: false, wrongDesc: "Heating is not required for acid-base room temperature titration." },
+      { id: 'watch_glass', name: 'Watch Glass', spec: 'Dish Lens', required: false, wrongDesc: "A Watch Glass is for drying solid crystals, not liquid titration." }
     ],
     cupboardPool: {
       shelfA: [
-        { id: 'hcl_01', name: 'Hydrochloric Acid', formula: 'HCl', conc: '0.1 M', hazard: 'Corrosive ⚠️', required: true, shelf: 'A' },
+        { id: 'hcl_01', name: 'Hydrochloric Acid', formula: 'HCl', conc: '0.1000 M', hazard: 'Corrosive ⚠️', required: true, shelf: 'A' },
         { id: 'h2so4_conc', name: 'Sulfuric Acid (Conc)', formula: 'H₂SO₄', conc: '18.0 M', hazard: 'Severe Acid 🔥', required: false, shelf: 'A', wrongDesc: "Concentrated H₂SO₄ is too hazardous and not required for 0.1 M titration." },
-        { id: 'acetic_acid', name: 'Acetic Acid', formula: 'CH₃COOH', conc: '0.5 M', hazard: 'Weak Acid ⚠️', required: false, shelf: 'A', wrongDesc: "Acetic Acid is a weak organic acid; we require strong 0.1 M HCl." },
-        { id: 'distilled_water', name: 'Distilled Water', formula: 'H₂O', conc: 'Pure', hazard: 'Safe 💧', required: false, shelf: 'A', wrongDesc: "Distilled water is for rinsing, but not the primary analyte." }
+        { id: 'acetic_acid', name: 'Acetic Acid', formula: 'CH₃COOH', conc: '0.5 M', hazard: 'Weak Acid ⚠️', required: false, shelf: 'A', wrongDesc: "Acetic Acid is a weak organic acid; we require standard strong 0.1 M HCl." },
+        { id: 'distilled_water', name: 'Distilled Water', formula: 'H₂O', conc: 'Pure', hazard: 'Safe 💧', required: false, shelf: 'A', wrongDesc: "Distilled water is for rinsing, but not the primary analyte reagent." }
       ],
       shelfB: [
-        { id: 'naoh_01', name: 'Sodium Hydroxide', formula: 'NaOH', conc: '0.1 M', hazard: 'Caustic Base ⚠️', required: true, shelf: 'B' },
+        { id: 'naoh_01', name: 'Sodium Hydroxide', formula: 'NaOH', conc: '0.1000 M', hazard: 'Caustic Base ⚠️', required: true, shelf: 'B' },
         { id: 'phenolphthalein', name: 'Phenolphthalein', formula: 'C₂₀H₁₄O₄', conc: '1% Sol.', hazard: 'Indicator 💧', required: true, shelf: 'B' },
-        { id: 'methyl_orange', name: 'Methyl Orange', formula: 'C₁₄H₁₄N₃NaO₃S', conc: '0.1% Sol.', hazard: 'Indicator 💧', required: false, shelf: 'B', wrongDesc: "Methyl orange changes at pH 3.1-4.4. Phenolphthalein is needed for strong acid-base titration." },
+        { id: 'methyl_orange', name: 'Methyl Orange', formula: 'C₁₄H₁₄N₃NaO₃S', conc: '0.1% Sol.', hazard: 'Indicator 💧', required: false, shelf: 'B', wrongDesc: "Methyl orange transitions at pH 3.1-4.4. Phenolphthalein is required for strong acid-base titration." },
         { id: 'ethanol', name: 'Ethanol (95%)', formula: 'C₂H₅OH', conc: '95%', hazard: 'Flammable 🔥', required: false, shelf: 'B', wrongDesc: "Ethanol is an organic solvent not used in this titration." }
       ]
     },
@@ -323,19 +689,19 @@ const LAB_MODULES = {
       }
     },
     apparatusPool: [
-      { id: 'furnace_rig', name: 'Blast Furnace Rig', icon: '🌋', spec: 'Refractory Lined Tower', required: true },
-      { id: 'pyrometer', name: 'Digital Pyrometer', icon: '🌡️', spec: 'Optical 0–2000°C Sensor', required: true },
-      { id: 'tuyere_blower', name: 'Tuyere Blast Nozzle', icon: '💨', spec: 'Oxygen-Air Blower', required: true },
-      { id: 'ladle_mold', name: 'Tapping Ladle', icon: '🪣', spec: 'Cast Iron Ingot Mold', required: true },
-      { id: 'burette', name: 'Burette', icon: '📏', spec: '50 mL Glass', required: false, wrongDesc: "A Burette is for liquid titration and will melt instantly in a furnace!" },
-      { id: 'condenser', name: 'Liebig Condenser', icon: '🧪', spec: 'Glass Distillation Tube', required: false, wrongDesc: "Liebig condensers are for laboratory liquid condensation." },
-      { id: 'filter_paper', name: 'Filter Paper', icon: '📄', spec: 'Paper Filter Disk', required: false, wrongDesc: "Paper incinerates immediately at smelting temperatures." },
-      { id: 'bunsen_burner', name: 'Bunsen Burner', icon: '🔥', spec: 'Small Lab Gas Burner', required: false, wrongDesc: "Bunsen burners only reach ~1000°C; smelting requires industrial tuyere air blasts (>1500°C)." }
+      { id: 'furnace_rig', name: 'Blast Furnace Stack', spec: 'Refractory Lined Steel Tower', required: true },
+      { id: 'pyrometer', name: 'Digital Pyrometer', spec: 'Optical 0–2000°C Sensor', required: true },
+      { id: 'tuyere_blower', name: 'Tuyere Blast Pipe', spec: 'Copper Water-Cooled Nozzle', required: true },
+      { id: 'ladle_mold', name: 'Foundry Tapping Ladle', spec: 'Refractory Ingot Mold', required: true },
+      { id: 'burette', name: 'Burette', spec: '50 mL Glass', required: false, wrongDesc: "A Burette is for liquid titration and will shatter in a blast furnace!" },
+      { id: 'beaker', name: 'Griffin Beaker', spec: '100 mL Glass', required: false, wrongDesc: "Glass beakers cannot withstand pyrometallurgical furnace temperatures." },
+      { id: 'calorimeter', name: 'Calorimeter Cup', spec: 'Styrofoam Vessel', required: false, wrongDesc: "Styrofoam melts immediately near smelting heat!" },
+      { id: 'platinum_loop', name: 'Platinum Loop', spec: 'Thin Wire', required: false, wrongDesc: "A wire loop is for flame tests, not industrial ore smelting." }
     ],
     cupboardPool: {
       shelfA: [
-        { id: 'hematite_ore', name: 'Hematite Ore', formula: 'Fe₂O₃', conc: 'Ore Pellets', hazard: 'Mineral 🪨', required: true, shelf: 'A' },
-        { id: 'metallurgical_coke', name: 'Metallurgical Coke', formula: 'C', conc: '90% Carbon', hazard: 'Fuel 🔥', required: true, shelf: 'A' },
+        { id: 'hematite_ore', name: 'Hematite Ore', formula: 'Fe₂O₃', conc: 'Dense Ore Pellets', hazard: 'Mineral 🪨', required: true, shelf: 'A' },
+        { id: 'metallurgical_coke', name: 'Metallurgical Coke', formula: 'C', conc: '90% Carbon Fuel', hazard: 'Fuel 🔥', required: true, shelf: 'A' },
         { id: 'sodium_metal', name: 'Sodium Metal', formula: 'Na', conc: 'Pure Metal', hazard: 'Explosive 💥', required: false, shelf: 'A', wrongDesc: "Sodium metal reacts violently and explosively with oxygen and moisture!" },
         { id: 'sulfuric_acid_conc', name: 'Sulfuric Acid', formula: 'H₂SO₄', conc: '18.0 M', hazard: 'Corrosive ⚠️', required: false, shelf: 'A', wrongDesc: "Sulfuric acid is not a raw material for blast furnace smelting." }
       ],
@@ -381,10 +747,7 @@ const LAB_MODULES = {
           heading: 'Exothermic Neutralization & Enthalpy',
           desc: 'When strong acids and strong bases neutralize, energy is released into the solution, increasing temperature. q = m · c · ΔT.',
           formula: 'q = m · c · ΔT   |   ΔH_neut ≈ -57.1 kJ/mol',
-          modalDetails: `
-            <h4>1. Heat of Reaction (q)</h4>
-            <p><code>q = -(m_solution &times; c_water &times; &Delta;T)</code></p>
-          `
+          modalDetails: `<p>Heat evolved is absorbed by the aqueous solution: q = -(m · c · ΔT).</p>`
         },
         apparatus: {
           tag: 'Lab Equipment',
@@ -409,24 +772,24 @@ const LAB_MODULES = {
       }
     },
     apparatusPool: [
-      { id: 'calorimeter', name: 'Calorimeter Cup', icon: '☕', spec: 'Double Polystyrene Insulated', required: true },
-      { id: 'thermometer', name: 'Digital Thermometer', icon: '🌡️', spec: '±0.1°C Electronic Probe', required: true },
-      { id: 'stirrer', name: 'Stirring Rod', icon: '🥢', spec: 'Teflon Thermal Stirrer', required: true },
-      { id: 'grad_cylinder', name: 'Graduated Cylinder', icon: '📐', spec: '50 mL Precision Glass', required: true },
-      { id: 'bunsen', name: 'Bunsen Burner', icon: '🔥', spec: 'Gas Flame Burner', required: false, wrongDesc: "External heat from a burner will ruin calorimetry measurements!" },
-      { id: 'filter_paper', name: 'Filter Paper', icon: '📄', spec: 'Whatman No. 1', required: false, wrongDesc: "Filter paper is for filtration, not calorimetry." },
-      { id: 'dropper', name: 'Dropper Pipette', icon: '💧', spec: 'Rubber Teat Pipette', required: false, wrongDesc: "We need graduated cylinders for 50 mL volumes." },
-      { id: 'evaporating_dish', name: 'Evaporating Dish', icon: '🥣', spec: 'Porcelain Flat Base', required: false, wrongDesc: "Evaporating dishes allow heat to escape rapidly." }
+      { id: 'calorimeter', name: 'Calorimeter Vessel', spec: 'Double-Walled Insulated Cup', required: true },
+      { id: 'thermometer', name: 'Digital Thermocouple', spec: '±0.1°C Precision Probe', required: true },
+      { id: 'stand_clamp', name: 'Lab Clamp Stand', spec: 'Stainless Support Rod', required: true },
+      { id: 'beaker', name: 'Measuring Beaker', spec: '100 mL Glass', required: true },
+      { id: 'furnace_rig', name: 'Blast Furnace', spec: 'Smelting Stack', required: false, wrongDesc: "Blast furnaces generate external heat; calorimetry measures reaction heat!" },
+      { id: 'bunsen_burner', name: 'Bunsen Burner', spec: 'Gas Burner', required: false, wrongDesc: "External flame will ruin precise enthalpy measurements!" },
+      { id: 'cobalt_glass', name: 'Cobalt Glass', spec: 'Optical Filter', required: false, wrongDesc: "Cobalt glass is for flame tests, not calorimetry." },
+      { id: 'pipette', name: 'Pipette', spec: 'Small 10 mL Pipette', required: false, wrongDesc: "We need 50 mL beakers/cylinders for calorimetry volumes." }
     ],
     cupboardPool: {
       shelfA: [
-        { id: 'hcl_1m', name: 'Hydrochloric Acid', formula: 'HCl', conc: '1.0 M', hazard: 'Corrosive ⚠️', required: true, shelf: 'A' },
+        { id: 'hcl_1m', name: 'Hydrochloric Acid', formula: 'HCl', conc: '1.000 M', hazard: 'Corrosive ⚠️', required: true, shelf: 'A' },
         { id: 'distilled_water_cal', name: 'Distilled Water', formula: 'H₂O', conc: 'Pure', hazard: 'Safe 💧', required: true, shelf: 'A' },
         { id: 'hno3_conc', name: 'Nitric Acid', formula: 'HNO₃', conc: '2.0 M', hazard: 'Oxidizer 🔥', required: false, shelf: 'A', wrongDesc: "Nitric acid has unwanted oxidation side reactions; use 1.0 M HCl." },
         { id: 'acetone', name: 'Acetone', formula: 'C₃H₆O', conc: 'Pure', hazard: 'Flammable 🔥', required: false, shelf: 'A', wrongDesc: "Acetone is not used in aqueous calorimetry." }
       ],
       shelfB: [
-        { id: 'naoh_1m', name: 'Sodium Hydroxide', formula: 'NaOH', conc: '1.0 M', hazard: 'Caustic ⚠️', required: true, shelf: 'B' },
+        { id: 'naoh_1m', name: 'Sodium Hydroxide', formula: 'NaOH', conc: '1.000 M', hazard: 'Caustic ⚠️', required: true, shelf: 'B' },
         { id: 'ammonia_sol', name: 'Ammonium Hydroxide', formula: 'NH₄OH', conc: '1.0 M', hazard: 'Weak Base ⚠️', required: false, shelf: 'B', wrongDesc: "NH₄OH is a weak base with incomplete ionization." },
         { id: 'copper_sulfate', name: 'Copper Sulfate', formula: 'CuSO₄', conc: '0.5 M', hazard: 'Irritant ⚠️', required: false, shelf: 'B', wrongDesc: "Copper sulfate is not required for neutralization heat." },
         { id: 'glycerol', name: 'Glycerol', formula: 'C₃H₈O₃', conc: 'Pure', hazard: 'Safe 💧', required: false, shelf: 'B', wrongDesc: "Glycerol is not used in this experiment." }
@@ -478,14 +841,14 @@ const LAB_MODULES = {
       }
     },
     apparatusPool: [
-      { id: 'bunsen_burner', name: 'Bunsen Burner', icon: '🔥', spec: 'Adjustable Air Collar', required: true },
-      { id: 'platinum_loop', name: 'Platinum Loop', icon: '🦯', spec: 'Nichrome/Pt Inert Wire', required: true },
-      { id: 'watch_glass', name: 'Watch Glasses', icon: '🥏', spec: 'Porcelain / Glass Dish', required: true },
-      { id: 'cobalt_glass', name: 'Cobalt Blue Glass', icon: '🟦', spec: 'Optical Spectral Filter', required: true },
-      { id: 'burette', name: 'Burette', icon: '📏', spec: '50 mL Glass', required: false, wrongDesc: "Burettes are for liquid titration, not flame tests!" },
-      { id: 'condenser', name: 'Liebig Condenser', icon: '🧪', spec: 'Distillation Tube', required: false, wrongDesc: "Liebig condensers are for distillation." },
-      { id: 'mortar_pestle', name: 'Mortar & Pestle', icon: '🥣', spec: 'Agate Grinder', required: false, wrongDesc: "Salts are already finely powdered." },
-      { id: 'separating_funnel', name: 'Separating Funnel', icon: '🔻', spec: 'Pear Shaped 250 mL', required: false, wrongDesc: "Separating funnels are for immiscible liquids." }
+      { id: 'bunsen_burner', name: 'Bunsen Burner', spec: 'Adjustable Air Collar', required: true },
+      { id: 'platinum_loop', name: 'Platinum Loop', spec: 'Nichrome/Pt Inert Wire', required: true },
+      { id: 'watch_glass', name: 'Watch Glasses', spec: 'Borosilicate Concave Lens', required: true },
+      { id: 'cobalt_glass', name: 'Cobalt Blue Glass', spec: 'Optical Spectral Filter Plate', required: true },
+      { id: 'burette', name: 'Burette', spec: '50 mL Glass', required: false, wrongDesc: "Burettes are for liquid titration, not flame tests!" },
+      { id: 'calorimeter', name: 'Calorimeter', spec: 'Insulated Vessel', required: false, wrongDesc: "Calorimeters are for measuring heat of reaction." },
+      { id: 'stand_clamp', name: 'Retort Stand', spec: 'Heavy Base', required: false, wrongDesc: "Flame tests use handheld wire loops over the burner." },
+      { id: 'ladle_mold', name: 'Tapping Ladle', spec: 'Foundry Ladle', required: false, wrongDesc: "Ladles are for molten metallurgy, not qualitative flame tests." }
     ],
     cupboardPool: {
       shelfA: [
@@ -509,7 +872,7 @@ const LAB_MODULES = {
 };
 
 // ============================================================================
-// 3. LAB STATE MANAGER
+// 4. LAB STATE MANAGER
 // ============================================================================
 class LabStateManager {
   constructor() {
@@ -573,7 +936,7 @@ class LabStateManager {
         chargedCoke: false,
         chargedFlux: false,
         tuyereBlastOn: false,
-        temperature: 600, // °C
+        temperature: 600,
         reactionRate: 0,
         slagTapped: false,
         ironTapped: false,
@@ -600,7 +963,7 @@ class LabStateManager {
 const state = new LabStateManager();
 
 // ============================================================================
-// 4. DOM CONTROLLER & RENDERERS
+// 5. DOM CONTROLLER & RENDERERS
 // ============================================================================
 document.addEventListener('DOMContentLoaded', () => {
   initUrlParams();
@@ -707,7 +1070,7 @@ function bindGlobalEvents() {
 }
 
 // ============================================================================
-// 5. STAGE NAVIGATION & RENDERING
+// 6. STAGE NAVIGATION & RENDERING
 // ============================================================================
 function goToStage(stageNum) {
   state.currentStage = stageNum;
@@ -777,7 +1140,7 @@ function renderCurrentModule() {
 }
 
 // ============================================================================
-// 6. STAGE 2: APPARATUS SELECTION (WITH RED X & ERROR VOICE FEEDBACK)
+// 7. STAGE 2: REALISTIC APPARATUS SELECTION
 // ============================================================================
 function renderStage2() {
   const mod = state.moduleData;
@@ -809,7 +1172,9 @@ function renderStage2() {
     card.id = `card-app-${item.id}`;
 
     card.innerHTML = `
-      <div class="app-icon">${item.icon}</div>
+      <div class="app-icon real-svg-container">
+        ${getRealisticApparatusSVG(item.id)}
+      </div>
       <div class="app-name">${item.name}</div>
       <div class="app-spec">${item.spec}</div>
       <div class="wrong-overlay">
@@ -871,7 +1236,7 @@ function handleApparatusClick(item, cardEl) {
 }
 
 // ============================================================================
-// 7. STAGE 3: CHEMICAL & ORE STORAGE CUPBOARD
+// 8. STAGE 3: REALISTIC CHEMICAL CUPBOARD & LAB BOTTLES
 // ============================================================================
 function renderStage3() {
   const mod = state.moduleData;
@@ -906,25 +1271,11 @@ function renderStage3() {
 function createBottleElement(item) {
   const bottle = document.createElement('div');
   const isPicked = state.selectedCupboard.has(item.id);
-  bottle.className = `chemical-bottle ${isPicked ? 'picked' : ''}`;
+  bottle.className = `chemical-bottle real-bottle-card ${isPicked ? 'picked' : ''}`;
   bottle.id = `bottle-${item.id}`;
 
-  const liquidColor = state.currentModuleId === 'smelting' 
-    ? (item.id === 'hematite_ore' ? '#78350F' : (item.id === 'metallurgical_coke' ? '#1E293B' : '#CBD5E1'))
-    : (item.shelf === 'A' ? 'rgba(59, 130, 246, 0.45)' : 'rgba(236, 72, 153, 0.35)');
-
   bottle.innerHTML = `
-    <div class="bottle-visual">
-      <div class="bottle-cap"></div>
-      <div class="bottle-glass">
-        <div class="liquid-fill" style="background: ${liquidColor};"></div>
-      </div>
-    </div>
-    <div class="bottle-label-box">
-      <div class="bottle-formula">${item.formula}</div>
-      <div class="bottle-conc">${item.conc}</div>
-      <div class="bottle-name-sub">${item.name}</div>
-    </div>
+    ${getRealisticBottleHTML(item)}
     <div class="wrong-overlay">
       <div class="cross-icon">❌</div>
       <div class="wrong-text">Wrong Material!</div>
@@ -984,7 +1335,7 @@ function handleBottleClick(item, bottleEl) {
 }
 
 // ============================================================================
-// 8. STAGE 4: EXPERIMENT SIMULATION BENCH
+// 9. STAGE 4: EXPERIMENT SIMULATION BENCH
 // ============================================================================
 function renderStage4() {
   const mod = state.moduleData;
@@ -1003,7 +1354,7 @@ function renderStage4() {
 }
 
 // ----------------------------------------------------------------------------
-// SMELTING EXPERIMENT SIMULATION (BLAST FURNACE & TEMP REGULATION)
+// SMELTING EXPERIMENT SIMULATION
 // ----------------------------------------------------------------------------
 function renderSmeltingSim() {
   const metrics = document.getElementById('expMetrics');
@@ -1025,7 +1376,7 @@ function renderSmeltingSim() {
   const viewport = document.getElementById('simViewport');
   viewport.innerHTML = `
     <div class="furnace-rig">
-      <div class="furnace-top-hopper" id="furnaceHopper">📥 Hopper</div>
+      <div class="furnace-top-hopper" id="furnaceHopper">📥 Double-Bell Hopper</div>
       <div class="furnace-body" id="furnaceBody">
         <div class="furnace-glow-core cold" id="furnaceGlow"></div>
         <div style="z-index: 2; font-family: var(--font-display); font-size: 11px; font-weight: 800; color: #FFFFFF; text-shadow: 0 2px 4px rgba(0,0,0,0.8);" id="furnaceStatusText">
@@ -1198,12 +1549,10 @@ function bindSmeltingEvents() {
       return;
     }
 
-    // Optimal Smelting Execution
     labSound.playFanfare();
     state.expState.ironTapped = true;
     btnTap.disabled = true;
 
-    // Show Molten Iron Stream & Ladle Fill Animation
     const stream = document.getElementById('moltenIronStream');
     const ladleFill = document.getElementById('ladleFill');
     const slagBadge = document.getElementById('slagTapBadge');
@@ -1513,7 +1862,9 @@ function renderCalorimetrySim() {
   const viewport = document.getElementById('simViewport');
   viewport.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
-      <div style="font-size: 80px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));" id="calorimeterIcon">☕</div>
+      <div style="width: 120px; height: 140px;" id="calorimeterIcon">
+        ${getRealisticApparatusSVG('calorimeter')}
+      </div>
       <div style="position: absolute; top: 10px; right: -40px; background: white; border: 2px solid #7C3AED; padding: 6px 12px; border-radius: 8px; font-family: var(--font-mono); font-weight: 800; font-size: 16px; color: #7C3AED;" id="digitalProbe">
         22.0 °C
       </div>
@@ -1716,7 +2067,7 @@ function updateExpFeedback(text) {
 }
 
 // ============================================================================
-// 9. STAGE 5: REPORT & QUICK REVISION
+// 10. STAGE 5: REPORT & QUICK REVISION
 // ============================================================================
 function renderStage5() {
   const finalScore = state.calculateFinalScore();
@@ -1790,7 +2141,7 @@ function renderRevisionContent() {
 }
 
 // ============================================================================
-// 10. MODALS & TOAST NOTICES
+// 11. MODALS & TOAST NOTICES
 // ============================================================================
 function openHurrahModal() {
   document.getElementById('modalHurrah').classList.add('open');
@@ -1843,7 +2194,7 @@ function updateHeaderScore() {
 }
 
 // ============================================================================
-// 11. QUESTLY FLUTTER BRIDGE EVENT SENDER
+// 12. QUESTLY FLUTTER BRIDGE EVENT SENDER
 // ============================================================================
 function sendQuestlyEvent(eventType, payload) {
   try {
