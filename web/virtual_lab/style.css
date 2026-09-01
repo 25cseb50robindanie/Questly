@@ -544,7 +544,7 @@ body {
 }
 
 /* ==========================================================================
-   STAGE 2 & 3: APPARATUS & CUPBOARD
+   STAGE 2: APPARATUS SELECTION
    ========================================================================== */
 .stage-banner {
   display: flex;
@@ -1009,38 +1009,40 @@ body {
 .chemical-bottle.wrong .wrong-overlay { display: flex !important; }
 
 /* ==========================================================================
-   LIVE FEEDBACK BOX (FOOTER)
-   ========================================================================== */
-.stage-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 18px;
-  background: var(--color-white);
-  border: 2px solid rgba(45, 20, 75, 0.1);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  margin-top: auto;
-}
-
-.live-feedback-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 12px;
-  font-weight: 700;
-  max-width: 65%;
-}
-
-.live-feedback-box.info { color: var(--color-purple); }
-.live-feedback-box.success { color: var(--color-green); }
-.live-feedback-box.error { color: var(--color-red); }
-
-/* ==========================================================================
-   STAGE 4: DIRECT HANDS-ON WORKBENCH SIMULATION
+   STAGE 4: WORKBENCH SIMULATION LAYOUT & METRICS
    ========================================================================== */
 .exp-banner { margin-bottom: 10px; }
-.exp-metrics-bar { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.exp-metrics-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.metric-card {
+  background: var(--color-white);
+  border: 1.5px solid rgba(45, 20, 75, 0.12);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  min-width: 90px;
+}
+
+.metric-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 800;
+  color: #64748B;
+  text-transform: uppercase;
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-purple);
+}
 
 .sim-interactive-workbench {
   display: flex;
@@ -1050,7 +1052,7 @@ body {
   margin-bottom: 12px;
 }
 
-/* Left main workbench desk */
+/* Left main workbench viewport */
 .workbench-viewport {
   flex: 1.3;
   background: linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 100%);
@@ -1079,7 +1081,18 @@ body {
   overflow-y: auto;
 }
 
-/* Interactive Direct-Action Cards in Tray */
+.panel-section-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--color-plum);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .direct-action-card {
   background: #F8FAFC;
   border: 2px solid #E2E8F0;
@@ -1121,7 +1134,185 @@ body {
 .action-card-hint { font-size: 10px; color: #64748B; font-weight: 600; margin-top: 1px; }
 
 /* ==========================================================================
-   HIGH-FIDELITY INDUSTRIAL BLAST FURNACE STACK (GAMIFIED 3D VIEW)
+   TITRATION RIG & GLASSWARE (VISIBLE ON WORKBENCH)
+   ========================================================================== */
+.titration-rig {
+  position: relative;
+  width: 280px;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stand-post {
+  position: absolute;
+  right: 45px;
+  top: 15px;
+  bottom: 15px;
+  width: 10px;
+  background: linear-gradient(90deg, #94A3B8 0%, #475569 100%);
+  border-radius: 4px;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.15);
+}
+
+.stand-base {
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 18px;
+  background: linear-gradient(180deg, #334155 0%, #0F172A 100%);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.white-tile {
+  position: absolute;
+  bottom: 18px;
+  left: 45px;
+  width: 140px;
+  height: 14px;
+  background: #FFFFFF;
+  border: 2px solid #CBD5E1;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.burette-assembly {
+  position: absolute;
+  top: 15px;
+  left: 82px;
+  width: 26px;
+  height: 210px;
+  border: 2.5px solid rgba(30, 41, 59, 0.85);
+  border-radius: 6px 6px 3px 3px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(3px);
+  box-shadow: inset 0 0 8px rgba(255,255,255,0.8), 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.burette-liquid {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90%;
+  background: linear-gradient(180deg, rgba(147, 197, 253, 0.5) 0%, rgba(59, 130, 246, 0.7) 100%);
+  border-radius: 0 0 2px 2px;
+  transition: height 0.3s linear;
+}
+
+.burette-scale {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  border-right: 1px solid rgba(0,0,0,0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.scale-mark {
+  width: 6px;
+  height: 1.5px;
+  background: #1E293B;
+}
+
+.stopcock-valve {
+  position: absolute;
+  bottom: -18px;
+  left: -8px;
+  width: 42px;
+  height: 18px;
+  background: #EF4444;
+  border: 1.5px solid #991B1B;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 900;
+  color: white;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.stopcock-valve.open {
+  transform: rotate(90deg);
+  background: #10B981;
+  border-color: #065F46;
+}
+
+.droplet-stream {
+  position: absolute;
+  bottom: -45px;
+  left: 11px;
+  width: 5px;
+  height: 10px;
+  background: #3B82F6;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.droplet-stream.dropping {
+  animation: dropFalling 0.5s infinite linear;
+}
+
+@keyframes dropFalling {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(45px); opacity: 0; }
+}
+
+.conical-flask-sim {
+  position: absolute;
+  bottom: 32px;
+  left: 65px;
+  width: 95px;
+  height: 105px;
+  clip-path: polygon(32% 0%, 68% 0%, 100% 100%, 0% 100%);
+  background: rgba(255, 255, 255, 0.6);
+  border: 2.5px solid #334155;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.conical-flask-sim:hover {
+  transform: scale(1.04);
+}
+
+.flask-liquid {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: rgba(224, 242, 254, 0.45);
+  transition: background-color 0.8s ease, transform 0.3s ease;
+}
+
+.flask-liquid.colorless { background: rgba(224, 242, 254, 0.45); }
+.flask-liquid.transient-pink { background: rgba(244, 114, 182, 0.4); }
+.flask-liquid.pale-pink { background: rgba(236, 72, 153, 0.7); box-shadow: 0 0 16px rgba(236, 72, 153, 0.6); }
+.flask-liquid.over-titrated { background: rgba(190, 24, 93, 0.95); box-shadow: 0 0 22px rgba(190, 24, 93, 0.8); }
+
+.swirl-anim { animation: swirlFlask 0.4s ease-in-out infinite alternate; }
+@keyframes swirlFlask { 0% { transform: rotate(-4deg); } 100% { transform: rotate(4deg); } }
+
+/* ==========================================================================
+   HIGH-FIDELITY INDUSTRIAL BLAST FURNACE STACK (3D CUTAWAY)
    ========================================================================== */
 .blast-furnace-cutaway {
   position: relative;
@@ -1148,10 +1339,9 @@ body {
   overflow: hidden;
 }
 
-/* Clear readable zone badges inside furnace */
 .furnace-zone-banner {
   z-index: 10;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.88);
   border: 1.5px solid #818CF8;
   border-radius: 4px;
   padding: 3px 8px;
@@ -1185,7 +1375,6 @@ body {
 
 .furnace-zone-banner.hearth-zone .zone-sub { color: #FDE68A; }
 
-/* Internal Fiery Core & Embers */
 .furnace-fiery-core {
   position: absolute;
   inset: 0;
@@ -1213,11 +1402,15 @@ body {
   100% { filter: brightness(1.25) drop-shadow(0 0 25px #FDE047); }
 }
 
-/* Hopper with interactive charging basket */
+@keyframes overheatPulse {
+  0% { transform: scale(0.96); filter: blur(4px); }
+  100% { transform: scale(1.04); filter: blur(10px); }
+}
+
 .hopper-charging-deck {
   position: absolute;
   top: 0;
-  width: 130px;
+  width: 140px;
   height: 35px;
   background: #475569;
   border: 2px solid #1E293B;
@@ -1242,7 +1435,6 @@ body {
   color: #FFFFFF;
 }
 
-/* Tuyere Air Nozzles with Clickable Lever */
 .tuyere-pipe-assembly {
   position: absolute;
   bottom: 80px;
@@ -1269,7 +1461,6 @@ body {
   font-weight: bold;
 }
 
-/* Molten Iron Tap Channel & Ladle Mold */
 .taphole-channel {
   position: absolute;
   bottom: 24px;
@@ -1330,7 +1521,6 @@ body {
   color: #CBD5E1;
 }
 
-/* Slag Tap Outlet */
 .slag-tap-box {
   position: absolute;
   bottom: 55px;
@@ -1346,37 +1536,59 @@ body {
   z-index: 15;
 }
 
-/* Direct Interactive Dropper on Bench */
-.interactive-bench-item {
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+.temp-slider-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 8px;
-  border-radius: var(--radius-md);
+  gap: 6px;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
 }
 
-.interactive-bench-item:hover {
-  transform: translateY(-4px) scale(1.05);
-  filter: drop-shadow(0 6px 12px rgba(124, 58, 237, 0.25));
-}
-
-.interactive-hint-badge {
-  background: var(--color-purple);
-  color: white;
+.temp-slider-header {
+  display: flex;
+  justify-content: space-between;
   font-family: var(--font-display);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-top: 4px;
-  animation: pulseGlow 1.8s infinite;
+  color: var(--color-plum);
+}
+
+.temp-range-input {
+  width: 100%;
+  accent-color: var(--color-purple);
+  cursor: pointer;
 }
 
 /* ==========================================================================
-   STAGE 5: REPORT & QUICK REVISION
+   LIVE FEEDBACK FOOTER & STAGE 5 REPORT
    ========================================================================== */
+.stage-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--color-white);
+  border: 2px solid rgba(45, 20, 75, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-top: auto;
+}
+
+.live-feedback-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  max-width: 65%;
+}
+
+.live-feedback-box.info { color: var(--color-purple); }
+.live-feedback-box.success { color: var(--color-green); }
+.live-feedback-box.error { color: var(--color-red); }
+
 .results-hero { text-align: center; margin-bottom: 18px; }
 
 .congrats-trophy {
