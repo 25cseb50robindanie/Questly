@@ -44,6 +44,8 @@ dependencies:
   webview_flutter: ^4.14.1
   flutter_tts: ^4.2.5
   speech_to_text: ^7.0.0
+  path_provider: ^2.1.5
+  llama_cpp_dart: ^0.2.2
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +74,10 @@ flutter:
     - assets/audio/
     - assets/fonts/
     - assets/knowledge/
+    - assets/curriculum/
+    - assets/curriculum/grade8_science/
+    - assets/curriculum/grade8_math/
+    - assets/models/
     - assets/vector_ui/
     - assets/vector_ui/icons/
     - assets/vector_ui/levelup/

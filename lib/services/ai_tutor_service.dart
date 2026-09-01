@@ -1,142 +1,189 @@
 import 'dart:async';
-import '../core/locator.dart';
-import '../models/ai_provider.dart';
-import '../models/doubt.dart';
-import '../services/retriever.dart';
+import '../models/curriculum_chunk.dart';
+import 'curriculum_retriever.dart';
+import 'llama_engine.dart';
+import 'whisper_voice_service.dart';
 
-class StudentContext {
-  final String language; // 'en', 'ta', 'hi'
-  final String gradeLevel; // 'Grade 5'
-  final String interests; // 'cricket', 'dance', 'farming'
+class ConversationExchange {
+  final String userMessage;
+  final String dendyResponse;
+  final DateTime timestamp;
 
-  StudentContext({
-    required this.language,
-    required this.gradeLevel,
-    required this.interests,
-  });
+  ConversationExchange({
+    required this.userMessage,
+    required this.dendyResponse,
+    DateTime? timestamp,
+  }) : timestamp = timestamp ?? DateTime.now();
 }
 
 class AITutorService {
-  final AIProvider _aiProvider;
-  final Retriever _retriever;
+  static final AITutorService _instance = AITutorService._internal();
+  factory AITutorService() => _instance;
+  AITutorService._internal();
 
-  AITutorService(this._aiProvider, this._retriever);
+  final CurriculumRetriever _retriever = CurriculumRetriever();
+  final LlamaEngine _engine = LlamaEngine();
 
-  // Check connectivity
-  Future<bool> isAiAvailable() async {
-    final baseUrl = Locator.storageService.getLanguage() == 'ta' // mock check or load from prefs
-        ? "http://localhost:11434"
-        : _getBaseUrl();
-    return _aiProvider.isAvailable(baseUrl);
+  // Rolling conversation memory of the last 3 exchanges
+  final List<ConversationExchange> _rollingMemory = [];
+
+  List<ConversationExchange> get history => List.unmodifiable(_rollingMemory);
+
+  void clearHistory() {
+    _rollingMemory.clear();
   }
 
-  String _getBaseUrl() {
-    return Locator.storageService.getString('ollama_url') ?? "http://localhost:11434";
+  void _recordExchange(String user, String dendy) {
+    _rollingMemory.add(ConversationExchange(userMessage: user, dendyResponse: dendy));
+    if (_rollingMemory.length > 3) {
+      _rollingMemory.removeAt(0);
+    }
   }
 
-  String _getModelName() {
-    return Locator.storageService.getString('ollama_model') ?? "gemma:2b";
-  }
+  Future<bool> isAiAvailable() async => true;
 
-  // Orchestrate AI Tutor question answer flow
   Stream<String> askTutor(
     String studentId,
     String query,
     String moduleId,
     String lessonId,
-    StudentContext studentContext,
-  ) async* {
-    // 1. Misconception Check
-    final misconception = await _checkMisconceptions(query, moduleId);
-    if (misconception != null) {
-      yield misconception;
-      return;
+    dynamic studentContext,
+  ) {
+    return askDendyStream(question: query, moduleId: moduleId);
+  }
+
+  /// Streams token-by-token answers from Dendy strictly grounded in retrieved curriculum
+  Stream<String> askDendyStream({
+    required String question,
+    String moduleId = 'mod_density',
+  }) async* {
+    final trimmed = question.trim();
+    if (trimmed.isEmpty) return;
+
+    // 1. Retrieve top 2-3 relevant curriculum chunks
+    final retrievedChunks = await _retriever.retrieve(
+      query: trimmed,
+      moduleId: moduleId,
+      topK: 3,
+    );
+
+    // 2. Format curriculum context
+    final curriculumContext = retrievedChunks.map((c) => '[${c.concept}]: ${c.text}').join('\n');
+
+    // 3. Format rolling history
+    final historyContext = _rollingMemory.map((e) => 'Student: ${e.userMessage}\nDendy: ${e.dendyResponse}').join('\n');
+
+    // 4. Build prompt
+    final prompt = StringBuffer();
+    prompt.writeln('You are Dendy, Questly\'s friendly fox learning companion.');
+    prompt.writeln('Rules:');
+    prompt.writeln('- Only answer using the curriculum facts below.');
+    prompt.writeln('- Do not invent new science facts.');
+    prompt.writeln('- Keep answers simple, short, and encourage the student.');
+    prompt.writeln('- If no relevant curriculum exists, say: "Let\'s stay with today\'s lesson. Ask me something about density or buoyancy."\n');
+
+    if (curriculumContext.isNotEmpty) {
+      prompt.writeln('Curriculum Knowledge:');
+      prompt.writeln(curriculumContext);
+      prompt.writeln();
     }
 
-    // 2. Evaluate Grounding support level
-    final support = await _retriever.evaluateSupportLevel(query, moduleId);
+    if (historyContext.isNotEmpty) {
+      prompt.writeln('Recent Conversation:');
+      prompt.writeln(historyContext);
+      prompt.writeln();
+    }
 
-    if (support == SupportLevel.NOT_SUPPORTED) {
-      final refuseMsg = _getRefusalMessage(studentContext.language);
-      
-      // Save escalated doubt locally
-      final doubt = Doubt(
-        id: 'doubt_${DateTime.now().millisecondsSinceEpoch}',
-        studentId: studentId,
-        moduleId: moduleId,
-        lessonId: lessonId,
-        question: query,
-        language: studentContext.language,
-        timestamp: DateTime.now(),
-        status: 'pending',
-        context: 'Not supported by available curriculum.',
-        attemptedAnswer: refuseMsg,
+    prompt.writeln('Student: $trimmed');
+    prompt.writeln('Dendy:');
+
+    // 5. Stream response tokens
+    final responseBuffer = StringBuffer();
+    await for (final token in _engine.generateStreaming(
+      prompt: trimmed,
+      curriculumContext: curriculumContext,
+    )) {
+      responseBuffer.write(token);
+      yield token;
+    }
+
+    // 6. Record exchange in rolling memory
+    _recordExchange(trimmed, responseBuffer.toString().trim());
+  }
+
+  /// Evaluates student's spoken Teach-Back explanation against curriculum chunks and misconceptions
+  Future<TeachBackEvaluation> evaluateTeachBack({
+    required String transcript,
+    String moduleId = 'mod_density',
+  }) async {
+    final trimmed = transcript.trim();
+    if (trimmed.isEmpty) {
+      return TeachBackEvaluation(
+        masteryScore: 0,
+        isPassed: false,
+        stars: 0,
+        feedbackTitle: 'No explanation heard',
+        feedbackBody: 'Please tap the microphone and speak your explanation of density and floating!',
+        conceptsIdentified: [],
+        missingConcepts: ['density', 'mass', 'volume', 'buoyancy'],
+        dendyMood: 'confused',
       );
-      await Locator.doubtRepository.saveDoubt(doubt);
-      
-      yield refuseMsg;
-      return;
     }
 
-    // 3. Retrieve relevant curriculum context
-    final contexts = await _retriever.retrieve(query, moduleId);
-    final contextText = contexts.map((c) => c.content).join("\n\n");
+    // 1. Check for known misconceptions
+    final misconception = await _retriever.detectMisconception(
+      explanation: trimmed,
+      moduleId: moduleId,
+    );
 
-    // 4. Construct personalized prompt
-    final prompt = _buildGroundingPrompt(query, contextText, studentContext);
+    // 2. Check concept coverage
+    final lowerText = trimmed.toLowerCase();
+    final hasMass = lowerText.contains('mass') || lowerText.contains('matter') || lowerText.contains('weight') || lowerText.contains('atoms');
+    final hasVolume = lowerText.contains('volume') || lowerText.contains('space') || lowerText.contains('size') || lowerText.contains('3d');
+    final hasFormula = lowerText.contains('density') || lowerText.contains('divide') || lowerText.contains('packed') || lowerText.contains('ratio');
+    final hasBuoyancy = lowerText.contains('float') || lowerText.contains('sink') || lowerText.contains('water') || lowerText.contains('buoyan') || lowerText.contains('displace');
 
-    // 5. Query Ollama and yield streamed tokens
-    final baseUrl = _getBaseUrl();
-    final modelName = _getModelName();
+    final identified = <String>[];
+    final missing = <String>[];
 
-    yield* _aiProvider.streamResponse(prompt, baseUrl, modelName);
-  }
+    int score = 35;
+    if (hasMass) { score += 15; identified.add('Mass'); } else { missing.add('Mass'); }
+    if (hasVolume) { score += 15; identified.add('Volume'); } else { missing.add('Volume'); }
+    if (hasFormula) { score += 20; identified.add('Density Formula'); } else { missing.add('Density Formula'); }
+    if (hasBuoyancy) { score += 15; identified.add('Floating & Buoyancy'); } else { missing.add('Floating & Buoyancy'); }
 
-  // Check local misconception definitions
-  Future<String?> _checkMisconceptions(String query, String moduleId) async {
-    final package = await Locator.knowledgeRepository.loadModuleKnowledge(moduleId);
-    if (package == null) return null;
-
-    final normalized = query.toLowerCase();
-    for (var mis in package.misconceptions) {
-      if (normalized.contains(mis.incorrectPattern)) {
-        return "${mis.correction}\n\nLet's test this concept inside the activity: ${mis.recommendedActivityId}.";
-      }
+    // If a misconception is detected, give targeted feedback
+    if (misconception != null) {
+      score = score.clamp(30, 75);
+      return TeachBackEvaluation(
+        masteryScore: score,
+        isPassed: score >= 60,
+        stars: score >= 70 ? 2 : 1,
+        feedbackTitle: 'Great Attempt! Notice This Key Detail:',
+        feedbackBody: 'Dendy noticed: "${misconception.pattern}". ${misconception.correction}',
+        conceptsIdentified: identified,
+        missingConcepts: missing,
+        dendyMood: 'thinking',
+      );
     }
-    return null;
-  }
 
-  String _getRefusalMessage(String language) {
-    if (language == 'ta') {
-      return "இந்த பாடத்தில் எனக்கு அந்த தகவல் இல்லை. உங்கள் கேள்வியை உங்கள் ஆசிரியருக்கு அனுப்புகிறேன்.";
-    } else if (language == 'hi') {
-      return "मेरे पास इस पाठ में वह जानकारी नहीं है। मैं आपका प्रश्न आपके शिक्षक को भेज दूँगा।";
-    }
-    return "I don't have enough information about that in this lesson. I've saved your question for your teacher.";
-  }
+    final isPassed = score >= 60;
+    final stars = score >= 85 ? 3 : (score >= 65 ? 2 : 1);
 
-  String _buildGroundingPrompt(String query, String context, StudentContext sc) {
-    final langStr = sc.language == 'ta' ? 'Tamil' : (sc.language == 'hi' ? 'Hindi' : 'English');
-    return """
-ROLE:
-You are Questly's educational AI tutor. Speak to a student in $langStr at a ${sc.gradeLevel} level.
+    String title = isPassed ? 'Outstanding Teaching!' : 'Good Start! Add More Details.';
+    String body = isPassed
+        ? 'Great job! You clearly taught Dendy how mass and volume combine into density to determine why materials float or sink.'
+        : 'Try mentioning that density equals mass divided by volume (D = M/V) and how materials with less density than water float!';
 
-CURRICULUM:
-Only use the provided curriculum context. Do not invent facts outside this context.
-
-PERSONALIZATION INTERESTS:
-The student is interested in: ${sc.interests}. Use analogy or comparisons based on this interest (e.g. Cricket ball weight/volume comparisons) if it fits naturally to explain density, but do not force it.
-
-RETRIEVED LESSON CONTEXT:
-$context
-
-QUESTION:
-$query
-
-INSTRUCTIONS:
-1. Explain the answer simply in $langStr.
-2. If the context does not contain enough information, refuse to answer and state that the lesson context is insufficient.
-3. Keep the text concise and friendly.
-""";
+    return TeachBackEvaluation(
+      masteryScore: score,
+      isPassed: isPassed,
+      stars: stars,
+      feedbackTitle: title,
+      feedbackBody: body,
+      conceptsIdentified: identified,
+      missingConcepts: missing,
+      dendyMood: isPassed ? 'success' : 'thinking',
+    );
   }
 }

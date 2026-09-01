@@ -80,9 +80,11 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
     });
   }
 
-  void _sendMessage([String? customText]) {
+  bool _isGenerating = false;
+
+  void _sendMessage([String? customText]) async {
     final text = (customText ?? _textController.text).trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty || _isGenerating) return;
 
     SoundService.playClick();
 
@@ -91,23 +93,46 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
       if (customText == null) {
         _textController.clear();
       }
+      _isGenerating = true;
+      // Add empty Dendy message placeholder to stream into
+      _messages.add(DendyChatMessage(text: '', isUser: false));
     });
 
     _scrollToBottom();
 
-    // Query Dendy NLP service and translate response to active language
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (!mounted) return;
-      final rawAnswer = DendyNlpService.answer(text);
-      final answer = LocalizationService.translate(rawAnswer);
+    final dendyMsgIndex = _messages.length - 1;
+    final tokenBuffer = StringBuffer();
 
-      setState(() {
-        _messages.add(DendyChatMessage(text: answer, isUser: false));
-      });
-
+    try {
+      await for (final token in Locator.aiTutorService.askDendyStream(question: text, moduleId: 'mod_density')) {
+        if (!mounted) break;
+        tokenBuffer.write(token);
+        setState(() {
+          _messages[dendyMsgIndex] = DendyChatMessage(
+            text: tokenBuffer.toString(),
+            isUser: false,
+          );
+        });
+        _scrollToBottom();
+      }
       SoundService.playStarPop();
-      _scrollToBottom();
-    });
+    } catch (e) {
+      if (mounted) {
+        final fallbackAnswer = LocalizationService.translate(DendyNlpService.answer(text));
+        setState(() {
+          _messages[dendyMsgIndex] = DendyChatMessage(
+            text: fallbackAnswer,
+            isUser: false,
+          );
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isGenerating = false;
+        });
+      }
+    }
   }
 
   void _toggleSpeechRecognition() {
@@ -208,7 +233,12 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
             ),
             child: Row(
               children: [
-                const DendyMascot(size: 38, mood: DendyMood.happy),
+                DendyMascot(
+                  size: 38,
+                  mood: _isGenerating
+                      ? DendyMood.thinking
+                      : (_isListening ? DendyMood.thinking : DendyMood.happy),
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(

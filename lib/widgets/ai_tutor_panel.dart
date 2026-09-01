@@ -131,14 +131,8 @@ class _AITutorPanelState extends State<AITutorPanel> {
     final moduleId = widget.student.currentModuleId ?? "mod_density";
     final lessonId = widget.student.currentLessonId ?? "density_les1";
 
-    final sc = StudentContext(
-      language: widget.student.language,
-      gradeLevel: "Grade 5",
-      interests: "cricket", // personalized analogy matches
-    );
-
     _streamSub = Locator.aiTutorService
-        .askTutor(widget.student.questlyId, query, moduleId, lessonId, sc)
+        .askDendyStream(question: query, moduleId: moduleId)
         .listen(
       (token) {
         accumulatedText += token;

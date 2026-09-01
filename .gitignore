@@ -49,3 +49,5 @@ app.*.map.json
 
 # Scratch & Temporary
 scratch/
+*.gguf
+

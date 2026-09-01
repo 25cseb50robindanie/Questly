@@ -162,11 +162,9 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
       _isEvaluating = true;
     });
 
-    final eval = await Locator.whisperVoiceService.evaluateTeachBack(
-      moduleId: 'mod_density',
+    final eval = await Locator.aiTutorService.evaluateTeachBack(
       transcript: text,
-      language: LocalizationService.currentLanguage,
-      topicTitle: 'Density & Buoyancy',
+      moduleId: 'mod_density',
     );
 
     if (mounted) {
@@ -176,6 +174,10 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
         _stage = _TeachBackStage.mastery;
       });
       SoundService.playSuccess();
+      // Read out Dendy's feedback
+      try {
+        Locator.readAloudService.speak(eval.feedbackBody, languageCode: LocalizationService.currentLanguage);
+      } catch (_) {}
     }
   }
 

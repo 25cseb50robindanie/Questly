@@ -1,0 +1,20 @@
+{
+  "packages": [
+    {
+      "id": "grade8_density",
+      "name": "Density & Buoyancy",
+      "version": "1.0.0",
+      "subject": "SCIENCE",
+      "path": "grade8_science/density.json",
+      "languages": ["en", "ta", "hi", "or"]
+    },
+    {
+      "id": "grade8_fractions",
+      "name": "Fractions & Ratios",
+      "version": "1.0.0",
+      "subject": "MATHEMATICS",
+      "path": "grade8_math/fractions.json",
+      "languages": ["en", "ta", "hi", "or"]
+    }
+  ]
+}

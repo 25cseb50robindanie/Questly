@@ -1,0 +1,82 @@
+{
+  "packageId": "grade8_density",
+  "name": "Density & Buoyancy",
+  "moduleId": "mod_density",
+  "version": "1.0.0",
+  "chunks": [
+    {
+      "id": "density_definition",
+      "concept": "Density",
+      "text": "Density is a measure of how tightly mass is packed into a given volume of space. An object with tightly packed matter has high density, while an object with spread-out particles has low density.",
+      "keywords": ["density", "particles", "atoms", "definition", "packed", "tightly", "matter", "define"]
+    },
+    {
+      "id": "density_formula",
+      "concept": "Density Formula",
+      "text": "The formula for density is Density = Mass / Volume (D = M/V). Mass is measured in grams (g) or kilograms (kg), and volume is measured in cubic centimeters (cm³) or milliliters (ml). Density is expressed in g/cm³ or kg/L.",
+      "keywords": ["density", "formula", "mass", "volume", "calculate", "divide", "equation", "units", "grams", "cm3"]
+    },
+    {
+      "id": "mass_concept",
+      "concept": "Mass",
+      "text": "Mass is the total amount of matter inside an object, measured in grams (g) or kilograms (kg). Mass remains constant regardless of gravity or location.",
+      "keywords": ["mass", "grams", "kilograms", "weight", "matter", "amount"]
+    },
+    {
+      "id": "volume_concept",
+      "concept": "Volume",
+      "text": "Volume is the amount of three-dimensional space an object occupies, measured in cubic centimeters (cm³) or milliliters (ml). Volume can be measured by multiplying dimensions or by liquid water displacement.",
+      "keywords": ["volume", "space", "milliliters", "displacement", "size", "occupies", "3d"]
+    },
+    {
+      "id": "floating_principle",
+      "concept": "Floating",
+      "text": "An object floats in water if its average density is less than the density of water (1.0 g/cm³). For example, wood has a density around 0.6 g/cm³, which is less than 1.0 g/cm³, so it floats comfortably on the surface.",
+      "keywords": ["float", "floating", "water", "density of water", "wood", "surface", "lighter", "less than water"]
+    },
+    {
+      "id": "sinking_principle",
+      "concept": "Sinking",
+      "text": "An object sinks in water if its average density is greater than the density of water (1.0 g/cm³). For example, iron has a density of 7.8 g/cm³, which is greater than 1.0 g/cm³, so it sinks directly to the bottom.",
+      "keywords": ["sink", "sinking", "iron", "metal", "heavy", "greater than water", "bottom", "submerge"]
+    },
+    {
+      "id": "ice_floating",
+      "concept": "Ice Floating",
+      "text": "Ice floats on liquid water because water uniquely expands as it freezes, creating open hexagonal crystal spaces that make solid ice less dense (0.92 g/cm³) than liquid water (1.00 g/cm³).",
+      "keywords": ["ice", "iceberg", "freeze", "freezing", "expands", "cold", "liquid water", "frozen"]
+    },
+    {
+      "id": "ship_buoyancy",
+      "concept": "Buoyancy",
+      "text": "Giant steel ships float because their hollow hull encloses a vast volume of air. The combined average density of the steel hull plus the enclosed air is significantly less than the density of water (1.0 g/cm³), generating strong buoyant force.",
+      "keywords": ["ship", "boat", "steel", "hollow", "air", "buoyancy", "buoyant", "archimedes", "hull", "cargo"]
+    },
+    {
+      "id": "buoyancy_force",
+      "concept": "Buoyancy Force",
+      "text": "Buoyancy is the upward force exerted by a fluid that opposes the weight of an immersed object. Archimedes principle states that the upward buoyant force is equal to the weight of the fluid displaced by the object.",
+      "keywords": ["buoyancy", "buoyant force", "upward force", "archimedes", "fluid", "displaced", "displacement"]
+    },
+    {
+      "id": "density_column_liquids",
+      "concept": "Liquid Layers",
+      "text": "Different liquids form distinct layers based on density. Immiscible liquids will arrange themselves with the most dense at the bottom (like honey at 1.42 g/cm³), water in the middle (1.0 g/cm³), and the least dense on top (like oil at 0.92 g/cm³).",
+      "keywords": ["liquid", "oil", "honey", "layer", "column", "stack", "separate", "mixture"]
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "misconception_heavy_sinks",
+      "pattern": "heavy things always sink",
+      "keywords": ["heavy", "weight", "always sink", "weighs a lot"],
+      "correction": "Weight alone does not determine sinking or floating; density does (Mass ÷ Volume). A giant 50,000-ton steel cargo ship floats because its hollow air-filled hull lowers its average density below water, whereas a tiny 2-gram pebble sinks because its density is higher than water."
+    },
+    {
+      "id": "misconception_size_sinks",
+      "pattern": "big things sink and small things float",
+      "keywords": ["big", "large", "small", "size"],
+      "correction": "Size alone does not determine floating. A massive tree trunk floats because wood is less dense than water (0.6 g/cm³), while a tiny metal pin sinks because metal is denser than water (7.8 g/cm³)."
+    }
+  ]
+}

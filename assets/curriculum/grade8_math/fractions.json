@@ -1,0 +1,40 @@
+{
+  "packageId": "grade8_fractions",
+  "name": "Fractions & Ratios",
+  "moduleId": "mod_fractions",
+  "version": "1.0.0",
+  "chunks": [
+    {
+      "id": "fraction_definition",
+      "concept": "Fraction",
+      "text": "A fraction represents a part of a whole or any number of equal parts. It is written as a numerator over a denominator separated by a fraction line.",
+      "keywords": ["fraction", "whole", "part", "equal parts", "definition", "represent"]
+    },
+    {
+      "id": "numerator_denominator",
+      "concept": "Numerator and Denominator",
+      "text": "In a fraction, the top number is the Numerator (how many equal parts are selected), and the bottom number is the Denominator (the total number of equal parts that make up the whole). The denominator can never be zero.",
+      "keywords": ["numerator", "denominator", "top number", "bottom number", "total parts", "divide"]
+    },
+    {
+      "id": "equivalent_fractions",
+      "concept": "Equivalent Fractions",
+      "text": "Equivalent fractions are different fractions that name the exact same amount or value (for example, 1/2, 2/4, and 4/8 are all equivalent). You can find equivalent fractions by multiplying or dividing both the numerator and denominator by the same non-zero number.",
+      "keywords": ["equivalent", "equal", "simplify", "simplify fraction", "same value", "reduce"]
+    },
+    {
+      "id": "ratio_concept",
+      "concept": "Ratios",
+      "text": "A ratio is a comparison of two quantities indicating how many times one value contains another. Ratios can be expressed as a:b, as a fraction a/b, or with words 'a to b'.",
+      "keywords": ["ratio", "comparison", "proportions", "quantities", "compare"]
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "misconception_bigger_denominator",
+      "pattern": "bigger denominator means bigger fraction",
+      "keywords": ["bigger denominator", "larger denominator", "bigger number on bottom"],
+      "correction": "A larger denominator means the whole is divided into more smaller pieces! For example, 1/8 is smaller than 1/2 because splitting a whole into 8 pieces produces smaller pieces than splitting into 2."
+    }
+  ]
+}

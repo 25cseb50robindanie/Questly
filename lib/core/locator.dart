@@ -76,9 +76,7 @@ class Locator {
     speechToTextProvider = MockSpeechToTextProvider();
     textToSpeechProvider = MockTextToSpeechProvider();
     
-    final aiProvider = OllamaAIProvider();
-    final retriever = KeywordRetriever();
-    aiTutorService = AITutorService(aiProvider, retriever);
+    aiTutorService = AITutorService();
 
     // Instantiate New Game App Services
     dailyRewardService = DailyRewardService(storageService);
