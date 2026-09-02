@@ -23,24 +23,23 @@ class VirtualLabScreen extends StatefulWidget {
 class _VirtualLabScreenState extends State<VirtualLabScreen>
     with TickerProviderStateMixin {
   Student? _student;
-  int _currentLevel = 1; // 1 to 5
-  int _unlockedLevel = 1;
+  int _currentLevel = 1; // Exactly 1 level on screen at a time (1 to 5)
+  int _unlockedLevel = 1; // Strict progression: cannot skip ahead
   bool _isCompleted = false;
 
-  // --- Animations ---
+  // --- Animation Controllers ---
   late AnimationController _dripAnimController;
   late AnimationController _swirlAnimController;
-  late AnimationController _celebrationAnimController;
 
-  // --- Level 1 State: Concept & Pre-Lab ---
+  // --- Level 1 State: Learning & Pre-Lab Check ---
   int? _selectedQuizOption;
-  bool _level1Passed = false;
+  bool _level1QuizSubmitted = false;
 
-  // --- Level 2 State: Apparatus Setup ---
-  final Set<String> _selectedApparatus = {};
-  final List<Map<String, dynamic>> _apparatusList = [
+  // --- Level 2 State: Apparatus Workbench Assembly ---
+  final Set<String> _assembledApparatus = {};
+  final List<Map<String, dynamic>> _apparatusItems = [
     {'id': 'stand', 'name': 'Retort Stand', 'icon': Icons.tune_rounded, 'desc': 'Clamps burette vertically'},
-    {'id': 'burette', 'name': '50 mL Burette', 'icon': Icons.format_color_fill_rounded, 'desc': 'Dispenses titrant dropwise'},
+    {'id': 'burette', 'name': '50 mL Burette', 'icon': Icons.format_color_fill_rounded, 'desc': 'Dispenses base dropwise'},
     {'id': 'flask', 'name': 'Conical Flask', 'icon': Icons.science_rounded, 'desc': 'Reaction vessel for swirling'},
     {'id': 'pipette', 'name': '20 mL Pipette', 'icon': Icons.colorize_rounded, 'desc': 'Measures exact acid volume'},
   ];
@@ -49,13 +48,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   bool _acidPipetted = false;
   bool _indicatorAdded = false;
 
-  // --- Level 4 State: Dropwise Titration Simulation ---
-  double _buretteVolume = 0.0; // 0.0 to 50.0 mL
-  final double _targetEndpoint = 20.0; // mL of 0.1M NaOH
+  // --- Level 4 State: Interactive Titration Simulation ---
+  double _buretteVolume = 0.0; // 0.00 to 50.00 mL
+  final double _targetEndpoint = 20.00; // 20.00 mL of 0.1M NaOH
   bool _isContinuousDripping = false;
-  Timer? _continuousTimer;
+  Timer? _continuousDripTimer;
   bool _isSwirling = false;
-  bool _level4Success = false;
 
   @override
   void initState() {
@@ -71,19 +69,13 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-
-    _celebrationAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
   }
 
   @override
   void dispose() {
-    _continuousTimer?.cancel();
+    _continuousDripTimer?.cancel();
     _dripAnimController.dispose();
     _swirlAnimController.dispose();
-    _celebrationAnimController.dispose();
     super.dispose();
   }
 
@@ -94,45 +86,34 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     });
   }
 
-  void _goToLevel(int level) {
+  // Strict Navigation: User can only view currently unlocked levels (no skipping)
+  void _selectLevel(int level) {
     if (level < 1 || level > 5 || level > _unlockedLevel) return;
     SoundService.playClick();
-    _continuousTimer?.cancel();
+    _continuousDripTimer?.cancel();
     setState(() {
       _currentLevel = level;
       _isContinuousDripping = false;
     });
   }
 
-  void _advanceToNextLevel() {
-    SoundService.playCorrect();
-    final next = _currentLevel + 1;
-    setState(() {
-      if (next > _unlockedLevel) {
-        _unlockedLevel = next;
-      }
-      _currentLevel = next;
-    });
-  }
-
-  // --- Level 1 Check ---
-  void _submitQuizAnswer(int index) {
+  // --- Level 1: Submit Learning Checkpoint ---
+  void _submitLevel1Quiz(int index) {
     SoundService.playClick();
     setState(() {
       _selectedQuizOption = index;
+      _level1QuizSubmitted = true;
     });
 
     if (index == 0) {
       // Correct!
       SoundService.playCorrect();
-      setState(() {
-        _level1Passed = true;
-        if (_unlockedLevel < 2) _unlockedLevel = 2;
-      });
-      _showLevelCompletedSheet(
+      if (_unlockedLevel < 2) _unlockedLevel = 2;
+      _showLevelCompletionModal(
+        levelNumber: 1,
         title: 'Level 1 Complete! ⭐',
-        subtitle: 'You mastered the neutralization theory and indicator principles.',
-        nextActionText: 'Go to Level 2: Apparatus Setup ➜',
+        subtitle: 'You mastered the neutralization theory and indicator principles!',
+        nextButtonLabel: 'Start Level 2: Apparatus Setup ➜',
         onNext: () {
           Navigator.pop(context);
           setState(() => _currentLevel = 2);
@@ -143,24 +124,25 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     }
   }
 
-  // --- Level 2 Check ---
+  // --- Level 2: Toggle Apparatus Item ---
   void _toggleApparatus(String id) {
     SoundService.playStarPop();
     setState(() {
-      if (_selectedApparatus.contains(id)) {
-        _selectedApparatus.remove(id);
+      if (_assembledApparatus.contains(id)) {
+        _assembledApparatus.remove(id);
       } else {
-        _selectedApparatus.add(id);
+        _assembledApparatus.add(id);
       }
     });
 
-    if (_selectedApparatus.length == 4) {
+    if (_assembledApparatus.length == 4) {
       SoundService.playCorrect();
       if (_unlockedLevel < 3) _unlockedLevel = 3;
-      _showLevelCompletedSheet(
+      _showLevelCompletionModal(
+        levelNumber: 2,
         title: 'Level 2 Complete! 🧪',
-        subtitle: 'All 4 essential apparatus items are securely assembled on your lab table.',
-        nextActionText: 'Go to Level 3: Chemical Reagents ➜',
+        subtitle: 'All 4 essential apparatus items are securely assembled on your lab table!',
+        nextButtonLabel: 'Start Level 3: Chemical Reagents ➜',
         onNext: () {
           Navigator.pop(context);
           setState(() => _currentLevel = 3);
@@ -169,27 +151,28 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     }
   }
 
-  // --- Level 3 Check ---
+  // --- Level 3: Reagents Preparation ---
   void _pipetteAcid() {
     SoundService.playStarPop();
     setState(() => _acidPipetted = true);
-    _checkLevel3Completion();
+    _checkLevel3Done();
   }
 
   void _addIndicator() {
     SoundService.playStarPop();
     setState(() => _indicatorAdded = true);
-    _checkLevel3Completion();
+    _checkLevel3Done();
   }
 
-  void _checkLevel3Completion() {
+  void _checkLevel3Done() {
     if (_acidPipetted && _indicatorAdded) {
       SoundService.playCorrect();
       if (_unlockedLevel < 4) _unlockedLevel = 4;
-      _showLevelCompletedSheet(
+      _showLevelCompletionModal(
+        levelNumber: 3,
         title: 'Level 3 Complete! 💧',
-        subtitle: '20.0 mL of analyte acid and 3 drops of indicator are prepared in the flask.',
-        nextActionText: 'Go to Level 4: Titration Simulator ➜',
+        subtitle: '20.0 mL of analyte acid and 3 drops of indicator are prepared in the flask!',
+        nextButtonLabel: 'Start Level 4: Titration Simulator ➜',
         onNext: () {
           Navigator.pop(context);
           setState(() => _currentLevel = 4);
@@ -198,7 +181,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     }
   }
 
-  // --- Level 4 Titration Actions ---
+  // --- Level 4: Titration Experiment ---
   void _addDrop({double amount = 0.05}) {
     if (_buretteVolume >= 50.0) return;
     SoundService.playStarPop();
@@ -216,7 +199,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     });
 
     if (_isContinuousDripping) {
-      _continuousTimer = Timer.periodic(const Duration(milliseconds: 180), (timer) {
+      _continuousDripTimer = Timer.periodic(const Duration(milliseconds: 180), (timer) {
         if (!mounted || _buretteVolume >= 50.0) {
           timer.cancel();
           if (mounted) setState(() => _isContinuousDripping = false);
@@ -225,7 +208,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         _addDrop(amount: 0.15);
       });
     } else {
-      _continuousTimer?.cancel();
+      _continuousDripTimer?.cancel();
     }
   }
 
@@ -238,20 +221,18 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   void _verifyEndpoint() {
-    _continuousTimer?.cancel();
+    _continuousDripTimer?.cancel();
     setState(() => _isContinuousDripping = false);
 
     final diff = (_buretteVolume - _targetEndpoint).abs();
     if (diff <= 0.35) {
       SoundService.playCorrect();
-      setState(() {
-        _level4Success = true;
-        if (_unlockedLevel < 5) _unlockedLevel = 5;
-      });
-      _showLevelCompletedSheet(
+      if (_unlockedLevel < 5) _unlockedLevel = 5;
+      _showLevelCompletionModal(
+        levelNumber: 4,
         title: 'Level 4 Complete! 🎯',
-        subtitle: 'Perfect equivalence point! Persistent pale pink endpoint at ${_buretteVolume.toStringAsFixed(2)} mL.',
-        nextActionText: 'Go to Level 5: Stoichiometry Report ➜',
+        subtitle: 'Perfect equivalence point! Faint persistent pink endpoint detected at ${_buretteVolume.toStringAsFixed(2)} mL!',
+        nextButtonLabel: 'Start Level 5: Stoichiometry Report ➜',
         onNext: () {
           Navigator.pop(context);
           setState(() => _currentLevel = 5);
@@ -262,7 +243,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Keep going! Volume is ${_buretteVolume.toStringAsFixed(2)} mL (Target: 20.00 mL). Add drops until pink color persists!',
+            'Keep going! Current volume is ${_buretteVolume.toStringAsFixed(2)} mL (Target: 20.00 mL). Add drops until faint pink persists!',
             style: const TextStyle(fontFamily: 'Fredoka', fontWeight: FontWeight.bold),
           ),
           backgroundColor: ColorSystem.castlePurple,
@@ -313,7 +294,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     } else if (ph >= 8.2 && ph <= 9.0) {
       return const Color(0x99F472B6); // Pale Persistent Pink
     } else {
-      return const Color(0xDDDB2777); // Deep Magenta
+      return const Color(0xDDDB2777); // Deep Magenta (Over-titrated)
     }
   }
 
@@ -351,7 +332,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     if (mounted) {
       await QuestCompletionDialog.show(
         context: context,
-        title: 'TITRATION MASTERED! 🏆',
+        title: 'LAB COMPLETED! 🏆',
         message: 'You completed all 5 Virtual Lab levels with high precision and stoichiometric mastery!',
         xpReward: 60,
         goldReward: 15,
@@ -361,10 +342,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     }
   }
 
-  void _showLevelCompletedSheet({
+  // --- Level Completion Modal Dialog ---
+  void _showLevelCompletionModal({
+    required int levelNumber,
     required String title,
     required String subtitle,
-    required String nextActionText,
+    required String nextButtonLabel,
     required VoidCallback onNext,
   }) {
     showModalBottomSheet(
@@ -373,7 +356,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       enableDrag: false,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(18),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -383,49 +366,49 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 48,
+                width: 44,
                 height: 4,
                 decoration: BoxDecoration(
                   color: Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(height: 14),
-              const Icon(Icons.check_circle_rounded, color: ColorSystem.green, size: 48),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
+              const Icon(Icons.check_circle_rounded, color: ColorSystem.green, size: 44),
+              const SizedBox(height: 6),
               Text(
                 title,
                 style: const TextStyle(
                   fontFamily: 'Fredoka',
-                  fontSize: 18,
+                  fontSize: 17,
                   fontWeight: FontWeight.w900,
                   color: ColorSystem.plum,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               Text(
                 subtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Fredoka',
-                  fontSize: 12,
+                  fontSize: 11.5,
                   color: ColorSystem.plum.withOpacity(0.7),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildMiniBadge('+15 XP', ColorSystem.purple),
+                  _buildRewardPill('+15 XP', ColorSystem.purple),
                   const SizedBox(width: 8),
-                  _buildMiniBadge('+5 Coins', ColorSystem.gold),
+                  _buildRewardPill('+5 Coins', ColorSystem.gold),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
                 child: CustomButton(
-                  text: nextActionText,
+                  text: nextButtonLabel,
                   backgroundColor: ColorSystem.green,
                   textColor: Colors.white,
                   onPressed: onNext,
@@ -438,7 +421,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     );
   }
 
-  Widget _buildMiniBadge(String text, Color color) {
+  Widget _buildRewardPill(String text, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -464,46 +447,55 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       backgroundColor: ColorSystem.cream,
       body: QuestlyBackground(
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Top Header Bar
-                _buildTopBar(),
-                const SizedBox(height: 6),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isShortScreen = constraints.maxHeight < 480;
 
-                // Level Progress Stepper Row
-                _buildLevelStepper(),
-                const SizedBox(height: 8),
-
-                // Dendy Companion Guidance Box
-                _buildDendyGuidanceCard(),
-                const SizedBox(height: 8),
-
-                // Active Level Content (Mobile App Card)
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: ColorSystem.plum, width: 1.8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ColorSystem.plum.withOpacity(0.06),
-                          offset: const Offset(0, 4),
-                          blurRadius: 10,
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: _buildCurrentLevelContent(),
-                    ),
-                  ),
+              return Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isShortScreen ? 10 : 14,
+                  vertical: isShortScreen ? 6 : 8,
                 ),
-              ],
-            ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Top App Header
+                    _buildTopHeader(isShortScreen),
+                    SizedBox(height: isShortScreen ? 4 : 6),
+
+                    // Level Stepper (1 to 5) with strict locks
+                    _buildLevelStepper(),
+                    SizedBox(height: isShortScreen ? 6 : 8),
+
+                    // Dendy (Foxy) Teacher & Instruction Speech Box
+                    _buildFoxyTeacherCard(isShortScreen),
+                    SizedBox(height: isShortScreen ? 6 : 8),
+
+                    // Active Single Level Content Card
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: ColorSystem.plum, width: 1.8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: ColorSystem.plum.withOpacity(0.06),
+                              offset: const Offset(0, 3),
+                              blurRadius: 8,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: _buildCurrentLevelView(isShortScreen),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -511,9 +503,9 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // ==========================================
-  // 1. TOP APP BAR
+  // 1. TOP APP HEADER
   // ==========================================
-  Widget _buildTopBar() {
+  Widget _buildTopHeader(bool isShortScreen) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -531,20 +523,20 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'VIRTUAL LAB',
+                Text(
+                  'VIRTUAL SCIENCE LAB',
                   style: TextStyle(
                     fontFamily: 'Fredoka',
-                    fontSize: 12,
+                    fontSize: isShortScreen ? 11 : 12,
                     fontWeight: FontWeight.w900,
                     color: ColorSystem.plum,
                   ),
                 ),
                 Text(
-                  'LEVEL $_currentLevel OF 5',
-                  style: const TextStyle(
+                  'LEVEL $_currentLevel OF 5 • ACID-BASE TITRATION',
+                  style: TextStyle(
                     fontFamily: 'Fredoka',
-                    fontSize: 9.5,
+                    fontSize: isShortScreen ? 8.5 : 9.5,
                     fontWeight: FontWeight.w800,
                     color: ColorSystem.purple,
                   ),
@@ -554,27 +546,27 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
           ],
         ),
 
-        // XP & Gold Counters
+        // Live XP & Gold
         if (_student != null)
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                   border: Border.all(color: ColorSystem.plum.withOpacity(0.15)),
                 ),
                 child: Row(
                   children: [
-                    VectorAssetHelper.xpStarIcon(size: 13),
+                    VectorAssetHelper.xpStarIcon(size: 12),
                     const SizedBox(width: 4),
                     Text(
                       '${_student!.xp} XP',
                       style: const TextStyle(
                         fontFamily: 'Fredoka',
-                        fontSize: 10,
+                        fontSize: 9.5,
                         fontWeight: FontWeight.w900,
                         color: ColorSystem.purple,
                       ),
@@ -584,21 +576,21 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
               ),
               const SizedBox(width: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                   border: Border.all(color: ColorSystem.plum.withOpacity(0.15)),
                 ),
                 child: Row(
                   children: [
-                    VectorAssetHelper.questCoinIcon(size: 13),
+                    VectorAssetHelper.questCoinIcon(size: 12),
                     const SizedBox(width: 4),
                     Text(
                       '${_student!.gold}',
                       style: const TextStyle(
                         fontFamily: 'Fredoka',
-                        fontSize: 10,
+                        fontSize: 9.5,
                         fontWeight: FontWeight.w900,
                         color: ColorSystem.gold,
                       ),
@@ -613,7 +605,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // ==========================================
-  // 2. LEVEL STEPPER (PHONE APP PILLS)
+  // 2. LEVEL PROGRESSION STEPPER (STRICT LOCKS)
   // ==========================================
   Widget _buildLevelStepper() {
     return Row(
@@ -641,30 +633,30 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
           child: Padding(
             padding: EdgeInsets.only(right: index == 4 ? 0 : 4),
             child: InkWell(
-              onTap: isLocked ? null : () => _goToLevel(levelNum),
-              borderRadius: BorderRadius.circular(8),
+              onTap: isLocked ? null : () => _selectLevel(levelNum),
+              borderRadius: BorderRadius.circular(6),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 decoration: BoxDecoration(
                   color: bg,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                   border: Border.all(color: border, width: 1.2),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (isPassed) ...[
-                      const Icon(Icons.check_rounded, size: 10, color: ColorSystem.green),
+                      const Icon(Icons.check_rounded, size: 9, color: ColorSystem.green),
                       const SizedBox(width: 2),
                     ] else if (isLocked) ...[
-                      Icon(Icons.lock_outline_rounded, size: 9, color: Colors.grey.shade400),
+                      Icon(Icons.lock_outline_rounded, size: 8.5, color: Colors.grey.shade400),
                       const SizedBox(width: 2),
                     ],
                     Text(
-                      'L$levelNum',
+                      'Level $levelNum',
                       style: TextStyle(
                         fontFamily: 'Fredoka',
-                        fontSize: 9.5,
+                        fontSize: 9,
                         fontWeight: FontWeight.w900,
                         color: textColor,
                       ),
@@ -680,53 +672,65 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // ==========================================
-  // 3. DENDY COMPANION GUIDANCE CARD
+  // 3. FOXY (DENDY) TEACHER & INSTRUCTION CARD
   // ==========================================
-  Widget _buildDendyGuidanceCard() {
-    String message;
+  Widget _buildFoxyTeacherCard(bool isShortScreen) {
+    String teacherMessage;
     DendyState dendyState = DendyState.idle;
 
     switch (_currentLevel) {
       case 1:
-        message = '"Level 1: Answer the pre-lab theory question correctly to enter the virtual workbench!"';
+        teacherMessage =
+            '"Hi! I\'m Dendy, your lab tutor! Read the neutralization theory below, then answer the checkpoint question to begin!"';
         dendyState = DendyState.idle;
         break;
       case 2:
-        message = '"Level 2: Tap each apparatus card to place all 4 essential tools onto the lab table!"';
+        teacherMessage =
+            '"Now let\'s assemble our apparatus! Tap all 4 pieces of glassware to place them onto your workbench."';
         dendyState = DendyState.thinking;
         break;
       case 3:
-        message = '"Level 3: Pipette 20.0 mL of HCl into the flask, then add 3 drops of indicator!"';
+        teacherMessage =
+            '"Time for reagents! Pipette 20.0 mL of HCl acid into the flask, then add 3 drops of indicator!"';
         dendyState = DendyState.thinking;
         break;
       case 4:
-        message = '"Level 4: Add drops slowly and swirl regularly until the faint pink endpoint appears!"';
+        teacherMessage =
+            '"Carefully add drops from the burette and swirl the flask. Stop right when you reach a faint persistent pink endpoint!"';
         dendyState = DendyState.thinking;
         break;
       case 5:
       default:
-        message = '"Level 5: Excellent chemistry! Review the stoichiometric calculations and claim your reward!"';
+        teacherMessage =
+            '"Outstanding chemistry mastery! Review your volumetric calculations and claim your 3-star trophy!"';
         dendyState = DendyState.success;
         break;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: isShortScreen ? 8 : 10,
+        vertical: isShortScreen ? 6 : 8,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: ColorSystem.plum.withOpacity(0.15)),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          DendyMascot(state: dendyState, size: 34),
+          DendyMascot(
+            state: dendyState,
+            size: isShortScreen ? 30 : 36,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              message,
-              style: const TextStyle(
+              teacherMessage,
+              style: TextStyle(
                 fontFamily: 'Fredoka',
-                fontSize: 10,
+                fontSize: isShortScreen ? 9 : 10,
                 fontWeight: FontWeight.bold,
                 color: ColorSystem.plum,
                 height: 1.25,
@@ -734,63 +738,66 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
             ),
           ),
           const SizedBox(width: 6),
-          DendySpeakButton(textToSpeak: message, size: 20),
+          DendySpeakButton(
+            textToSpeak: teacherMessage,
+            size: isShortScreen ? 18 : 20,
+          ),
         ],
       ),
     );
   }
 
   // ==========================================
-  // 4. ACTIVE LEVEL CONTENT
+  // 4. LEVEL ROUTER (ONLY 1 LEVEL ON SCREEN)
   // ==========================================
-  Widget _buildCurrentLevelContent() {
+  Widget _buildCurrentLevelView(bool isShortScreen) {
     switch (_currentLevel) {
       case 1:
-        return _buildLevel1View();
+        return _buildLevel1LearningView(isShortScreen);
       case 2:
-        return _buildLevel2View();
+        return _buildLevel2ApparatusView(isShortScreen);
       case 3:
-        return _buildLevel3View();
+        return _buildLevel3ReagentsView(isShortScreen);
       case 4:
-        return _buildLevel4View();
+        return _buildLevel4TitrationSimView(isShortScreen);
       case 5:
       default:
-        return _buildLevel5View();
+        return _buildLevel5ReportView(isShortScreen);
     }
   }
 
   // ------------------------------------------
-  // LEVEL 1: PRE-LAB THEORY CHECK
+  // LEVEL 1: LEARNING & PRE-LAB CHECKPOINT
   // ------------------------------------------
-  Widget _buildLevel1View() {
-    final List<String> options = [
-      'Colorless in Acid ➔ Pale Persistent Pink in Base',
-      'Blue ➔ Bright Red at Neutral Point',
-      'Remains completely clear regardless of pH',
+  Widget _buildLevel1LearningView(bool isShortScreen) {
+    final List<String> quizOptions = [
+      'Colorless (Acid) ➔ Pale Persistent Pink (Base)',
+      'Dark Blue ➔ Bright Red at Neutral Point',
+      'Remains completely clear forever',
     ];
 
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(isShortScreen ? 10 : 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Chemical Reaction Equation Card
+          // Chemical Reaction Equation Banner
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: ColorSystem.castlePurple,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: const Row(
               children: [
-                Icon(Icons.science_rounded, color: ColorSystem.gold, size: 18),
-                const SizedBox(width: 8),
+                Icon(Icons.science_rounded, color: ColorSystem.gold, size: 16),
+                const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     'HCl (aq) + NaOH (aq) ➔ NaCl (aq) + H₂O (l)',
                     style: TextStyle(
                       fontFamily: 'Fredoka',
-                      fontSize: 11,
+                      fontSize: 10.5,
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
                     ),
@@ -799,26 +806,39 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
 
+          // Theory Guide Note
           Text(
-            'QUESTION: What is the color transition of Phenolphthalein indicator at the equivalence point?',
-            style: const TextStyle(
+            'Titration is a volumetric analysis method where a standard titrant (0.1M NaOH) is added dropwise to an unknown analyte (HCl) until exact neutralization occurs at the stoichiometric equivalence point.',
+            style: TextStyle(
               fontFamily: 'Fredoka',
-              fontSize: 10.5,
-              fontWeight: FontWeight.w900,
-              color: ColorSystem.plum,
+              fontSize: isShortScreen ? 8.5 : 9.5,
+              color: ColorSystem.plum.withOpacity(0.8),
+              height: 1.25,
             ),
           ),
           const SizedBox(height: 8),
 
+          Text(
+            'CHECKPOINT: What is the color transition of Phenolphthalein indicator?',
+            style: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: isShortScreen ? 9.5 : 10,
+              fontWeight: FontWeight.w900,
+              color: ColorSystem.plum,
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          // Options List
           Expanded(
             child: ListView.builder(
-              itemCount: options.length,
+              itemCount: quizOptions.length,
               itemBuilder: (ctx, idx) {
                 final isSelected = _selectedQuizOption == idx;
                 final isRight = idx == 0;
-                Color bg = Colors.white;
+                Color bg = const Color(0xFFF8FAFC);
                 Color border = ColorSystem.plum.withOpacity(0.15);
 
                 if (isSelected) {
@@ -829,24 +849,26 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 6),
                   child: InkWell(
-                    onTap: () => _submitQuizAnswer(idx),
-                    borderRadius: BorderRadius.circular(10),
+                    onTap: () => _submitLevel1Quiz(idx),
+                    borderRadius: BorderRadius.circular(8),
                     child: Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       decoration: BoxDecoration(
                         color: bg,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: border, width: 1.3),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: border, width: 1.2),
                       ),
                       child: Row(
                         children: [
                           CircleAvatar(
-                            radius: 9,
-                            backgroundColor: isSelected ? (isRight ? ColorSystem.green : ColorSystem.coral) : ColorSystem.lavender.withOpacity(0.2),
+                            radius: 8,
+                            backgroundColor: isSelected
+                                ? (isRight ? ColorSystem.green : ColorSystem.coral)
+                                : ColorSystem.lavender.withOpacity(0.2),
                             child: Text(
                               String.fromCharCode(65 + idx),
                               style: TextStyle(
-                                fontSize: 9,
+                                fontSize: 8,
                                 fontWeight: FontWeight.bold,
                                 color: isSelected ? Colors.white : ColorSystem.plum,
                               ),
@@ -855,10 +877,10 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              options[idx],
+                              quizOptions[idx],
                               style: const TextStyle(
                                 fontFamily: 'Fredoka',
-                                fontSize: 10,
+                                fontSize: 9.5,
                                 fontWeight: FontWeight.bold,
                                 color: ColorSystem.plum,
                               ),
@@ -880,11 +902,11 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // ------------------------------------------
-  // LEVEL 2: APPARATUS SETUP
+  // LEVEL 2: APPARATUS WORKBENCH ASSEMBLY
   // ------------------------------------------
-  Widget _buildLevel2View() {
+  Widget _buildLevel2ApparatusView(bool isShortScreen) {
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(isShortScreen ? 10 : 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -895,13 +917,13 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                 'TAP TO ASSEMBLE APPARATUS',
                 style: TextStyle(
                   fontFamily: 'Fredoka',
-                  fontSize: 11,
+                  fontSize: 10.5,
                   fontWeight: FontWeight.w900,
                   color: ColorSystem.plum,
                 ),
               ),
               Text(
-                '${_selectedApparatus.length} / 4 Placed',
+                '${_assembledApparatus.length} / 4 Placed',
                 style: const TextStyle(
                   fontFamily: 'Fredoka',
                   fontSize: 10,
@@ -911,49 +933,49 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
 
           Expanded(
             child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 1.7,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
+                childAspectRatio: isShortScreen ? 2.1 : 1.8,
+                crossAxisSpacing: 6,
+                mainAxisSpacing: 6,
               ),
-              itemCount: _apparatusList.length,
+              itemCount: _apparatusItems.length,
               itemBuilder: (ctx, idx) {
-                final item = _apparatusList[idx];
-                final isAdded = _selectedApparatus.contains(item['id']);
+                final item = _apparatusItems[idx];
+                final isAdded = _assembledApparatus.contains(item['id']);
 
                 return InkWell(
                   onTap: () => _toggleApparatus(item['id'] as String),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: isAdded ? ColorSystem.green.withOpacity(0.12) : const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: isAdded ? ColorSystem.green : ColorSystem.plum.withOpacity(0.15),
-                        width: isAdded ? 1.8 : 1.0,
+                        width: isAdded ? 1.6 : 1.0,
                       ),
                     ),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(6),
+                          padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
                             color: isAdded ? ColorSystem.green : ColorSystem.castlePurple.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Icon(
                             item['icon'] as IconData,
-                            size: 20,
+                            size: 16,
                             color: isAdded ? Colors.white : ColorSystem.castlePurple,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -963,7 +985,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                                 item['name'] as String,
                                 style: TextStyle(
                                   fontFamily: 'Fredoka',
-                                  fontSize: 10,
+                                  fontSize: 9.5,
                                   fontWeight: FontWeight.w900,
                                   color: isAdded ? ColorSystem.green : ColorSystem.plum,
                                 ),
@@ -974,10 +996,10 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                                 item['desc'] as String,
                                 style: TextStyle(
                                   fontFamily: 'Fredoka',
-                                  fontSize: 8,
+                                  fontSize: 7.5,
                                   color: ColorSystem.plum.withOpacity(0.6),
                                 ),
-                                maxLines: 2,
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
@@ -985,7 +1007,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                         ),
                         Icon(
                           isAdded ? Icons.check_circle_rounded : Icons.add_circle_outline_rounded,
-                          size: 16,
+                          size: 14,
                           color: isAdded ? ColorSystem.green : Colors.grey.shade400,
                         ),
                       ],
@@ -1001,11 +1023,11 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // ------------------------------------------
-  // LEVEL 3: CHEMICAL REAGENTS
+  // LEVEL 3: CHEMICAL REAGENTS PREPARATION
   // ------------------------------------------
-  Widget _buildLevel3View() {
+  Widget _buildLevel3ReagentsView(bool isShortScreen) {
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(isShortScreen ? 10 : 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -1013,12 +1035,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
             'PREPARE FLASK REAGENTS',
             style: TextStyle(
               fontFamily: 'Fredoka',
-              fontSize: 11,
+              fontSize: 10.5,
               fontWeight: FontWeight.w900,
               color: ColorSystem.plum,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
 
           Expanded(
             child: Row(
@@ -1026,10 +1048,10 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                 // Step A: Pipette Acid
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: _acidPipetted ? ColorSystem.green.withOpacity(0.1) : const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: _acidPipetted ? ColorSystem.green : ColorSystem.plum.withOpacity(0.15),
                         width: 1.4,
@@ -1038,27 +1060,26 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.colorize_rounded, size: 32, color: ColorSystem.coral),
-                        const SizedBox(height: 6),
+                        const Icon(Icons.colorize_rounded, size: 28, color: ColorSystem.coral),
+                        const SizedBox(height: 4),
                         const Text(
                           '0.100 M HCl Acid',
                           style: TextStyle(
                             fontFamily: 'Fredoka',
-                            fontSize: 10.5,
+                            fontSize: 9.5,
                             fontWeight: FontWeight.w900,
                             color: ColorSystem.plum,
                           ),
                         ),
-                        const SizedBox(height: 2),
                         Text(
                           '20.00 mL Aliquot',
                           style: TextStyle(
                             fontFamily: 'Fredoka',
-                            fontSize: 8.5,
+                            fontSize: 8,
                             color: ColorSystem.plum.withOpacity(0.6),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
                         CustomButton(
                           text: _acidPipetted ? '✓ Pipetted' : 'Pipette 20 mL',
                           backgroundColor: _acidPipetted ? ColorSystem.green : ColorSystem.castlePurple,
@@ -1074,10 +1095,10 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                 // Step B: Indicator
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: _indicatorAdded ? ColorSystem.green.withOpacity(0.1) : const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: _indicatorAdded ? ColorSystem.green : ColorSystem.plum.withOpacity(0.15),
                         width: 1.4,
@@ -1086,29 +1107,28 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.opacity_rounded, size: 32, color: Color(0xFFEC4899)),
-                        const SizedBox(height: 6),
+                        const Icon(Icons.opacity_rounded, size: 28, color: Color(0xFFEC4899)),
+                        const SizedBox(height: 4),
                         const Text(
                           'Phenolphthalein',
                           style: TextStyle(
                             fontFamily: 'Fredoka',
-                            fontSize: 10.5,
+                            fontSize: 9.5,
                             fontWeight: FontWeight.w900,
                             color: ColorSystem.plum,
                           ),
                         ),
-                        const SizedBox(height: 2),
                         Text(
                           'pH 8.2 - 10.0 Indicator',
                           style: TextStyle(
                             fontFamily: 'Fredoka',
-                            fontSize: 8.5,
+                            fontSize: 8,
                             color: ColorSystem.plum.withOpacity(0.6),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
                         CustomButton(
-                          text: _indicatorAdded ? '✓ 3 Drops Added' : 'Add 3 Drops',
+                          text: _indicatorAdded ? '✓ 3 Drops' : 'Add 3 Drops',
                           backgroundColor: _indicatorAdded ? ColorSystem.green : const Color(0xFFEC4899),
                           textColor: Colors.white,
                           onPressed: _addIndicator,
@@ -1126,14 +1146,14 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // ------------------------------------------
-  // LEVEL 4: TITRATION EXPERIMENT SIMULATOR
+  // LEVEL 4: INTERACTIVE DROPWISE TITRATION
   // ------------------------------------------
-  Widget _buildLevel4View() {
+  Widget _buildLevel4TitrationSimView(bool isShortScreen) {
     final ph = _getCalculatedPH();
     final liquidColor = _getFlaskColor();
 
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(6),
       child: Row(
         children: [
           // Left: Visual Glass Workbench Canvas
@@ -1142,7 +1162,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
             child: Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: ColorSystem.plum.withOpacity(0.12)),
               ),
               child: Stack(
@@ -1160,15 +1180,15 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     ),
                   ),
 
-                  // Digital Readout (HUD)
+                  // Digital HUD Readout
                   Positioned(
-                    top: 6,
-                    left: 6,
+                    top: 4,
+                    left: 4,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
                       decoration: BoxDecoration(
                         color: ColorSystem.plum.withOpacity(0.88),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1177,7 +1197,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                             'V: ${_buretteVolume.toStringAsFixed(2)} mL',
                             style: const TextStyle(
                               fontFamily: 'Fredoka',
-                              fontSize: 9,
+                              fontSize: 8.5,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -1186,7 +1206,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                             'pH: ${ph.toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontFamily: 'Fredoka',
-                              fontSize: 9,
+                              fontSize: 8.5,
                               fontWeight: FontWeight.bold,
                               color: ColorSystem.gold,
                             ),
@@ -1199,7 +1219,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
 
           // Right: Tactile Mobile Controls
           Expanded(
@@ -1247,15 +1267,15 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // ------------------------------------------
-  // LEVEL 5: STOICHIOMETRY REPORT & REWARD
+  // LEVEL 5: STOICHIOMETRY LAB REPORT
   // ------------------------------------------
-  Widget _buildLevel5View() {
+  Widget _buildLevel5ReportView(bool isShortScreen) {
     final diff = (_buretteVolume - _targetEndpoint).abs();
     final calculatedMolarity = _buretteVolume > 0 ? (0.1 * _buretteVolume / 20.0) : 0.0;
     final accuracy = (100.0 - (diff * 5.0)).clamp(70.0, 100.0);
 
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(isShortScreen ? 8 : 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -1266,7 +1286,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                 'FINAL LAB REPORT',
                 style: TextStyle(
                   fontFamily: 'Fredoka',
-                  fontSize: 11,
+                  fontSize: 10.5,
                   fontWeight: FontWeight.w900,
                   color: ColorSystem.green,
                 ),
@@ -1275,27 +1295,27 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                 'Accuracy: ${accuracy.toStringAsFixed(1)}%',
                 style: const TextStyle(
                   fontFamily: 'Fredoka',
-                  fontSize: 10,
+                  fontSize: 9.5,
                   fontWeight: FontWeight.w900,
                   color: ColorSystem.plum,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
 
           Expanded(
             child: ListView(
               children: [
                 _buildReportItem('Analyte Solution', '20.00 mL HCl (0.100 M)'),
                 _buildReportItem('Titrant Standard', '0.100 M NaOH'),
-                _buildReportItem('Titer Endpoint Volume', '${_buretteVolume.toStringAsFixed(2)} mL'),
+                _buildReportItem('Endpoint Titer Volume', '${_buretteVolume.toStringAsFixed(2)} mL'),
                 _buildReportItem('Calculated Molarity', '${calculatedMolarity.toStringAsFixed(4)} M'),
                 _buildReportItem('Stoichiometric Ratio', '1 : 1 Equivalence'),
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
 
           CustomButton(
             text: 'CLAIM 60 XP & FINISH LAB 🏆',
@@ -1310,7 +1330,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
 
   Widget _buildReportItem(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(vertical: 2.5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -1318,7 +1338,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
             label,
             style: TextStyle(
               fontFamily: 'Fredoka',
-              fontSize: 9.5,
+              fontSize: 9,
               fontWeight: FontWeight.bold,
               color: ColorSystem.plum.withOpacity(0.65),
             ),
@@ -1327,7 +1347,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
             value,
             style: const TextStyle(
               fontFamily: 'Fredoka',
-              fontSize: 10,
+              fontSize: 9.5,
               fontWeight: FontWeight.w900,
               color: ColorSystem.plum,
             ),
@@ -1339,7 +1359,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
 }
 
 // ==========================================
-// MOBILE PAINTER: COMPACT TITRATION WORKBENCH
+// MOBILE PAINTER: HIGH FIDELITY TITRATION BENCH
 // ==========================================
 class _MobileTitrationPainter extends CustomPainter {
   final double buretteVolume;
@@ -1411,7 +1431,7 @@ class _MobileTitrationPainter extends CustomPainter {
     canvas.drawCircle(Offset(cx, valveY), 3, Paint()..color = const Color(0xFFEF4444));
     canvas.drawLine(Offset(cx, valveY), Offset(cx, valveY + 10), Paint()..color = const Color(0xFF475569)..strokeWidth = 1.5);
 
-    // Droplet
+    // Droplet Animation
     if (dripProgress > 0.0 && dripProgress < 1.0) {
       final dropY = (valveY + 10) + (size.height * 0.76 - (valveY + 10)) * dripProgress;
       canvas.drawCircle(Offset(cx, dropY), 2.5, Paint()..color = const Color(0xFF38BDF8));
