@@ -20,7 +20,11 @@ class ConversationExchange {
 class AITutorService {
   static final AITutorService _instance = AITutorService._internal();
   factory AITutorService() => _instance;
-  AITutorService._internal();
+  AITutorService._internal() {
+    _engine.initializeModel().catchError((e) {
+      debugPrint('[AITutorService] Background model init notice: $e');
+    });
+  }
 
   final CurriculumRetriever _retriever = CurriculumRetriever();
   final LlamaEngine _engine = LlamaEngine();

@@ -13,17 +13,22 @@ class LlamaEngine {
   Llama? _llama;
   bool _isModelLoaded = false;
   bool _isLoadingModel = false;
+  Completer<void>? _initCompleter;
   String? _modelPath;
   String? _lastError;
 
   bool get isModelLoaded => _isModelLoaded && _llama != null;
   bool get isLoadingModel => _isLoadingModel;
   String? get lastError => _lastError;
+  String? get modelPath => _modelPath;
 
   /// Initializes and caches the Qwen 2.5 0.5B Instruct GGUF model in application storage
   Future<void> initializeModel({String modelAssetName = 'qwen2.5-0.5b-instruct-q4_k_m.gguf'}) async {
     if (_isModelLoaded && _llama != null) return;
-    if (_isLoadingModel) return;
+    if (_initCompleter != null) {
+      return _initCompleter!.future;
+    }
+    _initCompleter = Completer<void>();
     _isLoadingModel = true;
     _lastError = null;
 
@@ -32,12 +37,12 @@ class LlamaEngine {
       final targetFile = File('${appDocDir.path}/$modelAssetName');
       final localAssetFile = File('assets/models/$modelAssetName');
 
-      if (await localAssetFile.exists() && localAssetFile.lengthSync() > 1000000) {
+      if (await localAssetFile.exists() && localAssetFile.lengthSync() > 10000000) {
         _modelPath = localAssetFile.path;
-        debugPrint('[LlamaEngine] Model file found: $_modelPath');
-      } else if (await targetFile.exists() && targetFile.lengthSync() > 1000000) {
+        debugPrint('[LlamaEngine] Using local asset file: $_modelPath (${(localAssetFile.lengthSync() / (1024 * 1024)).toStringAsFixed(1)} MB)');
+      } else if (await targetFile.exists() && targetFile.lengthSync() > 10000000) {
         _modelPath = targetFile.path;
-        debugPrint('[LlamaEngine] Model file cached: $_modelPath');
+        debugPrint('[LlamaEngine] Using cached storage file: $_modelPath (${(targetFile.lengthSync() / (1024 * 1024)).toStringAsFixed(1)} MB)');
       } else {
         try {
           debugPrint('[LlamaEngine] Unpacking model asset to storage (${targetFile.path})...');
@@ -48,15 +53,17 @@ class LlamaEngine {
             flush: true,
           );
           _modelPath = targetFile.path;
-          debugPrint('[LlamaEngine] Model copy success: $_modelPath');
+          debugPrint('[LlamaEngine] Model unpacked successfully: $_modelPath (${(targetFile.lengthSync() / (1024 * 1024)).toStringAsFixed(1)} MB)');
         } catch (e) {
-          debugPrint('[LlamaEngine] Asset bundle load notice: $e');
+          _lastError = 'Asset unpacking error: $e';
+          debugPrint('[LlamaEngine] Asset bundle load error: $e');
         }
       }
 
       if (_modelPath != null && File(_modelPath!).existsSync()) {
-        debugPrint('[LlamaEngine] Native libraries loading (libllama.so, libmtmd.so)...');
+        debugPrint('[LlamaEngine] Loading native C++ libraries (libllama.so, libmtmd.so)...');
         debugPrint('[LlamaEngine] Initializing native llama.cpp instance with $_modelPath...');
+        
         final contextParams = ContextParams()
           ..nCtx = 2048
           ..nBatch = 512;
@@ -73,14 +80,16 @@ class LlamaEngine {
         debugPrint('[LlamaEngine] Inference ready.');
         _isModelLoaded = true;
       } else {
-        _lastError = 'Model file not found at $_modelPath';
+        _lastError ??= 'Model file not found at path: $_modelPath';
         debugPrint('[LlamaEngine] Error: $_lastError');
       }
     } catch (e) {
-      _lastError = e.toString();
-      debugPrint('[LlamaEngine] Native Llama init error: $e');
+      _lastError = 'Native initialization exception: $e';
+      debugPrint('[LlamaEngine] Native Llama init exception: $e');
     } finally {
       _isLoadingModel = false;
+      _initCompleter?.complete();
+      _initCompleter = null;
     }
   }
 
@@ -93,7 +102,7 @@ class LlamaEngine {
     double temperature = 0.3,
   }) async* {
     if (_llama == null || !_isModelLoaded) {
-      debugPrint('[LlamaEngine] Model not ready yet. Initializing now...');
+      debugPrint('[LlamaEngine] Awaiting model initialization...');
       await initializeModel();
     }
 
@@ -110,7 +119,7 @@ class LlamaEngine {
                 '<|im_start|>user\n${userQuery ?? prompt}<|im_end|>\n'
                 '<|im_start|>assistant\n';
 
-        debugPrint('[LlamaEngine] Setting prompt to native Qwen LLM (${formattedPrompt.length} chars)');
+        debugPrint('[LlamaEngine] Starting native inference (${formattedPrompt.length} chars prompt)...');
         _llama!.setPrompt(formattedPrompt);
         
         final tokenStream = _llama!.generateText();
@@ -127,12 +136,16 @@ class LlamaEngine {
         return;
       } catch (e) {
         debugPrint('[LlamaEngine] Native token generation error: $e');
-        yield '[Dendy AI]: Error generating from neural network ($e). Please try asking again.';
+        yield '[Dendy AI]: Error during neural network generation ($e).';
         return;
       }
     }
 
-    // If model failed to load on device, explicitly notify the user
-    yield '[Dendy Offline AI]: Loading Qwen 2.5 model into device memory... Please wait a few seconds and ask again!';
+    // If model failed to load on device, provide explicit diagnostic info
+    final errorMsg = _lastError ?? "Model file could not be loaded into RAM.";
+    yield '🦊 [Dendy Offline AI Notice]:\n\n'
+        'Model status: $errorMsg\n\n'
+        'Path: ${_modelPath ?? "Not unpacked yet"}\n\n'
+        'Please ensure the app has storage permission and wait a few seconds while the 443 MB model finishes unpacking.';
   }
 }
