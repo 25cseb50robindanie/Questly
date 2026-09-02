@@ -1448,16 +1448,16 @@ function bindDirectTitrationEvents() {
     valve.textContent = 'OFF';
 
     const vol = state.expState.buretteVolume;
-    if (vol >= 9.8 && vol <= 10.3) {
+    if (vol >= 9.8 && vol <= 10.4) {
       labSound.playFanfare();
       state.expState.endpointReached = true;
       btnFinish.disabled = false;
-      updateExpFeedback('🎯 PERFECT! True stoichiometric equivalence point confirmed at exactly 10.0 mL of 0.1 M NaOH (pH 8.2)!');
+      updateExpFeedback(`🎯 PERFECT! Correct endpoint confirmed at ${vol.toFixed(1)} mL (pH 8.2 - 8.8)! Click Analyze Results to continue.`);
       seal.style.display = 'none';
     } else {
       labSound.playError();
       state.stage4Mistakes++;
-      updateExpFeedback(`⚠️ Endpoint deviation (${vol.toFixed(1)} mL). Expected 10.0 mL for 10.0 mL of 0.1 M HCl.`);
+      updateExpFeedback(`⚠️ Endpoint deviation (${vol.toFixed(1)} mL). Required reading is 9.8 mL – 10.4 mL.`);
     }
     updateHeaderScore();
   });
@@ -1487,10 +1487,10 @@ function dispenseTitrant(amt) {
     ph = 1.0 + (vol / 8.0) * 1.5; // 1.0 -> 2.5
   } else if (vol < 9.7) {
     ph = 2.5 + ((vol - 8.0) / 1.7) * 2.5; // 2.5 -> 5.0
-  } else if (vol <= 10.2) {
-    ph = 7.0 + ((vol - 9.7) / 0.5) * 1.6; // 7.0 -> 8.6
+  } else if (vol <= 10.4) {
+    ph = 7.0 + ((vol - 9.7) / 0.7) * 1.8; // 7.0 -> 8.8 (Pale Pink Endpoint Window)
   } else if (vol < 11.5) {
-    ph = 9.0 + ((vol - 10.2) / 1.3) * 2.5; // 9.0 -> 11.5
+    ph = 9.0 + ((vol - 10.4) / 1.1) * 2.5; // 9.0 -> 11.5
   } else {
     ph = 11.5 + Math.min(1.5, (vol - 11.5) * 0.15);
   }
@@ -1506,12 +1506,12 @@ function dispenseTitrant(amt) {
     colorVal.textContent = 'Colorless (Acidic)';
     colorVal.style.color = '#64748B';
     if (seal) seal.style.display = 'none';
-  } else if (ph >= 8.2 && ph <= 9.2) {
+  } else if (ph >= 8.2 && ph <= 9.0) {
     flaskLiquid.className = 'flask-liquid pale-pink';
     colorVal.textContent = 'Faint Pale Pink (Endpoint! ✨)';
     colorVal.style.color = '#EC4899';
     if (seal) seal.style.display = 'inline-block';
-    updateExpFeedback('✨ FAINT PALE PINK DETECTED! Turn OFF stopcock valve and click the green confirm seal on the tile!');
+    updateExpFeedback(`✨ FAINT PALE PINK (${vol.toFixed(1)} mL) DETECTED! Turn OFF stopcock valve and click the green confirm seal!`);
   } else {
     flaskLiquid.className = 'flask-liquid over-titrated';
     colorVal.textContent = 'Dark Magenta (Over-Titrated ⚠️)';
