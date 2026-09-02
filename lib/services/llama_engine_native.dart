@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -61,7 +62,36 @@ class LlamaEngine {
       }
 
       if (_modelPath != null && File(_modelPath!).existsSync()) {
-        debugPrint('[LlamaEngine] Loading native C++ libraries (libllama.so, libmtmd.so)...');
+        if (Platform.isAndroid) {
+          debugPrint('[LlamaEngine] Resolving Android native C++ libraries...');
+          bool resolved = false;
+
+          // Try libmtmd.so first
+          try {
+            DynamicLibrary.open('libmtmd.so');
+            Llama.libraryPath = 'libmtmd.so';
+            resolved = true;
+            debugPrint('[LlamaEngine] Using libmtmd.so');
+          } catch (_) {
+            debugPrint('[LlamaEngine] libmtmd.so not found, falling back to core libllama.so');
+          }
+
+          // Fallback to core libllama.so
+          if (!resolved) {
+            try {
+              try {
+                DynamicLibrary.open('libggml.so');
+              } catch (_) {}
+              DynamicLibrary.open('libllama.so');
+              Llama.libraryPath = 'libllama.so';
+              debugPrint('[LlamaEngine] Successfully resolved libllama.so');
+            } catch (e) {
+              debugPrint('[LlamaEngine] Direct libllama.so open notice: $e');
+              Llama.libraryPath = 'libllama.so';
+            }
+          }
+        }
+
         debugPrint('[LlamaEngine] Initializing native llama.cpp instance with $_modelPath...');
         
         final contextParams = ContextParams()
@@ -146,6 +176,6 @@ class LlamaEngine {
     yield '🦊 [Dendy Offline AI Notice]:\n\n'
         'Model status: $errorMsg\n\n'
         'Path: ${_modelPath ?? "Not unpacked yet"}\n\n'
-        'Please ensure the app has storage permission and wait a few seconds while the 443 MB model finishes unpacking.';
+        'Please wait a few seconds while the model finishes initializing.';
   }
 }
