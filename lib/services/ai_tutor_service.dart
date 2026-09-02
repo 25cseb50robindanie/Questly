@@ -71,7 +71,7 @@ class AITutorService {
   }) async {
     final trimmed = question.trim();
     if (trimmed.isEmpty) {
-      return const DendyRetrievalResult(text: "What would you like to explore today? 🦊");
+      return DendyRetrievalResult(text: "What would you like to explore today?");
     }
 
     final result = await _retriever.retrieveAnswer(
