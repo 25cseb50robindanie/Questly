@@ -401,6 +401,22 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
                   break;
                 }
               }
+            } else if (node.levelId == 'fractions_lvl1') {
+              final lessons = ['fractions_les1', 'fractions_les2', 'fractions_les3', 'fractions_les4', 'fractions_les5'];
+              for (final lid in lessons) {
+                if (!Locator.progressionService.isLessonCompleted(_student!.questlyId, lid)) {
+                  targetLessonId = lid;
+                  break;
+                }
+              }
+            } else if (node.levelId == 'fractions_lvl2') {
+              final lessons = ['ratios_les1', 'ratios_les2', 'ratios_les3', 'ratios_les4', 'ratios_les5'];
+              for (final lid in lessons) {
+                if (!Locator.progressionService.isLessonCompleted(_student!.questlyId, lid)) {
+                  targetLessonId = lid;
+                  break;
+                }
+              }
             }
 
             final Lesson? targetLesson = Locator.moduleRepository.getLessonById(targetLessonId);

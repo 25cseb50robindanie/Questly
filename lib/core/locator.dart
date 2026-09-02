@@ -22,6 +22,8 @@ import '../services/mission_service.dart';
 import '../services/read_aloud_service.dart';
 import '../services/whisper_voice_service.dart';
 
+import '../services/learner_analytics_service.dart';
+
 class Locator {
   static late final StorageService storageService;
   static late final StudentRepository studentRepository;
@@ -50,6 +52,7 @@ class Locator {
   static late final MissionService missionService;
   static late final ReadAloudService readAloudService;
   static late final WhisperVoiceService whisperVoiceService;
+  static late final LearnerAnalyticsService learnerAnalyticsService;
 
   static bool _initialized = false;
 
@@ -83,6 +86,7 @@ class Locator {
     missionService = MissionService(storageService);
     readAloudService = ReadAloudService();
     whisperVoiceService = WhisperVoiceService();
+    learnerAnalyticsService = LearnerAnalyticsService(storageService);
     
     // Seed and hook auth
     authService = MockAuthService(

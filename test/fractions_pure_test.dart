@@ -111,25 +111,39 @@ void main() async {
   }
   print("✓ PASS: Module title is correctly unified");
 
-  if (mod.levels.length != 1 || mod.levels.first.lessons.length != 5) {
-    throw Exception("FAIL: Expected 1 level with 5 lessons, got ${mod.levels.length} levels");
+  if (mod.levels.length != 2 || mod.levels[0].lessons.length != 5 || mod.levels[1].lessons.length != 5) {
+    throw Exception("FAIL: Expected 2 levels with 5 lessons each, got ${mod.levels.length} levels");
   }
-  print("✓ PASS: Level 1 has exactly 5 sequential lessons");
+  print("✓ PASS: Level 1 (Fractions) and Level 2 (Ratios) both have exactly 5 sequential lessons");
 
-  final lessons = mod.levels.first.lessons;
-  final expectedLessonTypes = [
+  final l1Lessons = mod.levels[0].lessons;
+  final expectedL1Types = [
     'fraction_concept',
-    'fraction_explore',
+    'fraction_visual',
     'fraction_practice',
-    'fraction_game',
-    'fraction_challenge'
+    'fraction_challenge',
+    'fraction_teach_dendy'
   ];
-  for (int i = 0; i < expectedLessonTypes.length; i++) {
-    if (lessons[i].activityType != expectedLessonTypes[i]) {
-      throw Exception("FAIL: Expected lesson ${i + 1} activityType to be '${expectedLessonTypes[i]}' but got '${lessons[i].activityType}'");
+  for (int i = 0; i < expectedL1Types.length; i++) {
+    if (l1Lessons[i].activityType != expectedL1Types[i]) {
+      throw Exception("FAIL: Expected L1 lesson ${i + 1} activityType to be '${expectedL1Types[i]}' but got '${l1Lessons[i].activityType}'");
     }
   }
-  print("✓ PASS: Lesson activity types are correctly ordered");
+
+  final l2Lessons = mod.levels[1].lessons;
+  final expectedL2Types = [
+    'ratio_concept',
+    'ratio_visual',
+    'ratio_practice',
+    'ratio_challenge',
+    'ratio_teach_dendy'
+  ];
+  for (int i = 0; i < expectedL2Types.length; i++) {
+    if (l2Lessons[i].activityType != expectedL2Types[i]) {
+      throw Exception("FAIL: Expected L2 lesson ${i + 1} activityType to be '${expectedL2Types[i]}' but got '${l2Lessons[i].activityType}'");
+    }
+  }
+  print("✓ PASS: Lesson activity types for Fractions & Ratios are correctly ordered");
 
   // 2. Test Roadmap Nodes
   final roadmapRepo = RoadmapRepository();

@@ -8,7 +8,7 @@ class CustomButton extends StatefulWidget {
   final Color backgroundColor;
   final Color textColor;
   final bool hasBorder;
-  final double width;
+  final double? width;
   final double height;
   final IconData? icon;
 
@@ -19,7 +19,7 @@ class CustomButton extends StatefulWidget {
     this.backgroundColor = ColorSystem.purple,
     this.textColor = Colors.white,
     this.hasBorder = true,
-    this.width = double.infinity,
+    this.width,
     this.height = 48,
     this.icon,
   }) : super(key: key);

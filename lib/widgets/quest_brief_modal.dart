@@ -191,6 +191,74 @@ class QuestBriefModal extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
+                        ] else if (node.levelId == 'fractions_lvl1') ...[
+                          const Text(
+                            'LESSONS IN THIS LEVEL',
+                            style: TextStyle(
+                              fontFamily: 'Fredoka',
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              color: ColorSystem.purple,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: ColorSystem.plum.withOpacity(0.12), width: 1),
+                            ),
+                            child: Column(
+                              children: [
+                                _buildLessonRow(context, studentId, 'fractions_les1', '1. Concept Learning', isFirst: true),
+                                const SizedBox(height: 3),
+                                _buildLessonRow(context, studentId, 'fractions_les2', '2. Visual Understanding'),
+                                const SizedBox(height: 3),
+                                _buildLessonRow(context, studentId, 'fractions_les3', '3. Guided Practice'),
+                                const SizedBox(height: 3),
+                                _buildLessonRow(context, studentId, 'fractions_les4', '4. Challenge'),
+                                const SizedBox(height: 3),
+                                _buildLessonRow(context, studentId, 'fractions_les5', '5. Teach Dendy'),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ] else if (node.levelId == 'fractions_lvl2') ...[
+                          const Text(
+                            'LESSONS IN THIS LEVEL',
+                            style: TextStyle(
+                              fontFamily: 'Fredoka',
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              color: ColorSystem.purple,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: ColorSystem.plum.withOpacity(0.12), width: 1),
+                            ),
+                            child: Column(
+                              children: [
+                                _buildLessonRow(context, studentId, 'ratios_les1', '1. Concept Learning', isFirst: true),
+                                const SizedBox(height: 3),
+                                _buildLessonRow(context, studentId, 'ratios_les2', '2. Visual Understanding'),
+                                const SizedBox(height: 3),
+                                _buildLessonRow(context, studentId, 'ratios_les3', '3. Guided Practice'),
+                                const SizedBox(height: 3),
+                                _buildLessonRow(context, studentId, 'ratios_les4', '4. Challenge'),
+                                const SizedBox(height: 3),
+                                _buildLessonRow(context, studentId, 'ratios_les5', '5. Teach Dendy'),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                         ] else ...[
                           Row(
                             children: [
@@ -343,9 +411,17 @@ class QuestBriefModal extends StatelessWidget {
     );
   }
 
-  Widget _buildLessonRow(BuildContext context, String studentId, String lessonId, String title, {bool isFirst = false}) {
-    final isDone = Locator.progressionService.isLessonCompleted(studentId, lessonId);
-    final isUnlocked = isFirst || Locator.progressionService.isLessonUnlocked(studentId, lessonId);
+  Widget _buildLessonRow(
+    BuildContext context,
+    String studentId,
+    String lessonId,
+    String title, {
+    bool isFirst = false,
+    bool isInitialCompleted = false,
+    bool isInitialUnlocked = false,
+  }) {
+    final isDone = isInitialCompleted || Locator.progressionService.isLessonCompleted(studentId, lessonId);
+    final isUnlocked = isDone || isFirst || isInitialUnlocked || Locator.progressionService.isLessonUnlocked(studentId, lessonId);
 
     Color bg = Colors.white;
     Color border = ColorSystem.plum.withOpacity(0.12);

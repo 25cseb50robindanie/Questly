@@ -20,6 +20,10 @@ class ProgressionService {
   bool isLessonUnlocked(String studentId, String lessonId) {
     // Lesson 1 is always unlocked
     if (lessonId == 'density_les1' || lessonId == 'fractions_les1') return true;
+    if (lessonId == 'ratios_les1') {
+      return isLessonCompleted(studentId, 'fractions_les5') ||
+          (Locator.storageService.getBool('node_comp_${studentId}_fractions_node1') ?? false);
+    }
 
     // Lesson 2 requires Lesson 1 to be completed
     if (lessonId == 'density_les2') {
@@ -28,6 +32,10 @@ class ProgressionService {
     if (lessonId == 'fractions_les2') {
       return isLessonCompleted(studentId, 'fractions_les1');
     }
+    if (lessonId == 'ratios_les2') {
+      return isLessonCompleted(studentId, 'ratios_les1');
+    }
+
     // Lesson 3 requires Lesson 2
     if (lessonId == 'density_les3') {
       return isLessonCompleted(studentId, 'density_les2');
@@ -35,6 +43,10 @@ class ProgressionService {
     if (lessonId == 'fractions_les3') {
       return isLessonCompleted(studentId, 'fractions_les2');
     }
+    if (lessonId == 'ratios_les3') {
+      return isLessonCompleted(studentId, 'ratios_les2');
+    }
+
     // Lesson 4 requires Lesson 3
     if (lessonId == 'density_les4') {
       return isLessonCompleted(studentId, 'density_les3');
@@ -42,6 +54,10 @@ class ProgressionService {
     if (lessonId == 'fractions_les4') {
       return isLessonCompleted(studentId, 'fractions_les3');
     }
+    if (lessonId == 'ratios_les4') {
+      return isLessonCompleted(studentId, 'ratios_les3');
+    }
+
     // Lesson 5 requires Lesson 4
     if (lessonId == 'density_les5') {
       return isLessonCompleted(studentId, 'density_les4');
@@ -49,16 +65,26 @@ class ProgressionService {
     if (lessonId == 'fractions_les5') {
       return isLessonCompleted(studentId, 'fractions_les4');
     }
+    if (lessonId == 'ratios_les5') {
+      return isLessonCompleted(studentId, 'ratios_les4');
+    }
 
     return false;
   }
 
   // Checks if a specific RoadmapNode is completed by the student
   bool isNodeCompleted(String studentId, RoadmapNode node) {
-    // If node is level type with multiple lessons (e.g. Level 1 Discover Density)
-    if (node.levelId != null && node.levelId == 'density_lvl1') {
-      // Level 1 requires all 5 lessons to be completed before the whole level node is marked completed!
-      final lessons = ['density_les1', 'density_les2', 'density_les3', 'density_les4', 'density_les5'];
+    // If node is level type with multiple lessons (e.g. Level 1 Discover Density, Canyon Crossings, or Alchemist's Workshop)
+    if (node.levelId != null &&
+        (node.levelId == 'density_lvl1' || node.levelId == 'fractions_lvl1' || node.levelId == 'fractions_lvl2')) {
+      final List<String> lessons;
+      if (node.levelId == 'density_lvl1') {
+        lessons = ['density_les1', 'density_les2', 'density_les3', 'density_les4', 'density_les5'];
+      } else if (node.levelId == 'fractions_lvl1') {
+        lessons = ['fractions_les1', 'fractions_les2', 'fractions_les3', 'fractions_les4', 'fractions_les5'];
+      } else {
+        lessons = ['ratios_les1', 'ratios_les2', 'ratios_les3', 'ratios_les4', 'ratios_les5'];
+      }
       return lessons.every((lid) => isLessonCompleted(studentId, lid));
     }
 
@@ -179,6 +205,18 @@ class ProgressionService {
       if (isLessonCompleted(studentId, 'density_les5')) return 3;
       if (isLessonCompleted(studentId, 'density_les3')) return 2;
       if (isLessonCompleted(studentId, 'density_les1')) return 1;
+      return 0;
+    }
+    if (node.levelId == 'fractions_lvl1') {
+      if (isLessonCompleted(studentId, 'fractions_les5')) return 3;
+      if (isLessonCompleted(studentId, 'fractions_les3')) return 2;
+      if (isLessonCompleted(studentId, 'fractions_les1')) return 1;
+      return 0;
+    }
+    if (node.levelId == 'fractions_lvl2') {
+      if (isLessonCompleted(studentId, 'ratios_les5')) return 3;
+      if (isLessonCompleted(studentId, 'ratios_les3')) return 2;
+      if (isLessonCompleted(studentId, 'ratios_les1')) return 1;
       return 0;
     }
 
