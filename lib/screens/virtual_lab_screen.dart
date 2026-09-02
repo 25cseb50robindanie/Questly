@@ -1115,47 +1115,47 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // =========================================================================
-  // LEVEL 2: APPARATUS SELECTION (COMPACT 2x3 GRID)
+  // LEVEL 2: APPARATUS SELECTION (COMPACT 2x3 GRID WITH RELEVANT ICONS)
   // =========================================================================
   Widget _buildLevel2View() {
     List<Map<String, dynamic>> tools;
 
     if (_selectedExperiment == LabExperiment.flameTest) {
       tools = [
-        {'id': 'burner', 'name': 'Bunsen Burner', 'desc': 'Heating flame', 'req': true},
-        {'id': 'loop', 'name': 'Platinum Loop', 'desc': 'Sample carrier', 'req': true},
-        {'id': 'watchglass', 'name': 'Watch Glass', 'desc': 'Holds crystals', 'req': true},
-        {'id': 'clamp', 'name': 'Retort Clamp', 'desc': 'Secures burner', 'req': true},
-        {'id': 'burette', 'name': '50 mL Burette', 'desc': 'Titration tube (Wrong)', 'req': false},
-        {'id': 'calorimeter', 'name': 'Insulated Cup', 'desc': 'Calorimeter (Wrong)', 'req': false},
+        {'id': 'burner', 'name': 'Bunsen Burner', 'desc': 'Heating flame', 'req': true, 'icon': Icons.local_fire_department_rounded, 'color': const Color(0xFFEF4444)},
+        {'id': 'loop', 'name': 'Platinum Loop', 'desc': 'Sample carrier', 'req': true, 'icon': Icons.gesture_rounded, 'color': const Color(0xFF0EA5E9)},
+        {'id': 'watchglass', 'name': 'Watch Glass', 'desc': 'Holds crystals', 'req': true, 'icon': Icons.circle_outlined, 'color': const Color(0xFF8B5CF6)},
+        {'id': 'clamp', 'name': 'Retort Clamp', 'desc': 'Secures burner', 'req': true, 'icon': Icons.hardware_rounded, 'color': const Color(0xFF64748B)},
+        {'id': 'burette', 'name': '50 mL Burette', 'desc': 'Titration tube (Wrong)', 'req': false, 'icon': Icons.format_color_fill_rounded, 'color': ColorSystem.purple},
+        {'id': 'calorimeter', 'name': 'Insulated Cup', 'desc': 'Calorimeter (Wrong)', 'req': false, 'icon': Icons.coffee_rounded, 'color': ColorSystem.plum},
       ];
     } else if (_selectedExperiment == LabExperiment.calorimetry) {
       tools = [
-        {'id': 'calorimeter', 'name': 'Styrofoam Cup', 'desc': 'Insulated cup', 'req': true},
-        {'id': 'thermometer', 'name': 'Thermometer', 'desc': 'Measures ΔT', 'req': true},
-        {'id': 'stirrer', 'name': 'Stir Bar', 'desc': 'Stirs liquid', 'req': true},
-        {'id': 'beaker', 'name': '100 mL Beaker', 'desc': 'Water vessel', 'req': true},
-        {'id': 'burette', 'name': '50 mL Burette', 'desc': 'Titration tube (Wrong)', 'req': false},
-        {'id': 'furnace', 'name': 'Tuyere Rig', 'desc': 'Smelting (Wrong)', 'req': false},
+        {'id': 'calorimeter', 'name': 'Styrofoam Cup', 'desc': 'Insulated vessel', 'req': true, 'icon': Icons.coffee_rounded, 'color': const Color(0xFF0284C7)},
+        {'id': 'thermometer', 'name': 'Thermometer', 'desc': 'Measures ΔT', 'req': true, 'icon': Icons.thermostat_rounded, 'color': const Color(0xFFEF4444)},
+        {'id': 'stirrer', 'name': 'Stir Bar', 'desc': 'Stirs solution', 'req': true, 'icon': Icons.sync_rounded, 'color': const Color(0xFF10B981)},
+        {'id': 'beaker', 'name': '100 mL Beaker', 'desc': 'Water vessel', 'req': true, 'icon': Icons.science_rounded, 'color': const Color(0xFF6366F1)},
+        {'id': 'burette', 'name': '50 mL Burette', 'desc': 'Titration tube (Wrong)', 'req': false, 'icon': Icons.format_color_fill_rounded, 'color': ColorSystem.purple},
+        {'id': 'furnace', 'name': 'Tuyere Rig', 'desc': 'Smelting (Wrong)', 'req': false, 'icon': Icons.fireplace_rounded, 'color': const Color(0xFFC2410C)},
       ];
     } else if (_selectedExperiment == LabExperiment.smelting) {
       tools = [
-        {'id': 'furnace', 'name': 'Furnace Shaft', 'desc': 'Smelting stack', 'req': true},
-        {'id': 'tuyere', 'name': 'Tuyere Blower', 'desc': '1500°C blast', 'req': true},
-        {'id': 'hopper', 'name': 'Charging Hopper', 'desc': 'Feeds ore & coke', 'req': true},
-        {'id': 'ladle', 'name': 'Tap Ladle', 'desc': 'Collects iron', 'req': true},
-        {'id': 'pipette', 'name': '20 mL Pipette', 'desc': 'Aliquot (Wrong)', 'req': false},
-        {'id': 'watchglass', 'name': 'Watch Glass', 'desc': 'Dish (Wrong)', 'req': false},
+        {'id': 'furnace', 'name': 'Furnace Shaft', 'desc': 'Smelting stack', 'req': true, 'icon': Icons.fireplace_rounded, 'color': const Color(0xFFC2410C)},
+        {'id': 'tuyere', 'name': 'Tuyere Blower', 'desc': '1500°C air blast', 'req': true, 'icon': Icons.air_rounded, 'color': const Color(0xFFF97316)},
+        {'id': 'hopper', 'name': 'Charging Hopper', 'desc': 'Feeds ore & coke', 'req': true, 'icon': Icons.file_download_rounded, 'color': const Color(0xFF78350F)},
+        {'id': 'ladle', 'name': 'Tap Ladle', 'desc': 'Collects iron', 'req': true, 'icon': Icons.soup_kitchen_rounded, 'color': const Color(0xFFEF4444)},
+        {'id': 'pipette', 'name': '20 mL Pipette', 'desc': 'Aliquot (Wrong)', 'req': false, 'icon': Icons.colorize_rounded, 'color': const Color(0xFF6366F1)},
+        {'id': 'watchglass', 'name': 'Watch Glass', 'desc': 'Dish (Wrong)', 'req': false, 'icon': Icons.circle_outlined, 'color': const Color(0xFF64748B)},
       ];
     } else {
       // Titration default
       tools = [
-        {'id': 'stand', 'name': 'Retort Stand', 'desc': 'Secures burette', 'req': true},
-        {'id': 'burette', 'name': '50 mL Burette', 'desc': 'Titrant tube', 'req': true},
-        {'id': 'flask', 'name': 'Conical Flask', 'desc': 'Reaction vessel', 'req': true},
-        {'id': 'pipette', 'name': '20 mL Pipette', 'desc': 'Acid aliquot', 'req': true},
-        {'id': 'beaker', 'name': '100 mL Beaker', 'desc': 'Stock holder (Extra)', 'req': false},
-        {'id': 'burner', 'name': 'Bunsen Burner', 'desc': 'Flame (Wrong)', 'req': false},
+        {'id': 'stand', 'name': 'Retort Stand', 'desc': 'Secures burette', 'req': true, 'icon': Icons.build_circle_rounded, 'color': ColorSystem.castlePurple},
+        {'id': 'burette', 'name': '50 mL Burette', 'desc': 'Titrant dispenser', 'req': true, 'icon': Icons.format_color_fill_rounded, 'color': ColorSystem.purple},
+        {'id': 'flask', 'name': 'Conical Flask', 'desc': 'Reaction vessel', 'req': true, 'icon': Icons.science_rounded, 'color': const Color(0xFF0EA5E9)},
+        {'id': 'pipette', 'name': '20 mL Pipette', 'desc': 'Acid aliquot dispenser', 'req': true, 'icon': Icons.colorize_rounded, 'color': const Color(0xFF6366F1)},
+        {'id': 'beaker', 'name': '100 mL Beaker', 'desc': 'Stock holder (Extra)', 'req': false, 'icon': Icons.local_cafe_outlined, 'color': ColorSystem.plum},
+        {'id': 'burner', 'name': 'Bunsen Burner', 'desc': 'Heating flame (Wrong)', 'req': false, 'icon': Icons.local_fire_department_rounded, 'color': const Color(0xFFEF4444)},
       ];
     }
 
@@ -1183,6 +1183,8 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
               itemBuilder: (ctx, idx) {
                 final item = tools[idx];
                 final isAdded = _assembledApparatus.contains(item['id']);
+                final toolColor = item['color'] as Color;
+                final toolIcon = item['icon'] as IconData;
 
                 return InkWell(
                   onTap: () => _toggleApparatus(item['id'] as String, item['req'] as bool),
@@ -1200,7 +1202,19 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     ),
                     child: Row(
                       children: [
-                        Icon(isAdded ? Icons.check_circle_rounded : Icons.science_outlined, size: 20, color: isAdded ? ColorSystem.green : ColorSystem.castlePurple),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: isAdded ? ColorSystem.green.withOpacity(0.2) : toolColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Icon(
+                            isAdded ? Icons.check_circle_rounded : toolIcon,
+                            size: 18,
+                            color: isAdded ? ColorSystem.green : toolColor,
+                          ),
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Column(
@@ -1236,47 +1250,47 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // =========================================================================
-  // LEVEL 3: REAGENTS PREPARATION (COMPACT 2x3 GRID)
+  // LEVEL 3: REAGENTS PREPARATION (COMPACT 2x3 GRID WITH RELEVANT ICONS)
   // =========================================================================
   Widget _buildLevel3View() {
     List<Map<String, dynamic>> reagents;
 
     if (_selectedExperiment == LabExperiment.flameTest) {
       reagents = [
-        {'id': 'licl', 'name': 'LiCl (Lithium)', 'desc': 'Crimson Red Salt', 'req': true},
-        {'id': 'hcl_rinse', 'name': 'Conc. HCl Acid', 'desc': 'Cleaning Solvent', 'req': true},
-        {'id': 'cacl2', 'name': 'CaCl₂ Salt', 'desc': 'Brick Red Salt', 'req': true},
-        {'id': 'kcl', 'name': 'KCl (Potassium)', 'desc': 'Lilac Violet Salt', 'req': true},
-        {'id': 'sugar', 'name': 'Sucrose Sugar', 'desc': 'Sugar (Wrong)', 'req': false},
-        {'id': 'oil', 'name': 'Cooking Oil', 'desc': 'Oil (Wrong)', 'req': false},
+        {'id': 'licl', 'name': 'LiCl (Lithium)', 'desc': 'Crimson Red Salt', 'req': true, 'icon': Icons.local_fire_department_rounded, 'color': const Color(0xFFEF4444)},
+        {'id': 'hcl_rinse', 'name': 'Conc. HCl Acid', 'desc': 'Cleaning Solvent', 'req': true, 'icon': Icons.cleaning_services_rounded, 'color': const Color(0xFF38BDF8)},
+        {'id': 'cacl2', 'name': 'CaCl₂ Salt', 'desc': 'Brick Red Salt', 'req': true, 'icon': Icons.wb_sunny_rounded, 'color': const Color(0xFFF59E0B)},
+        {'id': 'kcl', 'name': 'KCl (Potassium)', 'desc': 'Lilac Violet Salt', 'req': true, 'icon': Icons.flare_rounded, 'color': const Color(0xFFA855F7)},
+        {'id': 'sugar', 'name': 'Sucrose Sugar', 'desc': 'Sugar (Wrong)', 'req': false, 'icon': Icons.grain_rounded, 'color': const Color(0xFF64748B)},
+        {'id': 'oil', 'name': 'Cooking Oil', 'desc': 'Oil (Wrong)', 'req': false, 'icon': Icons.water_rounded, 'color': const Color(0xFF64748B)},
       ];
     } else if (_selectedExperiment == LabExperiment.calorimetry) {
       reagents = [
-        {'id': 'h2o_mass', 'name': '100.0 g Water', 'desc': 'Calorimeter Solvent', 'req': true},
-        {'id': 'naoh_solid', 'name': 'Solid NaOH', 'desc': 'Exothermic (+q)', 'req': true},
-        {'id': 'nh4no3', 'name': 'NH₄NO₃ Salt', 'desc': 'Endothermic (-q)', 'req': true},
-        {'id': 'ethanol', 'name': 'Ethanol Fuel', 'desc': 'Solvent (Wrong)', 'req': false},
-        {'id': 'sand', 'name': 'Silica Sand', 'desc': 'Sand (Wrong)', 'req': false},
-        {'id': 'oil', 'name': 'Mineral Oil', 'desc': 'Oil (Wrong)', 'req': false},
+        {'id': 'h2o_mass', 'name': '100.0 g Water', 'desc': 'Calorimeter Solvent', 'req': true, 'icon': Icons.water_drop_rounded, 'color': const Color(0xFF0284C7)},
+        {'id': 'naoh_solid', 'name': 'Solid NaOH', 'desc': 'Exothermic (+q)', 'req': true, 'icon': Icons.scatter_plot_rounded, 'color': const Color(0xFFEC4899)},
+        {'id': 'nh4no3', 'name': 'NH₄NO₃ Salt', 'desc': 'Endothermic (-q)', 'req': true, 'icon': Icons.ac_unit_rounded, 'color': const Color(0xFF38BDF8)},
+        {'id': 'ethanol', 'name': 'Ethanol Fuel', 'desc': 'Solvent (Wrong)', 'req': false, 'icon': Icons.local_gas_station_rounded, 'color': const Color(0xFFF97316)},
+        {'id': 'sand', 'name': 'Silica Sand', 'desc': 'Sand (Wrong)', 'req': false, 'icon': Icons.grain_rounded, 'color': const Color(0xFF78350F)},
+        {'id': 'oil', 'name': 'Mineral Oil', 'desc': 'Oil (Wrong)', 'req': false, 'icon': Icons.water_rounded, 'color': const Color(0xFF64748B)},
       ];
     } else if (_selectedExperiment == LabExperiment.smelting) {
       reagents = [
-        {'id': 'hematite', 'name': 'Hematite (Fe₂O₃)', 'desc': 'Iron Ore Source', 'req': true},
-        {'id': 'coke', 'name': 'Carbon Coke', 'desc': 'CO Gas Reducer', 'req': true},
-        {'id': 'limestone', 'name': 'Limestone (CaCO₃)', 'desc': 'Slag Flux Builder', 'req': true},
-        {'id': 'sand', 'name': 'Quartz Sand', 'desc': 'Silica (Impurity)', 'req': false},
-        {'id': 'copper_ore', 'name': 'Chalcopyrite', 'desc': 'Copper (Wrong)', 'req': false},
-        {'id': 'water', 'name': 'Liquid Water', 'desc': 'Water (Wrong)', 'req': false},
+        {'id': 'hematite', 'name': 'Hematite (Fe₂O₃)', 'desc': 'Iron Ore Source', 'req': true, 'icon': Icons.terrain_rounded, 'color': const Color(0xFFB91C1C)},
+        {'id': 'coke', 'name': 'Carbon Coke', 'desc': 'CO Gas Reducer', 'req': true, 'icon': Icons.square_rounded, 'color': const Color(0xFF1E293B)},
+        {'id': 'limestone', 'name': 'Limestone (CaCO₃)', 'desc': 'Slag Flux Builder', 'req': true, 'icon': Icons.filter_hdr_rounded, 'color': const Color(0xFFF59E0B)},
+        {'id': 'sand', 'name': 'Quartz Sand', 'desc': 'Silica (Impurity)', 'req': false, 'icon': Icons.grain_rounded, 'color': const Color(0xFF78350F)},
+        {'id': 'copper_ore', 'name': 'Chalcopyrite', 'desc': 'Copper (Wrong)', 'req': false, 'icon': Icons.token_rounded, 'color': const Color(0xFF10B981)},
+        {'id': 'water', 'name': 'Liquid Water', 'desc': 'Water (Wrong)', 'req': false, 'icon': Icons.water_drop_rounded, 'color': const Color(0xFF0284C7)},
       ];
     } else {
       // Titration default
       reagents = [
-        {'id': 'hcl', 'name': '0.100 M HCl Acid', 'desc': 'Analyte Solution', 'req': true},
-        {'id': 'naoh', 'name': '0.100 M NaOH', 'desc': 'Standard Titrant', 'req': true},
-        {'id': 'phenolphthalein', 'name': 'Phenolphthalein', 'desc': 'pH Indicator', 'req': true},
-        {'id': 'ch3cooh', 'name': '0.100 M Acetic Acid', 'desc': 'Weak Acid (Wrong)', 'req': false},
-        {'id': 'methyl_orange', 'name': 'Methyl Orange', 'desc': 'Indicator (Wrong)', 'req': false},
-        {'id': 'oil', 'name': 'Mineral Oil', 'desc': 'Oil (Wrong)', 'req': false},
+        {'id': 'hcl', 'name': '0.100 M HCl Acid', 'desc': 'Analyte Solution', 'req': true, 'icon': Icons.water_drop_rounded, 'color': const Color(0xFFEF4444)},
+        {'id': 'naoh', 'name': '0.100 M NaOH', 'desc': 'Standard Titrant', 'req': true, 'icon': Icons.opacity_rounded, 'color': const Color(0xFF8B5CF6)},
+        {'id': 'phenolphthalein', 'name': 'Phenolphthalein', 'desc': 'pH Indicator', 'req': true, 'icon': Icons.palette_rounded, 'color': const Color(0xFFEC4899)},
+        {'id': 'ch3cooh', 'name': '0.100 M Acetic Acid', 'desc': 'Weak Acid (Wrong)', 'req': false, 'icon': Icons.sanitizer_rounded, 'color': const Color(0xFFF59E0B)},
+        {'id': 'methyl_orange', 'name': 'Methyl Orange', 'desc': 'Indicator (Wrong)', 'req': false, 'icon': Icons.brush_rounded, 'color': const Color(0xFFF97316)},
+        {'id': 'oil', 'name': 'Mineral Oil', 'desc': 'Oil (Wrong)', 'req': false, 'icon': Icons.water_rounded, 'color': const Color(0xFF64748B)},
       ];
     }
 
@@ -1304,6 +1318,8 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
               itemBuilder: (ctx, idx) {
                 final item = reagents[idx];
                 final isSelected = _selectedReagents.contains(item['id']);
+                final reagentColor = item['color'] as Color;
+                final reagentIcon = item['icon'] as IconData;
 
                 return InkWell(
                   onTap: () => _toggleReagent(item['id'] as String, item['req'] as bool),
@@ -1321,7 +1337,19 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     ),
                     child: Row(
                       children: [
-                        Icon(isSelected ? Icons.check_circle_rounded : Icons.opacity_rounded, size: 20, color: isSelected ? ColorSystem.green : ColorSystem.castlePurple),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: isSelected ? ColorSystem.green.withOpacity(0.2) : reagentColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Icon(
+                            isSelected ? Icons.check_circle_rounded : reagentIcon,
+                            size: 18,
+                            color: isSelected ? ColorSystem.green : reagentColor,
+                          ),
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Column(
