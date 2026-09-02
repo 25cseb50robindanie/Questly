@@ -108,7 +108,6 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     setState(() {
       _selectedQuizIndex = idx;
       if (idx == 0) {
-        // Correct answer
         SoundService.playCorrect();
         _quizCorrect = true;
         if (_unlockedLevel < 2) _unlockedLevel = 2;
@@ -330,32 +329,37 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       backgroundColor: ColorSystem.cream,
       body: QuestlyBackground(
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildHeaderBar(),
-                const SizedBox(height: 6),
-                _buildLevelPills(),
-                const SizedBox(height: 6),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: ColorSystem.plum, width: 1.8),
-                      boxShadow: [
-                        BoxShadow(color: ColorSystem.plum.withOpacity(0.06), offset: const Offset(0, 3), blurRadius: 8),
-                      ],
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 850),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildHeaderBar(),
+                    const SizedBox(height: 8),
+                    _buildLevelPills(),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: ColorSystem.plum, width: 1.8),
+                          boxShadow: [
+                            BoxShadow(color: ColorSystem.plum.withOpacity(0.06), offset: const Offset(0, 3), blurRadius: 8),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: _buildCurrentLevelView(),
+                        ),
+                      ),
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: _buildCurrentLevelView(),
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -367,50 +371,53 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_rounded, color: ColorSystem.plum, size: 22),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              onPressed: () => Navigator.pop(context),
-            ),
-            const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('VIRTUAL SCIENCE LAB', style: TextStyle(fontFamily: 'Fredoka', fontSize: 12, fontWeight: FontWeight.w900, color: ColorSystem.plum)),
-                Text('LEVEL $_currentLevel OF 5 • ACID–BASE TITRATION', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.w800, color: ColorSystem.purple)),
-              ],
-            ),
-          ],
+        Expanded(
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_rounded, color: ColorSystem.plum, size: 24),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => Navigator.pop(context),
+              ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('VIRTUAL SCIENCE LAB', style: TextStyle(fontFamily: 'Fredoka', fontSize: 13, fontWeight: FontWeight.w900, color: ColorSystem.plum)),
+                    Text('LEVEL $_currentLevel OF 5 • ACID–BASE TITRATION', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w800, color: ColorSystem.purple)),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         if (_student != null)
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: ColorSystem.plum.withOpacity(0.15))),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: ColorSystem.plum.withOpacity(0.15))),
                 child: Row(
                   children: [
-                    VectorAssetHelper.xpStarIcon(size: 12),
+                    VectorAssetHelper.xpStarIcon(size: 13),
                     const SizedBox(width: 4),
-                    Text('${_student!.xp} XP', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
+                    Text('${_student!.xp} XP', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
                   ],
                 ),
               ),
               const SizedBox(width: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: ColorSystem.plum.withOpacity(0.15))),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: ColorSystem.plum.withOpacity(0.15))),
                 child: Row(
                   children: [
-                    VectorAssetHelper.questCoinIcon(size: 12),
+                    VectorAssetHelper.questCoinIcon(size: 13),
                     const SizedBox(width: 4),
-                    Text('${_student!.gold}', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.w900, color: ColorSystem.gold)),
+                    Text('${_student!.gold}', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.gold)),
                   ],
                 ),
               ),
@@ -444,24 +451,24 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
 
         return Expanded(
           child: Padding(
-            padding: EdgeInsets.only(right: index == 4 ? 0 : 4),
+            padding: EdgeInsets.only(right: index == 4 ? 0 : 6),
             child: InkWell(
               onTap: !isLocked ? () => setState(() => _currentLevel = levelNum) : null,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(6), border: Border.all(color: border, width: 1.2)),
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8), border: Border.all(color: border, width: 1.2)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (isPassed) ...[
-                      const Icon(Icons.check_rounded, size: 9, color: ColorSystem.green),
-                      const SizedBox(width: 2),
+                      const Icon(Icons.check_rounded, size: 10, color: ColorSystem.green),
+                      const SizedBox(width: 3),
                     ] else if (isLocked) ...[
-                      Icon(Icons.lock_outline_rounded, size: 8.5, color: Colors.grey.shade400),
-                      const SizedBox(width: 2),
+                      Icon(Icons.lock_outline_rounded, size: 9, color: Colors.grey.shade400),
+                      const SizedBox(width: 3),
                     ],
-                    Text('Level $levelNum', style: TextStyle(fontFamily: 'Fredoka', fontSize: 9, fontWeight: FontWeight.w900, color: textColor)),
+                    Text('Level $levelNum', style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: textColor)),
                   ],
                 ),
               ),
@@ -474,20 +481,20 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
 
   Widget _buildFoxyTeacherBanner(String speechText, DendyState state) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: ColorSystem.cream,
         border: Border(bottom: BorderSide(color: ColorSystem.plum.withOpacity(0.12), width: 1.2)),
       ),
       child: Row(
         children: [
-          DendyMascot(state: state, size: 36),
-          const SizedBox(width: 8),
+          DendyMascot(state: state, size: 40),
+          const SizedBox(width: 10),
           Expanded(
-            child: Text(speechText, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.bold, color: ColorSystem.plum, height: 1.25)),
+            child: Text(speechText, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.bold, color: ColorSystem.plum, height: 1.25)),
           ),
-          const SizedBox(width: 6),
-          DendySpeakButton(textToSpeak: speechText, size: 20),
+          const SizedBox(width: 8),
+          DendySpeakButton(textToSpeak: speechText, size: 22),
         ],
       ),
     );
@@ -565,9 +572,14 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildFoxyTeacherBanner(teacherMessage, _quizCorrect ? DendyState.success : DendyState.idle),
-        Expanded(child: Padding(padding: const EdgeInsets.all(10), child: slideContent)),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(12),
+            child: slideContent,
+          ),
+        ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(color: const Color(0xFFF8FAFC), border: Border(top: BorderSide(color: ColorSystem.plum.withOpacity(0.1)))),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -575,8 +587,8 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
               if (_conceptSlide > 0)
                 CustomButton(text: '⮜ Previous', backgroundColor: ColorSystem.lavender, textColor: Colors.white, onPressed: _prevSlide)
               else
-                const SizedBox(width: 80),
-              Text('Lesson ${_conceptSlide + 1} of 4', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
+                const SizedBox(width: 90),
+              Text('Lesson ${_conceptSlide + 1} of 4', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
               if (_conceptSlide < 3)
                 CustomButton(text: 'Next Concept ➜', backgroundColor: ColorSystem.castlePurple, textColor: Colors.white, onPressed: _nextSlide)
               else
@@ -597,16 +609,17 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(color: ColorSystem.castlePurple, borderRadius: BorderRadius.circular(10)),
-          child: Text(formula, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 11.5, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.3)),
-        ),
         const SizedBox(height: 10),
         Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: ColorSystem.cream, borderRadius: BorderRadius.circular(10), border: Border.all(color: ColorSystem.plum.withOpacity(0.1))),
-          child: Text(desc, textAlign: TextAlign.center, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, color: ColorSystem.plum, height: 1.3)),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(color: ColorSystem.castlePurple, borderRadius: BorderRadius.circular(12)),
+          child: Text(formula, textAlign: TextAlign.center, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 13, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.3)),
+        ),
+        const SizedBox(height: 14),
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(color: ColorSystem.cream, borderRadius: BorderRadius.circular(12), border: Border.all(color: ColorSystem.plum.withOpacity(0.1))),
+          child: Text(desc, textAlign: TextAlign.center, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 11.5, color: ColorSystem.plum, height: 1.35)),
         ),
       ],
     );
@@ -617,29 +630,29 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       children: [
         Expanded(
           child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(10), border: Border.all(color: c1.withOpacity(0.4), width: 1.4)),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(12), border: Border.all(color: c1.withOpacity(0.4), width: 1.4)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(t1, style: TextStyle(fontFamily: 'Fredoka', fontSize: 10.5, fontWeight: FontWeight.w900, color: c1)),
-                const SizedBox(height: 4),
-                Text(d1, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Fredoka', fontSize: 8.5, color: ColorSystem.plum.withOpacity(0.7))),
+                Text(t1, style: TextStyle(fontFamily: 'Fredoka', fontSize: 12, fontWeight: FontWeight.w900, color: c1)),
+                const SizedBox(height: 6),
+                Text(d1, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, color: ColorSystem.plum.withOpacity(0.7))),
               ],
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 10),
         Expanded(
           child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(10), border: Border.all(color: c2.withOpacity(0.4), width: 1.4)),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(12), border: Border.all(color: c2.withOpacity(0.4), width: 1.4)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(t2, style: TextStyle(fontFamily: 'Fredoka', fontSize: 10.5, fontWeight: FontWeight.w900, color: c2)),
-                const SizedBox(height: 4),
-                Text(d2, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Fredoka', fontSize: 8.5, color: ColorSystem.plum.withOpacity(0.7))),
+                Text(t2, style: TextStyle(fontFamily: 'Fredoka', fontSize: 12, fontWeight: FontWeight.w900, color: c2)),
+                const SizedBox(height: 6),
+                Text(d2, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, color: ColorSystem.plum.withOpacity(0.7))),
               ],
             ),
           ),
@@ -652,48 +665,43 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(question, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.plum)),
-        const SizedBox(height: 6),
-        Expanded(
-          child: ListView.builder(
-            itemCount: options.length,
-            itemBuilder: (ctx, idx) {
-              final isSelected = _selectedQuizIndex == idx;
-              final isRight = idx == correctIdx;
-              Color bg = const Color(0xFFF8FAFC);
-              Color border = ColorSystem.plum.withOpacity(0.15);
+        Text(question, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 11.5, fontWeight: FontWeight.w900, color: ColorSystem.plum)),
+        const SizedBox(height: 10),
+        ...List.generate(options.length, (idx) {
+          final isSelected = _selectedQuizIndex == idx;
+          final isRight = idx == correctIdx;
+          Color bg = const Color(0xFFF8FAFC);
+          Color border = ColorSystem.plum.withOpacity(0.15);
 
-              if (isSelected) {
-                bg = isRight ? ColorSystem.green.withOpacity(0.18) : ColorSystem.coral.withOpacity(0.18);
-                border = isRight ? ColorSystem.green : ColorSystem.coral;
-              }
+          if (isSelected) {
+            bg = isRight ? ColorSystem.green.withOpacity(0.18) : ColorSystem.coral.withOpacity(0.18);
+            border = isRight ? ColorSystem.green : ColorSystem.coral;
+          }
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: InkWell(
-                  onTap: () => _selectQuizOption(idx),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8), border: Border.all(color: border, width: 1.2)),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 8,
-                          backgroundColor: isSelected ? (isRight ? ColorSystem.green : ColorSystem.coral) : ColorSystem.lavender.withOpacity(0.2),
-                          child: Text(String.fromCharCode(65 + idx), style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : ColorSystem.plum)),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(child: Text(options[idx], style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.bold, color: ColorSystem.plum))),
-                        if (isSelected && isRight) const Icon(Icons.check_circle_rounded, color: ColorSystem.green, size: 16),
-                      ],
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: InkWell(
+              onTap: () => _selectQuizOption(idx),
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10), border: Border.all(color: border, width: 1.2)),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 10,
+                      backgroundColor: isSelected ? (isRight ? ColorSystem.green : ColorSystem.coral) : ColorSystem.lavender.withOpacity(0.2),
+                      child: Text(String.fromCharCode(65 + idx), style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : ColorSystem.plum)),
                     ),
-                  ),
+                    const SizedBox(width: 10),
+                    Expanded(child: Text(options[idx], style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10.5, fontWeight: FontWeight.bold, color: ColorSystem.plum))),
+                    if (isSelected && isRight) const Icon(Icons.check_circle_rounded, color: ColorSystem.green, size: 18),
+                  ],
                 ),
-              );
-            },
-          ),
-        ),
+              ),
+            ),
+          );
+        }),
       ],
     );
   }
@@ -722,13 +730,13 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 2.1,
-                crossAxisSpacing: 6,
-                mainAxisSpacing: 6,
+                childAspectRatio: 2.2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
               ),
               itemCount: tools.length,
               itemBuilder: (ctx, idx) {
@@ -737,12 +745,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
 
                 return InkWell(
                   onTap: () => _toggleApparatus(item['id'] as String, item['req'] as bool),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                   child: Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: isAdded ? ColorSystem.green.withOpacity(0.12) : const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isAdded ? ColorSystem.green : ColorSystem.plum.withOpacity(0.15),
                         width: isAdded ? 1.6 : 1.0,
@@ -750,15 +758,15 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     ),
                     child: Row(
                       children: [
-                        Icon(isAdded ? Icons.check_circle_rounded : Icons.science_outlined, size: 20, color: isAdded ? ColorSystem.green : ColorSystem.castlePurple),
-                        const SizedBox(width: 6),
+                        Icon(isAdded ? Icons.check_circle_rounded : Icons.science_outlined, size: 22, color: isAdded ? ColorSystem.green : ColorSystem.castlePurple),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(item['name'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 9, fontWeight: FontWeight.w900, color: isAdded ? ColorSystem.green : ColorSystem.plum), maxLines: 1),
-                              Text(item['desc'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 7, color: ColorSystem.plum.withOpacity(0.6)), maxLines: 1),
+                              Text(item['name'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: isAdded ? ColorSystem.green : ColorSystem.plum), maxLines: 1),
+                              Text(item['desc'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 8, color: ColorSystem.plum.withOpacity(0.6)), maxLines: 1),
                             ],
                           ),
                         ),
@@ -771,7 +779,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(color: const Color(0xFFF8FAFC), border: Border(top: BorderSide(color: ColorSystem.plum.withOpacity(0.1)))),
           child: CustomButton(
             text: isDone ? 'START REAGENTS PREPARATION ➜' : 'Select all 4 required tools (${_assembledApparatus.length}/4)',
@@ -808,13 +816,13 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 2.2,
-                crossAxisSpacing: 6,
-                mainAxisSpacing: 6,
+                childAspectRatio: 2.3,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
               ),
               itemCount: reagents.length,
               itemBuilder: (ctx, idx) {
@@ -823,12 +831,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
 
                 return InkWell(
                   onTap: () => _toggleReagent(item['id'] as String, item['req'] as bool),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                   child: Container(
-                    padding: const EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: isSelected ? ColorSystem.green.withOpacity(0.12) : const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isSelected ? ColorSystem.green : ColorSystem.purple.withOpacity(0.3),
                         width: isSelected ? 1.6 : 1.0,
@@ -836,15 +844,15 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     ),
                     child: Row(
                       children: [
-                        Icon(isSelected ? Icons.check_circle_rounded : Icons.opacity_rounded, size: 18, color: isSelected ? ColorSystem.green : ColorSystem.castlePurple),
-                        const SizedBox(width: 6),
+                        Icon(isSelected ? Icons.check_circle_rounded : Icons.opacity_rounded, size: 20, color: isSelected ? ColorSystem.green : ColorSystem.castlePurple),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(item['name'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 9, fontWeight: FontWeight.w900, color: isSelected ? ColorSystem.green : ColorSystem.plum), maxLines: 1),
-                              Text(item['desc'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 7, color: ColorSystem.plum.withOpacity(0.6)), maxLines: 1),
+                              Text(item['name'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: isSelected ? ColorSystem.green : ColorSystem.plum), maxLines: 1),
+                              Text(item['desc'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 8, color: ColorSystem.plum.withOpacity(0.6)), maxLines: 1),
                             ],
                           ),
                         ),
@@ -857,7 +865,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(color: const Color(0xFFF8FAFC), border: Border(top: BorderSide(color: ColorSystem.plum.withOpacity(0.1)))),
           child: CustomButton(
             text: isDone ? 'START VIRTUAL LAB SIMULATOR ➜' : 'Select at least 2 active chemicals (${_selectedReagents.length}/2)',
@@ -886,13 +894,13 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.all(8),
             child: Row(
               children: [
                 Expanded(
                   flex: 5,
                   child: Container(
-                    decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(10), border: Border.all(color: ColorSystem.plum.withOpacity(0.12))),
+                    decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(12), border: Border.all(color: ColorSystem.plum.withOpacity(0.12))),
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -912,16 +920,16 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                           ),
                         ),
                         Positioned(
-                          top: 4,
-                          left: 4,
+                          top: 6,
+                          left: 6,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-                            decoration: BoxDecoration(color: ColorSystem.plum.withOpacity(0.88), borderRadius: BorderRadius.circular(5)),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                            decoration: BoxDecoration(color: ColorSystem.plum.withOpacity(0.88), borderRadius: BorderRadius.circular(6)),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('V: ${_buretteVolume.toStringAsFixed(2)} mL', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 8.5, fontWeight: FontWeight.bold, color: Colors.white)),
-                                Text('pH: ${ph.toStringAsFixed(2)}', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 8.5, fontWeight: FontWeight.bold, color: ColorSystem.gold)),
+                                Text('V: ${_buretteVolume.toStringAsFixed(2)} mL', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.white)),
+                                Text('pH: ${ph.toStringAsFixed(2)}', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.bold, color: ColorSystem.gold)),
                               ],
                             ),
                           ),
@@ -930,12 +938,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     ),
                   ),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 8),
                 Expanded(
                   flex: 5,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       CustomButton(text: '+0.05 mL Drop', backgroundColor: ColorSystem.castlePurple, textColor: Colors.white, onPressed: () => _addDrop(amount: 0.05)),
                       CustomButton(text: '+1.00 mL Fast', backgroundColor: ColorSystem.purple, textColor: Colors.white, onPressed: () => _addDrop(amount: 1.00)),
@@ -971,22 +979,22 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('OVERALL PERFORMANCE ANALYSIS', style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.green)),
-                    Text('Accuracy: ${accuracy.toStringAsFixed(1)}%', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.w900, color: ColorSystem.plum)),
+                    const Text('OVERALL PERFORMANCE ANALYSIS', style: TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.w900, color: ColorSystem.green)),
+                    Text('Accuracy: ${accuracy.toStringAsFixed(1)}%', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.plum)),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(10), border: Border.all(color: ColorSystem.plum.withOpacity(0.1))),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(12), border: Border.all(color: ColorSystem.plum.withOpacity(0.1))),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -1005,7 +1013,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(color: const Color(0xFFF8FAFC), border: Border(top: BorderSide(color: ColorSystem.plum.withOpacity(0.1)))),
           child: CustomButton(
             text: 'CLAIM 60 XP & FINISH LAB',
@@ -1024,12 +1032,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       children: [
         Row(
           children: [
-            Icon(icon, size: 12, color: ColorSystem.castlePurple),
-            const SizedBox(width: 4),
-            Text(label, style: TextStyle(fontFamily: 'Fredoka', fontSize: 8.5, fontWeight: FontWeight.bold, color: ColorSystem.plum.withOpacity(0.65))),
+            Icon(icon, size: 14, color: ColorSystem.castlePurple),
+            const SizedBox(width: 6),
+            Text(label, style: TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.bold, color: ColorSystem.plum.withOpacity(0.65))),
           ],
         ),
-        Text(value, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9, fontWeight: FontWeight.w900, color: ColorSystem.plum)),
+        Text(value, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.plum)),
       ],
     );
   }
@@ -1059,6 +1067,8 @@ class _MobileTitrationPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+
     final cx = size.width * 0.55;
     final standX = size.width * 0.20;
 
@@ -1072,7 +1082,7 @@ class _MobileTitrationPainter extends CustomPainter {
     final bTop = size.height * 0.08;
     final bBottom = size.height * 0.54;
     final bWidth = 11.0;
-    final bRect = Rect.fromCenter(center: Offset(cx, (bTop + bBottom) / 2), width: bWidth, height: bBottom - bTop);
+    final bRect = Rect.fromCenter(center: Offset(cx, (bTop + bBottom) / 2), width: bWidth, height: (bBottom - bTop).abs());
 
     final fraction = (1.0 - (buretteVolume / maxVolume)).clamp(0.0, 1.0);
     final liqTop = bTop + (bBottom - bTop) * (1.0 - fraction);
