@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questly – Login Portal</title>
+  <meta name="description" content="Log in to Questly, choose your standard, language, and embark on STEM quests!">
+  <link rel="icon" type="image/jpeg" href="assets/img/foxy_mascot.jpg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="login-body">
+  <!-- ==========================================
+       CREATIVE LOGIN ANIMATION: DENDY WALK & WATER SPLASH BLOOM
+       ========================================== -->
+  <div class="dendy-splash-intro-overlay" id="dendy-splash-intro">
+    <button class="intro-skip-btn" onclick="skipSplashIntro()" title="Skip Intro">
+      <span>Skip Intro</span> ❯
+    </button>
+
+    <!-- Walking Stage across the Viewport -->
+    <div class="dendy-walk-stage" id="dendy-walk-stage">
+      
+      <!-- Speech Bubble that follows Dendy -->
+      <div class="dendy-intro-speech" id="dendy-intro-speech">
+        <span id="dendy-speech-bubble-text">🐾 Dendy is bringing the Quest Water! 🌊</span>
+      </div>
+
+      <!-- Standalone Cutout Character Rig (Pure Character, No Box, No Frame) -->
+      <div class="foxy-standalone-actor-rig" id="dendy-vector-rig">
+        <div class="foxy-organic-cutout">
+          <img src="assets/img/foxy_walking.jpg" alt="Foxy Walking" class="foxy-pose-img foxy-walk-pose">
+          <img src="assets/img/foxy_coat_suit_splash.jpg" alt="Foxy Splashing" class="foxy-pose-img foxy-splash-pose">
+        </div>
+        <!-- Realistic Ground Shadow under Foxy -->
+        <div class="foxy-ground-shadow"></div>
+      </div>
+
+      <!-- Glowing Walk Pathway underfoot -->
+      <div class="dendy-ground-walkway"></div>
+    </div>
+
+    <!-- Liquid Splash Wave & Bloom Shape that spreads outward on throw -->
+    <div class="water-liquid-splash-bloom" id="liquid-splash-bloom">
+      <svg class="splash-blob-svg" viewBox="0 0 500 500">
+        <path class="splash-blob-path" d="M250,50 C380,20 480,120 460,250 C440,380 370,470 250,460 C130,450 30,370 50,250 C70,130 120,80 250,50 Z" fill="url(#splashGrad)"/>
+        <defs>
+          <radialGradient id="splashGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="25%" stop-color="#38bdf8"/>
+            <stop offset="60%" stop-color="#a855f7"/>
+            <stop offset="90%" stop-color="#1e1b4b"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </radialGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- Full-screen Dynamic Canvas Water Droplets Simulation -->
+    <canvas id="water-splash-canvas"></canvas>
+  </div>
+
+  <!-- Ambient Background Container -->
+  <div class="fantasy-bg-container">
+    <div class="fantasy-bg-image"></div>
+    <div class="fantasy-bg-overlay"></div>
+    <canvas id="login-particle-canvas"></canvas>
+  </div>
+
+  <!-- Central Viewport Wrapper -->
+  <div class="login-page-container">
+    
+    <!-- Top Hero Branding -->
+    <header class="questly-hero-header">
+      <div class="questly-hero-logo-wrap">
+        <div class="orbital-glow-ring"></div>
+        <span class="golden-sparkle-top">✦</span>
+        <h1 class="questly-hero-logo">
+          <span class="cap-badge">🎓</span>Questly
+        </h1>
+      </div>
+      <div class="questly-hero-tagline">
+        Explore <span>✦</span> Learn <span>✦</span> Grow
+      </div>
+      <p class="questly-hero-subtext" id="tagline-subtext">The Gamified Learning Universe</p>
+    </header>
+
+    <!-- Main Glassmorphic Arched Portal Card -->
+    <div class="portal-card-wrapper">
+      
+      <!-- Top Golden Star Crest -->
+      <div class="portal-star-crest">
+        <span class="crest-star">✦</span>
+      </div>
+
+      <div class="portal-glass-card">
+        
+        <!-- Foxy Mascot Avatar Frame -->
+        <div class="foxy-avatar-frame-wrap">
+          <div class="foxy-avatar-neon-ring">
+            <img src="assets/img/foxy_mascot.jpg" alt="Foxy Mascot" class="foxy-avatar-img" id="login-foxy-avatar">
+          </div>
+          <!-- Live Mascot Speech Bubble -->
+          <div class="foxy-speech-bubble" id="foxy-speech">
+            <span id="foxy-speech-text">Welcome adventurer! Ready for today's quest?</span>
+          </div>
+        </div>
+
+        <!-- Embedded Questly Sub-Brand Title -->
+        <div class="portal-sub-brand">
+          <h2 class="portal-brand-title">Questly</h2>
+          <span class="portal-brand-sparkle">✦</span>
+        </div>
+
+        <!-- Tab Switcher: Login / Sign Up -->
+        <div class="portal-tab-switch" id="portal-tab-switch-row">
+          <button type="button" class="portal-tab active" id="tab-login" onclick="switchAuthTab('login')">
+            <span>Sign In</span>
+          </button>
+          <button type="button" class="portal-tab" id="tab-register" onclick="switchAuthTab('register')">
+            <span>Create Account</span>
+          </button>
+        </div>
+
+        <!-- Notification / Error Banner -->
+        <div class="portal-alert-box" id="portal-alert" style="display: none;">
+          <span class="alert-icon">⚠️</span>
+          <span class="alert-msg" id="portal-alert-text">Please fill in all fields.</span>
+        </div>
+
+        <!-- ==========================================
+             LOGIN FORM
+             ========================================== -->
+        <form id="questly-login-form" class="portal-form active" onsubmit="handlePortalLogin(event)">
+          
+          <!-- 1. Username / Email Input -->
+          <div class="input-pill-group">
+            <label for="login-username" class="input-sr-label">Username or Email</label>
+            <span class="input-icon">👤</span>
+            <input 
+              type="text" 
+              id="login-username" 
+              class="portal-input" 
+              placeholder="Username or Email" 
+              required 
+              autocomplete="username"
+            >
+          </div>
+
+          <!-- 2. Password Input -->
+          <div class="input-pill-group">
+            <label for="login-password" class="input-sr-label">Password</label>
+            <span class="input-icon">🔒</span>
+            <input 
+              type="password" 
+              id="login-password" 
+              class="portal-input" 
+              placeholder="Password" 
+              required 
+              autocomplete="current-password"
+            >
+            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('login-password', this)" title="Show/Hide Password" aria-label="Toggle password visibility">
+              <span class="toggle-eye-icon">👁</span>
+            </button>
+          </div>
+
+          <!-- 3. Standard / Grade Selector (After Password) -->
+          <div class="input-pill-group select-group">
+            <label for="login-standard" class="input-sr-label">Standard / Grade</label>
+            <span class="input-icon">🎓</span>
+            <select id="login-standard" class="portal-input portal-select" required>
+              <option value="Standard 1st">Standard 1st (Grade 1)</option>
+              <option value="Standard 2nd">Standard 2nd (Grade 2)</option>
+              <option value="Standard 3rd">Standard 3rd (Grade 3)</option>
+              <option value="Standard 4th">Standard 4th (Grade 4)</option>
+              <option value="Standard 5th">Standard 5th (Grade 5)</option>
+              <option value="Standard 6th">Standard 6th (Grade 6)</option>
+              <option value="Standard 7th">Standard 7th (Grade 7)</option>
+              <option value="Standard 8th" selected>Standard 8th (Grade 8)</option>
+              <option value="Standard 9th">Standard 9th (Grade 9)</option>
+              <option value="Standard 10th">Standard 10th (Grade 10)</option>
+              <option value="Standard 11th">Standard 11th (Grade 11)</option>
+              <option value="Standard 12th">Standard 12th (Grade 12)</option>
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+
+          <!-- 4. Language Preference Selector (Strictly Tamil, English, Odia) -->
+          <div class="input-pill-group select-group language-highlight">
+            <label for="login-language" class="input-sr-label">Language Preference</label>
+            <span class="input-icon">🌐</span>
+            <select id="login-language" class="portal-input portal-select" required onchange="onLanguageChange(this.value)">
+              <option value="en" selected>🇬🇧 English</option>
+              <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
+              <option value="or">🇮🇳 ଓଡ଼ିଆ (Odia)</option>
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+
+          <!-- Checkbox & Forgot Password Row -->
+          <div class="portal-row-utility">
+            <label class="custom-checkbox-wrap">
+              <input type="checkbox" id="remember-me" checked>
+              <span class="checkbox-box">✓</span>
+              <span class="checkbox-label" id="lbl-remember-me">Remember Me</span>
+            </label>
+            <a href="javascript:void(0)" class="forgot-link" onclick="handleForgotPassword()" id="lbl-forgot-pw">Forgot Password?</a>
+          </div>
+
+          <!-- Glowing Gradient Login Button -->
+          <button type="submit" class="portal-action-btn primary-glow-btn" id="btn-portal-login">
+            <span class="btn-cap-icon">🎓</span>
+            <span class="btn-text" id="btn-login-text">Login</span>
+            <span class="btn-arrow-icon">❯</span>
+          </button>
+
+          <!-- Divider -->
+          <div class="portal-divider">
+            <span>or</span>
+          </div>
+
+          <!-- Social Quick Logins -->
+          <div class="social-logins-row">
+            <button type="button" class="social-btn google-btn" onclick="quickSocialLogin('Google')">
+              <svg class="social-svg" viewBox="0 0 24 24" width="18" height="18">
+                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.3 8.9 5 12 5z"/>
+                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
+                <path fill="#FBBC05" d="M5.3 14.7c-.2-.7-.4-1.5-.4-2.4s.2-1.6.4-2.4L1.6 7c-.8 1.6-1.3 3.4-1.3 5.3s.5 3.7 1.3 5.3l3.7-2.9z"/>
+                <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.3-6.7-5.3L1.6 16c1.9 3.8 5.8 7 10.4 7z"/>
+              </svg>
+              <span>Continue with Google</span>
+            </button>
+
+            <button type="button" class="social-btn apple-btn" onclick="quickSocialLogin('Apple')">
+              <svg class="social-svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.62-.75 1.04-1.79.93-2.85-.9.04-1.99.6-2.63 1.35-.57.65-1.06 1.71-.93 2.73 1 .08 2.01-.48 2.63-1.23z"/>
+              </svg>
+              <span>Continue with Apple</span>
+            </button>
+          </div>
+
+          <!-- Bottom Switcher to Sign Up -->
+          <div class="portal-footer-link">
+            <span id="lbl-new-questly">New to Questly?</span>
+            <a href="javascript:void(0)" onclick="switchAuthTab('register')" id="link-create-account">Create an Account ❯</a>
+          </div>
+
+        </form>
+
+        <!-- ==========================================
+             REGISTRATION / SIGN UP FORM
+             ========================================== -->
+        <form id="questly-register-form" class="portal-form" onsubmit="handlePortalRegister(event)" style="display: none;">
+          
+          <!-- 1. Full Name / Explorer Codename -->
+          <div class="input-pill-group">
+            <label for="reg-username" class="input-sr-label">Explorer Codename</label>
+            <span class="input-icon">✨</span>
+            <input 
+              type="text" 
+              id="reg-username" 
+              class="portal-input" 
+              placeholder="Explorer Codename" 
+              required 
+              autocomplete="name"
+            >
+          </div>
+
+          <!-- 2. Email Address -->
+          <div class="input-pill-group">
+            <label for="reg-email" class="input-sr-label">Student Email</label>
+            <span class="input-icon">✉️</span>
+            <input 
+              type="email" 
+              id="reg-email" 
+              class="portal-input" 
+              placeholder="Student or Parent Email" 
+              required 
+              autocomplete="email"
+            >
+          </div>
+
+          <!-- 3. Password -->
+          <div class="input-pill-group">
+            <label for="reg-password" class="input-sr-label">Create Password</label>
+            <span class="input-icon">🔒</span>
+            <input 
+              type="password" 
+              id="reg-password" 
+              class="portal-input" 
+              placeholder="Create Secret Password" 
+              required 
+              autocomplete="new-password"
+            >
+            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-password', this)" title="Show/Hide Password" aria-label="Toggle password visibility">
+              <span class="toggle-eye-icon">👁</span>
+            </button>
+          </div>
+
+          <!-- 4. Standard / Grade Selector -->
+          <div class="input-pill-group select-group">
+            <label for="reg-standard" class="input-sr-label">Select Standard</label>
+            <span class="input-icon">🎓</span>
+            <select id="reg-standard" class="portal-input portal-select" required>
+              <option value="Standard 1st">Standard 1st (Grade 1)</option>
+              <option value="Standard 2nd">Standard 2nd (Grade 2)</option>
+              <option value="Standard 3rd">Standard 3rd (Grade 3)</option>
+              <option value="Standard 4th">Standard 4th (Grade 4)</option>
+              <option value="Standard 5th">Standard 5th (Grade 5)</option>
+              <option value="Standard 6th">Standard 6th (Grade 6)</option>
+              <option value="Standard 7th">Standard 7th (Grade 7)</option>
+              <option value="Standard 8th" selected>Standard 8th (Grade 8)</option>
+              <option value="Standard 9th">Standard 9th (Grade 9)</option>
+              <option value="Standard 10th">Standard 10th (Grade 10)</option>
+              <option value="Standard 11th">Standard 11th (Grade 11)</option>
+              <option value="Standard 12th">Standard 12th (Grade 12)</option>
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+
+          <!-- 5. Language Preference Selector -->
+          <div class="input-pill-group select-group language-highlight">
+            <label for="reg-language" class="input-sr-label">Language Preference</label>
+            <span class="input-icon">🌐</span>
+            <select id="reg-language" class="portal-input portal-select" required onchange="onLanguageChange(this.value)">
+              <option value="en" selected>🇬🇧 English</option>
+              <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
+              <option value="or">🇮🇳 ଓଡ଼ିଆ (Odia)</option>
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+
+          <!-- Register Action Button -->
+          <button type="submit" class="portal-action-btn primary-glow-btn" id="btn-portal-register">
+            <span class="btn-cap-icon">🚀</span>
+            <span class="btn-text" id="btn-register-text">Begin Adventure</span>
+            <span class="btn-arrow-icon">❯</span>
+          </button>
+
+          <!-- Bottom Switcher back to Sign In -->
+          <div class="portal-footer-link">
+            <span>Already have an account?</span>
+            <a href="javascript:void(0)" onclick="switchAuthTab('login')">Sign In ❯</a>
+          </div>
+
+        </form>
+
+        <!-- ==========================================
+             AUTHENTICATED USER ACTIVE SESSION CARD
+             ========================================== -->
+        <div id="questly-session-card" class="portal-session-state" style="display: none;">
+          <div class="session-welcome-badge">
+            <span class="session-sparkle">✨</span>
+            <h3 class="session-title" id="session-user-name">Welcome Back!</h3>
+          </div>
+          <div class="session-details-box" style="margin: 18px 0; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 14px; padding: 14px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px; font-size: 13.5px; color: #cbd5e1;">
+              <span>🎓 Standard:</span>
+              <strong style="color: var(--neon-cyan);" id="session-standard-val">Standard 8th</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px; font-size: 13.5px; color: #cbd5e1;">
+              <span>🌐 Language:</span>
+              <strong style="color: var(--gold-primary);" id="session-lang-val">English</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size: 13.5px; color: #cbd5e1;">
+              <span>⭐ Status:</span>
+              <strong style="color: #4ade80;">Active Session</strong>
+            </div>
+          </div>
+          <button type="button" class="portal-action-btn" onclick="handleLogout()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5;">
+            <span>🔄 Switch Account / Sign Out</span>
+          </button>
+        </div>
+
+      </div> <!-- /portal-glass-card -->
+    </div> <!-- /portal-card-wrapper -->
+
+    <!-- Magic Portal Rune Base -->
+    <div class="portal-ground-rune">
+      <div class="rune-circle-glow"></div>
+      <div class="rune-star-point">✦</div>
+    </div>
+
+    <!-- Replay Dendy Splash Intro Button -->
+    <div style="margin-top: 16px; z-index: 20;">
+      <button type="button" class="social-btn" onclick="playSplashIntro(true)" style="background: rgba(147, 51, 234, 0.3); border-color: rgba(168, 85, 247, 0.6); padding: 8px 18px; font-size: 12.5px; color: #f3e8ff;">
+        <span>🌊 Replay Dendy Splash Intro ✨</span>
+      </button>
+    </div>
+
+  </div> <!-- /login-page-container -->
+
+  <script src="app.js"></script>
+</body>
+</html>

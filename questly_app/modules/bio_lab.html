@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questly Virtual Lab – Plant Cell & Photosynthesis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: radial-gradient(circle at center, #064e3b 0%, #022c22 60%, #01140e 100%);
+      color: #ecfdf5;
+      font-family: 'Nunito', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(6, 78, 59, 0.85);
+      border-bottom: 2px solid #10b981;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    h1 { font-family: 'Fredoka', cursive; font-size: 20px; color: #a7f3d0; display: flex; align-items: center; gap: 8px; }
+    .badge { background: #047857; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 800; }
+    .lab-stage {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      padding: 16px;
+      height: calc(100vh - 60px);
+    }
+    .sim-viewport {
+      background: rgba(4, 44, 34, 0.7);
+      border: 2px solid #10b981;
+      border-radius: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 40px rgba(16, 185, 129, 0.2);
+    }
+    .plant-cell-svg {
+      width: 85%;
+      max-height: 70%;
+      filter: drop-shadow(0 10px 25px rgba(0,0,0,0.6));
+    }
+    .organelle { cursor: pointer; transition: transform 0.2s, filter 0.2s; }
+    .organelle:hover { transform: scale(1.05); filter: brightness(1.3) drop-shadow(0 0 10px #34d399); }
+    .controls-panel {
+      background: rgba(6, 78, 59, 0.7);
+      border: 2px solid #10b981;
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+    }
+    .control-box {
+      background: rgba(2, 44, 34, 0.85);
+      border: 1px solid #059669;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .control-title { font-weight: 800; font-size: 13px; color: #6ee7b7; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    input[type="range"] { width: 100%; accent-color: #10b981; }
+    .atp-meter {
+      height: 18px;
+      background: #064e3b;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #34d399;
+    }
+    .atp-fill {
+      height: 100%;
+      width: 45%;
+      background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444);
+      transition: width 0.3s ease;
+    }
+    .btn-action {
+      background: linear-gradient(90deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-family: 'Fredoka', cursive;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      transition: transform 0.15s;
+    }
+    .btn-action:hover { transform: scale(1.04); }
+    .info-bubble {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(6, 78, 59, 0.95);
+      border: 1.5px solid #34d399;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 13.5px;
+      color: #ecfdf5;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><span>🌿</span> Biology Lab: Plant Cell & Photosynthesis</h1>
+    <span class="badge" id="grade-badge">Standard 8th</span>
+  </header>
+
+  <div class="lab-stage">
+    <!-- Interactive Cell Simulation Viewport -->
+    <div class="sim-viewport">
+      <svg class="plant-cell-svg" viewBox="0 0 500 360">
+        <!-- Cell Wall -->
+        <polygon points="50,40 450,40 470,320 30,320" fill="#047857" stroke="#34d399" stroke-width="8" rx="20"/>
+        <!-- Cell Membrane -->
+        <polygon points="60,50 440,50 458,310 42,310" fill="#065f46" stroke="#6ee7b7" stroke-width="3"/>
+        <!-- Large Central Vacuole -->
+        <ellipse cx="230" cy="180" rx="110" ry="75" fill="#0284c7" opacity="0.6" stroke="#38bdf8" stroke-width="2" class="organelle" onclick="inspectOrganelle('Vacuole: Stores water and maintains cell turgor pressure.')"/>
+        <text x="200" y="185" fill="#e0f2fe" font-size="12" font-weight="bold">Vacuole</text>
+        <!-- Nucleus -->
+        <circle cx="380" cy="140" r="42" fill="#7c3aed" stroke="#c084fc" stroke-width="3" class="organelle" onclick="inspectOrganelle('Nucleus: Contains DNA genetic instructions.')"/>
+        <circle cx="380" cy="140" r="16" fill="#4c1d95"/>
+        <text x="358" y="145" fill="#f3e8ff" font-size="11" font-weight="bold">Nucleus</text>
+        <!-- Chloroplasts (Photosynthesis Site) -->
+        <g class="organelle" onclick="inspectOrganelle('Chloroplast: Converts sunlight + CO2 + Water into Glucose & Oxygen (ATP energy).')">
+          <ellipse cx="110" cy="110" rx="30" ry="18" fill="#10b981" stroke="#a7f3d0" stroke-width="2"/>
+          <line x1="95" y1="110" x2="125" y2="110" stroke="#047857" stroke-width="2"/>
+          <ellipse cx="120" cy="240" rx="32" ry="19" fill="#10b981" stroke="#a7f3d0" stroke-width="2"/>
+          <ellipse cx="360" cy="250" rx="28" ry="17" fill="#10b981" stroke="#a7f3d0" stroke-width="2"/>
+        </g>
+        <!-- Mitochondria -->
+        <g class="organelle" onclick="inspectOrganelle('Mitochondria: Cellular powerhouse generating ATP energy from glucose.')">
+          <ellipse cx="110" cy="175" rx="24" ry="14" fill="#ea580c" stroke="#fed7aa" stroke-width="2"/>
+          <path d="M98,175 Q110,168 122,175" stroke="#7c2d12" stroke-width="2" fill="none"/>
+        </g>
+      </svg>
+
+      <div class="info-bubble" id="info-bubble">
+        💡 <strong>Tip:</strong> Click on any organelle (Chloroplast, Nucleus, Vacuole) or adjust sunlight & CO2 to simulate photosynthesis!
+      </div>
+    </div>
+
+    <!-- Interactive Experiment Controls -->
+    <div class="controls-panel">
+      <div class="control-box">
+        <div class="control-title">☀️ Sunlight Intensity: <span id="val-sun">75%</span></div>
+        <input type="range" id="slider-sun" min="0" max="100" value="75" oninput="updateSimulation()">
+      </div>
+
+      <div class="control-box">
+        <div class="control-title">💨 Carbon Dioxide (CO2): <span id="val-co2">60%</span></div>
+        <input type="range" id="slider-co2" min="0" max="100" value="60" oninput="updateSimulation()">
+      </div>
+
+      <div class="control-box">
+        <div class="control-title">💧 Water Level (H2O): <span id="val-water">80%</span></div>
+        <input type="range" id="slider-water" min="0" max="100" value="80" oninput="updateSimulation()">
+      </div>
+
+      <div class="control-box">
+        <div class="control-title">⚡ Photosynthesis Output (ATP & Glucose):</div>
+        <div class="atp-meter">
+          <div class="atp-fill" id="atp-bar" style="width: 72%;"></div>
+        </div>
+        <div style="font-size:12px; margin-top:6px; color:#a7f3d0;" id="rate-text">Active Photosynthesis Rate: High (72%)</div>
+      </div>
+
+      <button class="btn-action" onclick="completeLab()">
+        ✅ Record Lab Data (+250 XP)
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function inspectOrganelle(msg) {
+      document.getElementById('info-bubble').innerHTML = '🔬 ' + msg;
+    }
+
+    function updateSimulation() {
+      const sun = parseInt(document.getElementById('slider-sun').value);
+      const co2 = parseInt(document.getElementById('slider-co2').value);
+      const water = parseInt(document.getElementById('slider-water').value);
+
+      document.getElementById('val-sun').textContent = sun + '%';
+      document.getElementById('val-co2').textContent = co2 + '%';
+      document.getElementById('val-water').textContent = water + '%';
+
+      const rate = Math.round((sun * 0.4 + co2 * 0.35 + water * 0.25));
+      document.getElementById('atp-bar').style.width = rate + '%';
+      document.getElementById('rate-text').textContent = 'Active Photosynthesis Rate: ' + (rate > 60 ? 'Optimal' : rate > 30 ? 'Moderate' : 'Low') + ' (' + rate + '%)';
+    }
+
+    function completeLab() {
+      alert("🎉 Lab Completed! You have recorded valid Photosynthesis & Cell Structure data! +250 XP Awarded.");
+      if (window.parent && window.parent.onLabComplete) {
+        window.parent.onLabComplete('bio', 250);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+@echo off
+echo Starting Questly - Learn - Quest - Grow...
+start "" "%~dp0questly_app\login.html"

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questly Virtual Lab – Space Gravity & Planetary Orbit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: radial-gradient(circle at center, #1e1b4b 0%, #090315 80%, #000 100%);
+      color: #f8fafc;
+      font-family: 'Nunito', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(30, 27, 75, 0.9);
+      border-bottom: 2px solid #a855f7;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(168, 85, 247, 0.3);
+    }
+    h1 { font-family: 'Fredoka', cursive; font-size: 20px; color: #c084fc; display: flex; align-items: center; gap: 8px; }
+    .badge { background: #7e22ce; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 800; }
+    .lab-stage {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      padding: 16px;
+      height: calc(100vh - 60px);
+    }
+    .sim-viewport {
+      background: rgba(10, 5, 25, 0.85);
+      border: 2px solid #a855f7;
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 50px rgba(168, 85, 247, 0.2);
+    }
+    canvas { width: 100%; height: 100%; }
+    .controls-panel {
+      background: rgba(30, 27, 75, 0.75);
+      border: 2px solid #c084fc;
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+    }
+    .control-box {
+      background: rgba(15, 10, 35, 0.85);
+      border: 1px solid #9333ea;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .control-title { font-weight: 800; font-size: 13px; color: #d8b4fe; margin-bottom: 6px; }
+    input[type="range"] { width: 100%; accent-color: #a855f7; }
+    .btn-action {
+      background: linear-gradient(90deg, #a855f7, #6366f1);
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-family: 'Fredoka', cursive;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+      transition: transform 0.15s;
+    }
+    .btn-action:hover { transform: scale(1.04); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><span>🚀</span> Space Lab: Planetary Gravity & Orbit Mechanics</h1>
+    <span class="badge">Standard 8th – 12th</span>
+  </header>
+
+  <div class="lab-stage">
+    <div class="sim-viewport">
+      <canvas id="orbit-canvas"></canvas>
+    </div>
+
+    <div class="controls-panel">
+      <div class="control-box">
+        <div class="control-title">🌍 Planet Mass (Star Mass): <span id="val-mass">1.0x Solar Mass</span></div>
+        <input type="range" id="slider-mass" min="0.5" max="2.5" step="0.1" value="1.0">
+      </div>
+
+      <div class="control-box">
+        <div class="control-title">🛸 Satellite Velocity (km/s): <span id="val-vel">7.8 km/s</span></div>
+        <input type="range" id="slider-vel" min="4" max="14" step="0.2" value="7.8">
+      </div>
+
+      <div class="control-box">
+        <div class="control-title">🛰 Orbit Status:</div>
+        <div style="color:#a855f7; font-weight:bold; font-size:15px;" id="orbit-status">Stable Circular Orbit (Period: 90 mins)</div>
+      </div>
+
+      <button class="btn-action" onclick="resetSatellite()">🔄 Launch New Satellite</button>
+      <button class="btn-action" style="background:linear-gradient(90deg, #10b981, #059669);" onclick="completeLab()">
+        ✅ Confirm Orbit Trajectory (+250 XP)
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('orbit-canvas');
+    const ctx = canvas.getContext('2d');
+    let planetMass = 1.0;
+    let initialVel = 7.8;
+    let sat = { x: 0, y: 0, vx: 0, vy: 0, trail: [] };
+
+    function resize() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+      resetSatellite();
+    }
+    window.addEventListener('resize', resize);
+
+    function resetSatellite() {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      sat.x = cx;
+      sat.y = cy - 120;
+      sat.vx = parseFloat(document.getElementById('slider-vel').value) * 0.45;
+      sat.vy = 0;
+      sat.trail = [];
+    }
+
+    document.getElementById('slider-mass').addEventListener('input', (e) => {
+      planetMass = parseFloat(e.target.value);
+      document.getElementById('val-mass').textContent = planetMass + 'x Solar Mass';
+    });
+
+    document.getElementById('slider-vel').addEventListener('input', (e) => {
+      initialVel = parseFloat(e.target.value);
+      document.getElementById('val-vel').textContent = initialVel + ' km/s';
+      resetSatellite();
+    });
+
+    function loop() {
+      ctx.fillStyle = 'rgba(10, 5, 25, 0.2)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      // Draw Center Star/Planet
+      const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 40);
+      grad.addColorStop(0, '#ffd700');
+      grad.addColorStop(0.5, '#f59e0b');
+      grad.addColorStop(1, '#7c2d12');
+      ctx.beginPath();
+      ctx.arc(cx, cy, 32 * planetMass, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.shadowColor = '#ffd700';
+      ctx.shadowBlur = 30;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Physics Gravity
+      const dx = cx - sat.x;
+      const dy = cy - sat.y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist > 35 && dist < 500) {
+        const force = (planetMass * 1800) / (dist * dist);
+        sat.vx += (dx / dist) * force;
+        sat.vy += (dy / dist) * force;
+        sat.x += sat.vx;
+        sat.y += sat.vy;
+
+        sat.trail.push({ x: sat.x, y: sat.y });
+        if (sat.trail.length > 120) sat.trail.shift();
+
+        document.getElementById('orbit-status').textContent = 'Stable Gravitational Orbit (Active)';
+        document.getElementById('orbit-status').style.color = '#38bdf8';
+      } else if (dist <= 35) {
+        document.getElementById('orbit-status').textContent = '⚠️ Crashed into Planet Atmosphere!';
+        document.getElementById('orbit-status').style.color = '#ef4444';
+      } else {
+        document.getElementById('orbit-status').textContent = '🛸 Satellite Escaped Orbit into Deep Space!';
+        document.getElementById('orbit-status').style.color = '#eab308';
+      }
+
+      // Draw Trail
+      ctx.beginPath();
+      for (let i = 0; i < sat.trail.length; i++) {
+        ctx.lineTo(sat.trail[i].x, sat.trail[i].y);
+      }
+      ctx.strokeStyle = 'rgba(168, 85, 247, 0.6)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw Satellite
+      ctx.beginPath();
+      ctx.arc(sat.x, sat.y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#00f0ff';
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 10;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      requestAnimationFrame(loop);
+    }
+
+    setTimeout(() => { resize(); loop(); }, 100);
+
+    function completeLab() {
+      alert("🎉 Orbital Trajectory Validated! +250 XP Awarded.");
+      if (window.parent && window.parent.onLabComplete) {
+        window.parent.onLabComplete('space', 250);
+      }
+    }
+  </script>
+</body>
+</html>

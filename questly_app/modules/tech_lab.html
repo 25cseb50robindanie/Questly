@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questly Virtual Lab – Logic Gates & Circuit Coding</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: radial-gradient(circle at center, #0f172a 0%, #020617 75%, #000 100%);
+      color: #f8fafc;
+      font-family: 'Nunito', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 2px solid #00f0ff;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 240, 255, 0.2);
+    }
+    h1 { font-family: 'Fredoka', cursive; font-size: 20px; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+    .badge { background: #0284c7; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 800; }
+    .lab-stage {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      padding: 16px;
+      height: calc(100vh - 60px);
+    }
+    .sim-viewport {
+      background: rgba(15, 23, 42, 0.7);
+      border: 2px solid #00f0ff;
+      border-radius: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 40px rgba(0, 240, 255, 0.15);
+    }
+    .controls-panel {
+      background: rgba(30, 41, 59, 0.7);
+      border: 2px solid #38bdf8;
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+    }
+    .control-box {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #38bdf8;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .gate-btn {
+      background: #1e293b;
+      border: 1.5px solid #38bdf8;
+      color: #38bdf8;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      margin: 2px;
+    }
+    .gate-btn.active {
+      background: #0284c7;
+      color: #fff;
+      box-shadow: 0 0 10px #38bdf8;
+    }
+    .switch-btn {
+      padding: 8px 16px;
+      background: #334155;
+      color: #fff;
+      border: 2px solid #64748b;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 15px;
+      margin: 4px;
+    }
+    .switch-btn.on {
+      background: #10b981;
+      border-color: #34d399;
+      box-shadow: 0 0 15px #10b981;
+    }
+    .btn-action {
+      background: linear-gradient(90deg, #00f0ff, #3b82f6);
+      color: #000;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-family: 'Fredoka', cursive;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 240, 255, 0.4);
+      transition: transform 0.15s;
+    }
+    .btn-action:hover { transform: scale(1.04); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><span>💻</span> Tech Lab: Logic Gates & Circuit Simulation</h1>
+    <span class="badge">Standard 8th – 12th</span>
+  </header>
+
+  <div class="lab-stage">
+    <div class="sim-viewport">
+      <svg viewBox="0 0 600 320" width="85%">
+        <!-- Input A line -->
+        <line x1="100" y1="100" x2="250" y2="100" stroke="#38bdf8" stroke-width="6" id="wire-a"/>
+        <!-- Input B line -->
+        <line x1="100" y1="220" x2="250" y2="220" stroke="#38bdf8" stroke-width="6" id="wire-b"/>
+        <!-- Gate body -->
+        <rect x="250" y="60" width="130" height="200" rx="16" fill="#1e293b" stroke="#00f0ff" stroke-width="4"/>
+        <text x="315" y="170" fill="#00f0ff" font-size="24" font-weight="bold" text-anchor="middle" id="gate-text">AND</text>
+        <!-- Output line -->
+        <line x1="380" y1="160" x2="500" y2="160" stroke="#64748b" stroke-width="6" id="wire-out"/>
+        <!-- LED Bulb -->
+        <circle cx="530" cy="160" r="25" fill="#334155" stroke="#94a3b8" stroke-width="4" id="led-bulb"/>
+        <text x="530" y="166" fill="#fff" font-size="14" font-weight="bold" text-anchor="middle" id="led-state">OFF</text>
+      </svg>
+    </div>
+
+    <div class="controls-panel">
+      <div class="control-box">
+        <div style="font-weight:bold; color:#38bdf8; margin-bottom:8px;">Select Logic Gate:</div>
+        <div>
+          <button class="gate-btn active" onclick="setGate('AND', this)">AND</button>
+          <button class="gate-btn" onclick="setGate('OR', this)">OR</button>
+          <button class="gate-btn" onclick="setGate('XOR', this)">XOR</button>
+          <button class="gate-btn" onclick="setGate('NAND', this)">NAND</button>
+          <button class="gate-btn" onclick="setGate('NOR', this)">NOR</button>
+        </div>
+      </div>
+
+      <div class="control-box">
+        <div style="font-weight:bold; color:#38bdf8; margin-bottom:8px;">Toggle Binary Inputs:</div>
+        <div style="display:flex; gap:10px;">
+          <button class="switch-btn" id="btn-a" onclick="toggleInput('a')">Input A: 0 (LOW)</button>
+          <button class="switch-btn" id="btn-b" onclick="toggleInput('b')">Input B: 0 (LOW)</button>
+        </div>
+      </div>
+
+      <div class="control-box">
+        <div style="font-weight:bold; color:#38bdf8;">Output Result:</div>
+        <div style="font-size:16px; font-weight:800; color:#38bdf8; margin-top:4px;" id="truth-eval">0 AND 0 = 0 (LED OFF)</div>
+      </div>
+
+      <button class="btn-action" onclick="completeLab()">
+        ✅ Submit Circuit Proof (+250 XP)
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let inputA = 0;
+    let inputB = 0;
+    let currentGate = 'AND';
+
+    function setGate(gate, btn) {
+      currentGate = gate;
+      document.querySelectorAll('.gate-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('gate-text').textContent = gate;
+      evaluateCircuit();
+    }
+
+    function toggleInput(which) {
+      if (which === 'a') {
+        inputA = inputA === 0 ? 1 : 0;
+        document.getElementById('btn-a').textContent = 'Input A: ' + inputA + (inputA ? ' (HIGH)' : ' (LOW)');
+        document.getElementById('btn-a').className = 'switch-btn ' + (inputA ? 'on' : '');
+        document.getElementById('wire-a').setAttribute('stroke', inputA ? '#00f0ff' : '#64748b');
+      } else {
+        inputB = inputB === 0 ? 1 : 0;
+        document.getElementById('btn-b').textContent = 'Input B: ' + inputB + (inputB ? ' (HIGH)' : ' (LOW)');
+        document.getElementById('btn-b').className = 'switch-btn ' + (inputB ? 'on' : '');
+        document.getElementById('wire-b').setAttribute('stroke', inputB ? '#00f0ff' : '#64748b');
+      }
+      evaluateCircuit();
+    }
+
+    function evaluateCircuit() {
+      let out = 0;
+      if (currentGate === 'AND') out = (inputA && inputB) ? 1 : 0;
+      else if (currentGate === 'OR') out = (inputA || inputB) ? 1 : 0;
+      else if (currentGate === 'XOR') out = (inputA !== inputB) ? 1 : 0;
+      else if (currentGate === 'NAND') out = !(inputA && inputB) ? 1 : 0;
+      else if (currentGate === 'NOR') out = !(inputA || inputB) ? 1 : 0;
+
+      const bulb = document.getElementById('led-bulb');
+      const ledText = document.getElementById('led-state');
+      const wireOut = document.getElementById('wire-out');
+
+      if (out === 1) {
+        bulb.setAttribute('fill', '#00f0ff');
+        bulb.setAttribute('stroke', '#fff');
+        ledText.textContent = 'ON';
+        wireOut.setAttribute('stroke', '#00f0ff');
+      } else {
+        bulb.setAttribute('fill', '#334155');
+        bulb.setAttribute('stroke', '#64748b');
+        ledText.textContent = 'OFF';
+        wireOut.setAttribute('stroke', '#64748b');
+      }
+
+      document.getElementById('truth-eval').textContent = inputA + ' ' + currentGate + ' ' + inputB + ' = ' + out + ' (LED ' + (out ? 'ON' : 'OFF') + ')';
+    }
+
+    function completeLab() {
+      alert("🎉 Circuit Validated! Logic Gates Mastered! +250 XP Awarded.");
+      if (window.parent && window.parent.onLabComplete) {
+        window.parent.onLabComplete('tech', 250);
+      }
+    }
+  </script>
+</body>
+</html>
