@@ -1,4 +1,30 @@
-/* =========================================================
+function getLocalizedApparatusName(item) {
+  if (window.VirtualLabI18n) {
+    const key = 'app_' + item.id;
+    const trans = window.VirtualLabI18n.t(key);
+    if (trans !== key) return trans;
+    if (item.id === 'pipette_volumetric' || item.id === 'pipette') return window.VirtualLabI18n.t('app_volumetric_pipette');
+    if (item.id === 'stand' || item.id === 'retort_stand') return window.VirtualLabI18n.t('app_retort_stand');
+    if (item.id === 'pipette_pump' || item.id === 'pump') return window.VirtualLabI18n.t('app_pipette_pump');
+    if (item.id === 'white_tile' || item.id === 'tile') return window.VirtualLabI18n.t('app_white_tile');
+    if (item.id === 'conical_flask') return window.VirtualLabI18n.t('app_conical_flask');
+    if (item.id === 'burette') return window.VirtualLabI18n.t('app_burette');
+  }
+  return item.name;
+}
+
+function getLocalizedReagentName(item) {
+  if (window.VirtualLabI18n) {
+    if (item.id === 'hcl_analyte' || item.id === 'hcl') return window.VirtualLabI18n.t('reagent_hcl');
+    if (item.id === 'naoh_titrant' || item.id === 'naoh') return window.VirtualLabI18n.t('reagent_naoh');
+    if (item.id === 'phenolphthalein') return window.VirtualLabI18n.t('reagent_phenolphthalein');
+    if (item.id === 'h2so4_conc') return window.VirtualLabI18n.t('reagent_h2so4');
+    if (item.id === 'methyl_orange') return window.VirtualLabI18n.t('reagent_methyl_orange');
+    if (item.id === 'ethanol') return window.VirtualLabI18n.t('reagent_ethanol');
+  }
+  return item.name;
+}
+\n/* =========================================================
    ZUNO VIRTUAL CHEMISTRY LAB
    STAGE 1 + STAGE 2 + STAGE 3 + STAGE 4 + STAGE 5
 ========================================================= */

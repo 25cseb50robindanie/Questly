@@ -292,9 +292,9 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
                 color: ColorSystem.purple,
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Text(
-                'LESSON 5: TEACH-BACK',
-                style: TextStyle(
+              child: Text(
+                l('lesson_5_teach_header'),
+                style: const TextStyle(
                   fontFamily: 'Fredoka',
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
@@ -305,7 +305,7 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'Teach It Back',
+              l('lesson_5_teach_title'),
               style: TextStyle(
                 fontFamily: 'Fredoka',
                 fontSize: isShort ? 12 : 14,
@@ -837,11 +837,11 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildMasteryStarBadge('CURIOSITY'),
-                      _buildMasteryStarBadge('EXPERIMENT'),
-                      _buildMasteryStarBadge('APPLY'),
-                      _buildMasteryStarBadge('CHALLENGE'),
-                      _buildMasteryStarBadge('TEACH-BACK'),
+                      _buildMasteryStarBadge(l('curiosity').toUpperCase()),
+                      _buildMasteryStarBadge(l('experiment').toUpperCase()),
+                      _buildMasteryStarBadge(l('apply').toUpperCase()),
+                      _buildMasteryStarBadge(l('challenge').toUpperCase()),
+                      _buildMasteryStarBadge(l('teach_back').toUpperCase()),
                     ],
                   ),
                 ),
@@ -858,14 +858,14 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
                   child: DendyMascot(
                     size: isShort ? 40 : 46,
                     state: _evaluation?.dendyMood == 'thinking' ? DendyState.thinking : DendyState.success,
-                    message: _evaluation?.feedbackBody ?? 'You understand density deeply! Level 2: Float or Sink is now unlocked on your Roadmap.',
+                    message: _evaluation?.feedbackBody ?? l('You understand density deeply! Level 2: Float or Sink is now unlocked on your Roadmap.'),
                   ),
                 ),
                 const SizedBox(height: 14),
 
                 // Final Action Button
                 CustomButton(
-                  text: 'CLAIM REWARDS & UNLOCK LEVEL 2',
+                  text: l('claim_rewards_return_btn'),
                   backgroundColor: ColorSystem.green,
                   textColor: Colors.white,
                   height: 42,

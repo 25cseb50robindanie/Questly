@@ -6,6 +6,7 @@ import '../models/roadmap_enums.dart';
 import '../services/sound_service.dart';
 import 'custom_button.dart';
 import 'vector_asset_helper.dart';
+import '../services/localization_service.dart';
 
 class RewardRevealDialog extends StatefulWidget {
   final String studentId;
@@ -112,7 +113,7 @@ class _RewardRevealDialogState extends State<RewardRevealDialog> with SingleTick
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                widget.title.toUpperCase(),
+                l(widget.title).toUpperCase(),
                 style: const TextStyle(
                   fontFamily: 'Fredoka',
                   fontSize: 16,
@@ -170,26 +171,26 @@ class _RewardRevealDialogState extends State<RewardRevealDialog> with SingleTick
                         break;
                       case RewardType.coins:
                         iconWidget = VectorAssetHelper.questCoinIcon(size: 18);
-                        details = '+${reward.amount} Quest Coins';
+                        details = '+${reward.amount} ${l('quest_coins')}';
                         break;
                       case RewardType.collectible:
                         iconWidget = VectorAssetHelper.collectibleIcon(
                           reward.assetPath.isNotEmpty ? reward.assetPath : reward.name,
                           size: 18,
                         );
-                        details = reward.name;
+                        details = l(reward.name);
                         break;
                       case RewardType.badge:
                         iconWidget = VectorAssetHelper.badgeIcon(reward.name, size: 18);
-                        details = '${reward.name} Badge';
+                        details = '${l(reward.name)} ${l('Badge')}';
                         break;
                       case RewardType.cosmetic:
                         iconWidget = VectorAssetHelper.shopRewardIcon(reward.assetPath, size: 18);
-                        details = reward.name;
+                        details = l(reward.name);
                         break;
                       case RewardType.chest:
                         iconWidget = VectorAssetHelper.chestIcon(size: 18, isEpic: true);
-                        details = 'Master Chest Unlocked';
+                        details = l('Master Chest Unlocked');
                         break;
                     }
 
@@ -209,7 +210,7 @@ class _RewardRevealDialogState extends State<RewardRevealDialog> with SingleTick
                               iconWidget,
                               const SizedBox(width: 8),
                               Text(
-                                reward.name,
+                                l(reward.name),
                                 style: const TextStyle(
                                   fontFamily: 'Fredoka',
                                   fontSize: 12,
@@ -235,16 +236,16 @@ class _RewardRevealDialogState extends State<RewardRevealDialog> with SingleTick
                 ),
                 const SizedBox(height: 16),
                 CustomButton(
-                  text: 'CLAIM REWARD',
+                  text: l('claim_reward_btn_label'),
                   backgroundColor: ColorSystem.purple,
                   textColor: Colors.white,
                   height: 38,
                   onPressed: _claimAll,
                 ),
               ] else ...[
-                const Text(
-                  'Opening Chest...',
-                  style: TextStyle(
+                Text(
+                  l('opening_chest'),
+                  style: const TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

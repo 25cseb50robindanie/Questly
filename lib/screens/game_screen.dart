@@ -8,6 +8,7 @@ import '../models/progress.dart';
 import '../games/questly_game.dart';
 import '../widgets/custom_button.dart';
 import '../services/auth_service.dart';
+import '../services/localization_service.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({Key? key}) : super(key: key);
@@ -204,7 +205,7 @@ class _GameScreenState extends State<GameScreen> {
                       children: [
                         // Section Header
                         Text(
-                          'SIMULATION CONTROLS',
+                          l('simulation_controls'),
                           style: Theme.of(context).textTheme.labelLarge?.copyWith(
                                 color: ColorSystem.plum,
                                 letterSpacing: 0.5,
@@ -214,7 +215,7 @@ class _GameScreenState extends State<GameScreen> {
                         // Preset Material dropdown Selector
                         Row(
                           children: [
-                            const Text('Material:', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text(l('material_label'), style: const TextStyle(fontWeight: FontWeight.bold)),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Container(
@@ -232,11 +233,11 @@ class _GameScreenState extends State<GameScreen> {
                                         : (val) {
                                             if (val != null) _applyPreset(val);
                                           },
-                                    items: const [
-                                      DropdownMenuItem(value: 'wood', child: Text('Wood (Floats)')),
-                                      DropdownMenuItem(value: 'aluminum', child: Text('Aluminum (Sinks)')),
-                                      DropdownMenuItem(value: 'gold', child: Text('Gold (Sinks)')),
-                                      DropdownMenuItem(value: 'custom', child: Text('Custom Material')),
+                                    items: [
+                                      DropdownMenuItem(value: 'wood', child: Text(l('wood_floats'))),
+                                      DropdownMenuItem(value: 'aluminum', child: Text(l('aluminum_sinks'))),
+                                      DropdownMenuItem(value: 'gold', child: Text(l('gold_sinks'))),
+                                      DropdownMenuItem(value: 'custom', child: Text(l('custom_material'))),
                                     ],
                                   ),
                                 ),
@@ -252,7 +253,7 @@ class _GameScreenState extends State<GameScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text('Mass (m):', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                                Text(l('mass_m_label'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                                 Text('${_mass.toStringAsFixed(1)} kg', style: const TextStyle(fontWeight: FontWeight.bold)),
                               ],
                             ),
@@ -281,7 +282,7 @@ class _GameScreenState extends State<GameScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text('Volume (V):', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                                Text(l('volume_v_label'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                                 Text('${_volume.toStringAsFixed(1)} L', style: const TextStyle(fontWeight: FontWeight.bold)),
                               ],
                             ),
@@ -315,7 +316,7 @@ class _GameScreenState extends State<GameScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Calculated Density:', style: TextStyle(fontSize: 12)),
+                              Text(l('calculated_density_label'), style: const TextStyle(fontSize: 12)),
                               Text(
                                 '${_currentDensity.toStringAsFixed(2)} kg/L',
                                 style: const TextStyle(
@@ -334,7 +335,7 @@ class _GameScreenState extends State<GameScreen> {
                           children: [
                             Expanded(
                               child: CustomButton(
-                                text: 'RESET',
+                                text: l('reset_btn'),
                                 backgroundColor: ColorSystem.lavender,
                                 textColor: ColorSystem.plum,
                                 onPressed: _resetBlock,
@@ -343,7 +344,7 @@ class _GameScreenState extends State<GameScreen> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: CustomButton(
-                                text: 'DROP',
+                                text: l('drop_btn'),
                                 backgroundColor: _isDropped ? ColorSystem.plum.withOpacity(0.2) : ColorSystem.purple,
                                 textColor: _isDropped ? ColorSystem.plum.withOpacity(0.4) : Colors.white,
                                 onPressed: _isDropped ? () {} : _dropBlock,
@@ -369,8 +370,8 @@ class _GameScreenState extends State<GameScreen> {
                 children: [
                   // Tactile Back Button
                   CustomButton(
-                    text: 'EXIT LAB',
-                    width: 100,
+                    text: l('exit_lab_btn'),
+                    width: 110,
                     height: 38,
                     backgroundColor: ColorSystem.cream,
                     textColor: ColorSystem.plum,
@@ -393,7 +394,7 @@ class _GameScreenState extends State<GameScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _activity!.title.toUpperCase(),
+                          l(_activity!.title).toUpperCase(),
                           style: const TextStyle(
                             fontFamily: 'system-ui',
                             fontSize: 10,
@@ -403,7 +404,7 @@ class _GameScreenState extends State<GameScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          _activity!.instruction,
+                          l(_activity!.instruction),
                           style: TextStyle(
                             fontFamily: 'system-ui',
                             fontSize: 11,
@@ -436,7 +437,7 @@ class _GameScreenState extends State<GameScreen> {
                           ),
                           const SizedBox(height: 14),
                           Text(
-                            'QUEST COMPLETED!',
+                            l('quest_completed_title'),
                             style: Theme.of(context).textTheme.displayLarge?.copyWith(
                                   fontSize: 24,
                                   color: ColorSystem.green,
@@ -444,7 +445,7 @@ class _GameScreenState extends State<GameScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Excellent work! The material block reached the target buoyant state.\nRecorded Density: ${_finalDensity.toStringAsFixed(2)} kg/L.',
+                            '${l('fantastic_job_mastered')}\n${l('calculated_density_label')} ${_finalDensity.toStringAsFixed(2)} kg/L.',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   height: 1.4,
@@ -486,7 +487,7 @@ class _GameScreenState extends State<GameScreen> {
                                     const Icon(Icons.star, color: ColorSystem.purple, size: 20),
                                     const SizedBox(width: 6),
                                     Text(
-                                      '+${_activity!.goldReward} Gold',
+                                      '+${_activity!.goldReward} ${l('quest_coins')}',
                                       style: const TextStyle(fontWeight: FontWeight.w900, color: ColorSystem.plum),
                                     ),
                                   ],
@@ -496,7 +497,7 @@ class _GameScreenState extends State<GameScreen> {
                           ),
                           const SizedBox(height: 24),
                           CustomButton(
-                            text: 'CLAIM REWARDS & RETURN',
+                            text: l('claim_rewards_return_btn'),
                             backgroundColor: ColorSystem.purple,
                             textColor: Colors.white,
                             onPressed: _claimRewards,

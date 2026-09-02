@@ -105,6 +105,7 @@ class CurrentLearningCard extends StatelessWidget {
     }
 
     return Container(
+      constraints: const BoxConstraints(minHeight: 195),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -140,9 +141,11 @@ class CurrentLearningCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   l(module!.title),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontFamily: 'Fredoka',
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.w900,
                     color: ColorSystem.plum,
                   ),
@@ -202,11 +205,12 @@ class CurrentLearningCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
-                  width: 200,
+                  width: 220,
                   child: CustomButton(
                     text: l('continue_quest').toUpperCase(),
                     backgroundColor: ColorSystem.purple,
                     textColor: Colors.white,
+                    height: 42,
                     onPressed: onContinuePressed,
                   ),
                 ),

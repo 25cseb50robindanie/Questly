@@ -412,11 +412,23 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
               await Locator.studentRepository.updateStudentProfile(updatedStudent);
 
               if (!mounted) return;
-              await Navigator.pushNamed(
-                context,
-                '/activity_renderer',
-                arguments: targetLesson.activities.first,
-              );
+              if (targetLessonId == 'density_les1' || targetLesson.activityType == 'discovery_curiosity') {
+                await Navigator.pushNamed(context, '/curiosity_discovery');
+              } else if (targetLessonId == 'density_les2' || targetLesson.activityType == 'experiment') {
+                await Navigator.pushNamed(context, '/density_experiment');
+              } else if (targetLessonId == 'density_les3' || targetLesson.activityType == 'apply') {
+                await Navigator.pushNamed(context, '/density_apply');
+              } else if (targetLessonId == 'density_les4' || targetLesson.activityType == 'challenge') {
+                await Navigator.pushNamed(context, '/density_detective');
+              } else if (targetLessonId == 'density_les5' || targetLesson.activityType == 'teach_dendy') {
+                await Navigator.pushNamed(context, '/density_teach_back');
+              } else {
+                await Navigator.pushNamed(
+                  context,
+                  '/activity_renderer',
+                  arguments: targetLesson.activities.first,
+                );
+              }
             }
           },
           onStartLesson: (String chosenLessonId) async {
@@ -429,11 +441,23 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
               await Locator.studentRepository.updateStudentProfile(updatedStudent);
 
               if (!mounted) return;
-              await Navigator.pushNamed(
-                context,
-                '/activity_renderer',
-                arguments: targetLesson.activities.first,
-              );
+              if (chosenLessonId == 'density_les1' || targetLesson.activityType == 'discovery_curiosity') {
+                await Navigator.pushNamed(context, '/curiosity_discovery');
+              } else if (chosenLessonId == 'density_les2' || targetLesson.activityType == 'experiment') {
+                await Navigator.pushNamed(context, '/density_experiment');
+              } else if (chosenLessonId == 'density_les3' || targetLesson.activityType == 'apply') {
+                await Navigator.pushNamed(context, '/density_apply');
+              } else if (chosenLessonId == 'density_les4' || targetLesson.activityType == 'challenge') {
+                await Navigator.pushNamed(context, '/density_detective');
+              } else if (chosenLessonId == 'density_les5' || targetLesson.activityType == 'teach_dendy') {
+                await Navigator.pushNamed(context, '/density_teach_back');
+              } else {
+                await Navigator.pushNamed(
+                  context,
+                  '/activity_renderer',
+                  arguments: targetLesson.activities.first,
+                );
+              }
             }
           },
         ),

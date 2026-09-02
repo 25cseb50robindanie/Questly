@@ -78,6 +78,20 @@ class ProfileScreen extends StatelessWidget {
 
                 // 3. Equipped Cosmetics Summary & Quick Shop Access
                 _buildCosmeticsDeck(context, student, currentTheme, dendySkinItem),
+
+                const SizedBox(height: 14),
+
+                // 4. Logout Action
+                CustomButton(
+                  text: l('logout').toUpperCase(),
+                  backgroundColor: ColorSystem.purple,
+                  textColor: Colors.white,
+                  height: 40,
+                  onPressed: () async {
+                    await Locator.authService.logout();
+                    Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil('/login', (route) => false);
+                  },
+                ),
               ],
             ),
           ),
@@ -211,6 +225,15 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
               );
+            },
+          ),
+          const SizedBox(width: 4),
+          IconButton(
+            icon: const Icon(Icons.logout_rounded, color: ColorSystem.pink, size: 26),
+            tooltip: l('logout'),
+            onPressed: () async {
+              await Locator.authService.logout();
+              Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil('/login', (route) => false);
             },
           ),
         ],

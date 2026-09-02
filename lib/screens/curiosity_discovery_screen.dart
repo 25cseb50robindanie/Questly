@@ -8,7 +8,6 @@ import '../widgets/custom_button.dart';
 import '../widgets/dendy_mascot.dart';
 import '../widgets/dendy_speak_button.dart';
 import '../widgets/questly_background.dart';
-import '../widgets/vector_asset_helper.dart';
 import '../services/sound_service.dart';
 import '../services/localization_service.dart';
 
@@ -24,18 +23,21 @@ enum LessonStage {
 
 class DiscoveryObject {
   final String id;
-  final String name;
-  final String description;
+  final String nameKey;
+  final String descKey;
   final bool actuallyFloats;
   final Widget illustration;
 
   const DiscoveryObject({
     required this.id,
-    required this.name,
-    required this.description,
+    required this.nameKey,
+    required this.descKey,
     required this.actuallyFloats,
     required this.illustration,
   });
+
+  String get name => l(nameKey);
+  String get description => l(descKey);
 }
 
 class CuriosityDiscoveryScreen extends StatefulWidget {
@@ -69,6 +71,13 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
   // Objects in Lesson 1
   late final List<DiscoveryObject> _objects;
 
+  static const List<String> _fontFallbacks = [
+    'Noto Sans',
+    'Segoe UI',
+    'Roboto',
+    'sans-serif',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -77,36 +86,36 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
     _objects = [
       const DiscoveryObject(
         id: 'wood_block',
-        name: 'WOODEN BLOCK',
-        description: 'Solid oak wood',
+        nameKey: 'curiosity_obj_wood',
+        descKey: 'curiosity_desc_wood',
         actuallyFloats: true,
         illustration: _ObjectCustomPainterWidget(type: _ObjectType.woodBlock, size: 40),
       ),
       const DiscoveryObject(
         id: 'metal_cube',
-        name: 'METAL CUBE',
-        description: 'Solid iron/steel',
+        nameKey: 'curiosity_obj_metal',
+        descKey: 'curiosity_desc_metal',
         actuallyFloats: false,
         illustration: _ObjectCustomPainterWidget(type: _ObjectType.metalCube, size: 40),
       ),
       const DiscoveryObject(
         id: 'plastic_ball',
-        name: 'PLASTIC BALL',
-        description: 'Hollow lightweight plastic',
+        nameKey: 'curiosity_obj_plastic',
+        descKey: 'curiosity_desc_plastic',
         actuallyFloats: true,
         illustration: _ObjectCustomPainterWidget(type: _ObjectType.plasticBall, size: 40),
       ),
       const DiscoveryObject(
         id: 'river_stone',
-        name: 'RIVER STONE',
-        description: 'Dense granite rock',
+        nameKey: 'curiosity_obj_stone',
+        descKey: 'curiosity_desc_stone',
         actuallyFloats: false,
         illustration: _ObjectCustomPainterWidget(type: _ObjectType.riverStone, size: 40),
       ),
       const DiscoveryObject(
         id: 'empty_bottle',
-        name: 'EMPTY BOTTLE',
-        description: 'Capped air-filled bottle',
+        nameKey: 'curiosity_obj_bottle',
+        descKey: 'curiosity_desc_bottle',
         actuallyFloats: true,
         illustration: _ObjectCustomPainterWidget(type: _ObjectType.emptyBottle, size: 40),
       ),
@@ -170,7 +179,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
       _stage = LessonStage.testing;
       _currentTestingIndex = 0;
       _testedObjectIds.clear();
-      _feedbackMessage = 'Testing ${_objects[0].name}...';
+      _feedbackMessage = l('curiosity_testing_object', args: {'name': _objects[0].name});
     });
 
     for (int i = 0; i < _objects.length; i++) {
@@ -178,7 +187,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
 
       setState(() {
         _currentTestingIndex = i;
-        _feedbackMessage = 'Testing ${_objects[i].name}...';
+        _feedbackMessage = l('curiosity_testing_object', args: {'name': _objects[i].name});
       });
 
       // Reset and trigger drop
@@ -201,10 +210,11 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
 
       setState(() {
         _testedObjectIds.add(currentObj.id);
+        final resultText = currentObj.actuallyFloats ? l('curiosity_status_floats') : l('curiosity_status_sinks');
         if (matched) {
-          _feedbackMessage = '✓ Result: ${currentObj.actuallyFloats ? "FLOATS" : "SINKS"} — Matched your prediction!';
+          _feedbackMessage = l('curiosity_result_match', args: {'result': resultText});
         } else {
-          _feedbackMessage = 'Observation: ${currentObj.actuallyFloats ? "FLOATS" : "SINKS"} — Different from prediction! Take a closer look.';
+          _feedbackMessage = l('curiosity_result_diff', args: {'result': resultText});
         }
       });
 
@@ -258,31 +268,36 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorSystem.cream,
-      body: QuestlyBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10.0),
-            child: Column(
-              children: [
-                // 1. Persistent Top Header with 5-step Lesson Tracker
-                _buildTopBar(),
-                const SizedBox(height: 10),
+    return ValueListenableBuilder<String>(
+      valueListenable: LocalizationService.languageNotifier,
+      builder: (context, currentLang, _) {
+        return Scaffold(
+          backgroundColor: ColorSystem.cream,
+          body: QuestlyBackground(
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10.0),
+                child: Column(
+                  children: [
+                    // 1. Persistent Top Header with 5-step Lesson Tracker
+                    _buildTopBar(),
+                    const SizedBox(height: 10),
 
-                // 2. Main Content View according to current Stage
-                Expanded(
-                  child: _stage == LessonStage.intro
-                      ? _buildIntroView()
-                      : _stage == LessonStage.completed
-                          ? _buildCompletedView()
-                          : _buildExperimentAndHypothesisView(),
+                    // 2. Main Content View according to current Stage
+                    Expanded(
+                      child: _stage == LessonStage.intro
+                          ? _buildIntroView()
+                          : _stage == LessonStage.completed
+                              ? _buildCompletedView()
+                              : _buildExperimentAndHypothesisView(),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -324,9 +339,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    l('LEVEL 1 • DISCOVER DENSITY'),
+                    l('level_1_title'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
+                      fontFamilyFallback: _fontFallbacks,
                       fontSize: isShort ? 11 : 13,
                       fontWeight: FontWeight.w900,
                       color: ColorSystem.purple,
@@ -334,9 +350,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                     ),
                   ),
                   Text(
-                    l('LESSON 1 OF 5'),
+                    l('lesson_counter', args: {'current': '1', 'total': '5'}),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
+                      fontFamilyFallback: _fontFallbacks,
                       fontSize: isShort ? 9 : 10,
                       fontWeight: FontWeight.bold,
                       color: ColorSystem.plum.withOpacity(0.6),
@@ -357,15 +374,15 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildStepIndicator(0, l('CURIOSITY'), isCurrent: true, isCompleted: _stage == LessonStage.completed),
+                  _buildStepIndicator(0, l('curiosity'), isCurrent: true, isCompleted: _stage == LessonStage.completed),
                   _buildStepDivider(),
-                  _buildStepIndicator(1, l('EXPERIMENT'), isCurrent: false, isCompleted: false),
+                  _buildStepIndicator(1, l('experiment'), isCurrent: false, isCompleted: false),
                   _buildStepDivider(),
-                  _buildStepIndicator(2, l('APPLY'), isCurrent: false, isCompleted: false),
+                  _buildStepIndicator(2, l('apply'), isCurrent: false, isCompleted: false),
                   _buildStepDivider(),
-                  _buildStepIndicator(3, l('CHALLENGE'), isCurrent: false, isCompleted: false),
+                  _buildStepIndicator(3, l('challenge'), isCurrent: false, isCompleted: false),
                   _buildStepDivider(),
-                  _buildStepIndicator(4, l('TEACH DENDY'), isCurrent: false, isCompleted: false),
+                  _buildStepIndicator(4, l('teach_dendy'), isCurrent: false, isCompleted: false),
                 ],
               ),
             ),
@@ -415,6 +432,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
             label,
             style: TextStyle(
               fontFamily: 'Fredoka',
+              fontFamilyFallback: _fontFallbacks,
               fontSize: 9,
               fontWeight: FontWeight.w900,
               color: textColor,
@@ -474,9 +492,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      l('DISCOVERY LAB • STEP 1'),
+                      l('curiosity_intro_step'),
                       style: const TextStyle(
                         fontFamily: 'Fredoka',
+                        fontFamilyFallback: _fontFallbacks,
                         fontSize: 9.5,
                         fontWeight: FontWeight.w900,
                         color: ColorSystem.purple,
@@ -486,9 +505,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   ),
                   SizedBox(height: isShort ? 6 : 10),
                   Text(
-                    l('DISCOVER DENSITY'),
+                    l('curiosity_intro_title'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
+                      fontFamilyFallback: _fontFallbacks,
                       fontSize: isShort ? 22 : 26,
                       fontWeight: FontWeight.w900,
                       color: ColorSystem.plum,
@@ -496,9 +516,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    l('"Why do some objects float while others sink?"'),
+                    l('curiosity_intro_q'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
+                      fontFamilyFallback: _fontFallbacks,
                       fontSize: isShort ? 13 : 15,
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.w600,
@@ -507,9 +528,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   ),
                   SizedBox(height: isShort ? 6 : 10),
                   Text(
-                    l('Before testing, predict what will happen when different materials are placed in water. Observe the physical results and notice what happens.'),
+                    l('curiosity_intro_desc'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
+                      fontFamilyFallback: _fontFallbacks,
                       fontSize: isShort ? 11 : 12.5,
                       color: ColorSystem.plum.withOpacity(0.8),
                       height: 1.35,
@@ -517,9 +539,9 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   ),
                   SizedBox(height: isShort ? 12 : 18),
                   SizedBox(
-                    width: 200,
+                    width: 220,
                     child: CustomButton(
-                      text: l('START DISCOVERY'),
+                      text: l('curiosity_start_btn'),
                       backgroundColor: ColorSystem.purple,
                       textColor: Colors.white,
                       height: isShort ? 38 : 42,
@@ -543,7 +565,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
               child: Center(
                 child: DendyMascot(
                   state: DendyState.thinking,
-                  message: l("Let's make a prediction before we test anything!"),
+                  message: l('curiosity_dendy_intro'),
                   size: isShort ? 75 : 90,
                 ),
               ),
@@ -601,9 +623,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   const Icon(Icons.science_outlined, color: ColorSystem.purple, size: 15),
                   const SizedBox(width: 5),
                   Text(
-                    'WATER TANK LABORATORY',
+                    l('curiosity_water_tank_lab'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
+                      fontFamilyFallback: _fontFallbacks,
                       fontSize: isShort ? 10 : 11,
                       fontWeight: FontWeight.w900,
                       color: ColorSystem.plum.withOpacity(0.7),
@@ -625,6 +648,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontFamily: 'Fredoka',
+                        fontFamilyFallback: _fontFallbacks,
                         fontSize: isShort ? 9 : 10,
                         fontWeight: FontWeight.bold,
                         color: ColorSystem.purple,
@@ -686,9 +710,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'HYPOTHESIS STATION',
+                l('curiosity_hypothesis_station'),
                 style: TextStyle(
                   fontFamily: 'Fredoka',
+                  fontFamilyFallback: _fontFallbacks,
                   fontSize: isShort ? 11.5 : 13,
                   fontWeight: FontWeight.w900,
                   color: ColorSystem.purple,
@@ -706,9 +731,13 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   ),
                 ),
                 child: Text(
-                  '${_predictions.length} / ${_objects.length} PREDICTED',
+                  l('curiosity_predicted_counter', args: {
+                    'count': '${_predictions.length}',
+                    'total': '${_objects.length}',
+                  }),
                   style: TextStyle(
                     fontFamily: 'Fredoka',
+                    fontFamilyFallback: _fontFallbacks,
                     fontSize: isShort ? 8.5 : 9.5,
                     fontWeight: FontWeight.bold,
                     color: allSelected ? ColorSystem.green : ColorSystem.plum,
@@ -719,9 +748,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
           ),
           const SizedBox(height: 2),
           Text(
-            'Which object will float?',
+            l('curiosity_which_will_float'),
             style: TextStyle(
               fontFamily: 'Fredoka',
+              fontFamilyFallback: _fontFallbacks,
               fontSize: isShort ? 10.5 : 12,
               fontWeight: FontWeight.bold,
               color: ColorSystem.plum,
@@ -756,8 +786,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
           // Test Button CTA
           CustomButton(
             text: isTesting
-                ? 'TESTING IN PROGRESS...'
-                : (allSelected ? 'TEST PREDICTIONS' : 'SELECT ALL PREDICTIONS (${_predictions.length}/5)'),
+                ? l('curiosity_btn_testing')
+                : (allSelected
+                    ? l('curiosity_btn_test')
+                    : l('curiosity_btn_select_all', args: {'count': '${_predictions.length}'})),
             backgroundColor: allSelected && !isTesting ? ColorSystem.purple : Colors.grey.shade400,
             textColor: Colors.white,
             height: isShort ? 36 : 40,
@@ -819,6 +851,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   obj.name,
                   style: const TextStyle(
                     fontFamily: 'Fredoka',
+                    fontFamilyFallback: _fontFallbacks,
                     fontSize: 10,
                     fontWeight: FontWeight.w900,
                     color: ColorSystem.plum,
@@ -828,6 +861,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   obj.description,
                   style: TextStyle(
                     fontFamily: 'Fredoka',
+                    fontFamilyFallback: _fontFallbacks,
                     fontSize: 8.5,
                     color: ColorSystem.plum.withOpacity(0.65),
                   ),
@@ -844,9 +878,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                           borderRadius: BorderRadius.circular(3),
                         ),
                         child: Text(
-                          obj.actuallyFloats ? 'FLOATED' : 'SUNK',
+                          obj.actuallyFloats ? l('curiosity_badge_floated') : l('curiosity_badge_sunk'),
                           style: const TextStyle(
                             fontFamily: 'Fredoka',
+                            fontFamilyFallback: _fontFallbacks,
                             fontSize: 7.5,
                             fontWeight: FontWeight.w900,
                             color: ColorSystem.plum,
@@ -855,9 +890,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        matched ? '✓ Match' : 'Different',
+                        matched ? l('curiosity_badge_match') : l('curiosity_badge_diff'),
                         style: TextStyle(
                           fontFamily: 'Fredoka',
+                          fontFamilyFallback: _fontFallbacks,
                           fontSize: 7.5,
                           fontWeight: FontWeight.bold,
                           color: matched ? ColorSystem.green : ColorSystem.plum.withOpacity(0.7),
@@ -875,7 +911,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildChoiceChip(
-                label: 'FLOAT',
+                label: l('curiosity_chip_float'),
                 isSelected: selectedChoice == PredictionChoice.float,
                 isCorrect: isTested && obj.actuallyFloats,
                 isTested: isTested,
@@ -884,7 +920,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
               ),
               const SizedBox(width: 4),
               _buildChoiceChip(
-                label: 'SINK',
+                label: l('curiosity_chip_sink'),
                 isSelected: selectedChoice == PredictionChoice.sink,
                 isCorrect: isTested && !obj.actuallyFloats,
                 isTested: isTested,
@@ -947,6 +983,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
             label,
             style: TextStyle(
               fontFamily: 'Fredoka',
+              fontFamilyFallback: _fontFallbacks,
               fontSize: 9,
               fontWeight: FontWeight.w900,
               color: textColor,
@@ -978,9 +1015,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
               const Icon(Icons.lightbulb_outline_rounded, color: ColorSystem.gold, size: 18),
               const SizedBox(width: 5),
               Text(
-                'OBSERVATION & REFLECTION',
+                l('curiosity_refl_header'),
                 style: TextStyle(
                   fontFamily: 'Fredoka',
+                  fontFamilyFallback: _fontFallbacks,
                   fontSize: isShort ? 11 : 12,
                   fontWeight: FontWeight.w900,
                   color: ColorSystem.purple,
@@ -992,18 +1030,20 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
           SizedBox(height: isShort ? 4 : 8),
 
           Text(
-            'Some objects floated while others sank.',
+            l('curiosity_refl_summary'),
             style: TextStyle(
               fontFamily: 'Fredoka',
+              fontFamilyFallback: _fontFallbacks,
               fontSize: isShort ? 13 : 15,
               fontWeight: FontWeight.w900,
               color: ColorSystem.plum,
             ),
           ),
           Text(
-            '"Why do you think that happened?"',
+            l('curiosity_refl_q'),
             style: TextStyle(
               fontFamily: 'Fredoka',
+              fontFamilyFallback: _fontFallbacks,
               fontSize: isShort ? 12 : 13,
               fontStyle: FontStyle.italic,
               fontWeight: FontWeight.bold,
@@ -1019,20 +1059,20 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
               children: [
                 _buildReflectionOption(
                   index: 0,
-                  title: 'Material Composition',
-                  subtitle: 'Is it because of what the material is made of?',
+                  title: l('curiosity_refl_opt0_title'),
+                  subtitle: l('curiosity_refl_opt0_sub'),
                 ),
                 const SizedBox(height: 6),
                 _buildReflectionOption(
                   index: 1,
-                  title: 'Trapped Air & Shape',
-                  subtitle: 'Does having air inside (like the bottle) help it float?',
+                  title: l('curiosity_refl_opt1_title'),
+                  subtitle: l('curiosity_refl_opt1_sub'),
                 ),
                 const SizedBox(height: 6),
                 _buildReflectionOption(
                   index: 2,
-                  title: 'Heaviness vs Size',
-                  subtitle: 'Is it how heavy an object is compared to how much space it takes up?',
+                  title: l('curiosity_refl_opt2_title'),
+                  subtitle: l('curiosity_refl_opt2_sub'),
                 ),
               ],
             ),
@@ -1049,9 +1089,10 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'We will investigate the exact reasons and measurements in the next experiment lab!',
+                  l('curiosity_refl_note'),
                   style: TextStyle(
                     fontFamily: 'Fredoka',
+                    fontFamilyFallback: _fontFallbacks,
                     fontSize: isShort ? 9.5 : 10.5,
                     color: ColorSystem.plum.withOpacity(0.8),
                     height: 1.25,
@@ -1059,8 +1100,8 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                 ),
               ),
               const SizedBox(width: 6),
-              const DendySpeakButton(
-                textToSpeak: 'We will investigate the exact reasons and measurements in the next experiment lab!',
+              DendySpeakButton(
+                textToSpeak: l('curiosity_refl_note'),
                 size: 24,
               ),
             ],
@@ -1069,7 +1110,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
 
           // Complete Button
           CustomButton(
-            text: 'COMPLETE DISCOVERY',
+            text: l('curiosity_btn_complete'),
             backgroundColor: ColorSystem.purple,
             textColor: Colors.white,
             height: isShort ? 36 : 40,
@@ -1126,6 +1167,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                     title,
                     style: const TextStyle(
                       fontFamily: 'Fredoka',
+                      fontFamilyFallback: _fontFallbacks,
                       fontSize: 10.5,
                       fontWeight: FontWeight.bold,
                       color: ColorSystem.plum,
@@ -1135,6 +1177,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                     subtitle,
                     style: TextStyle(
                       fontFamily: 'Fredoka',
+                      fontFamilyFallback: _fontFallbacks,
                       fontSize: 9,
                       color: ColorSystem.plum.withOpacity(0.7),
                     ),
@@ -1186,9 +1229,11 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                 SizedBox(height: isShort ? 6 : 10),
 
                 Text(
-                  'DISCOVERY COMPLETE!',
+                  l('curiosity_done_title'),
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Fredoka',
+                    fontFamilyFallback: _fontFallbacks,
                     fontSize: isShort ? 18 : 22,
                     fontWeight: FontWeight.w900,
                     color: ColorSystem.purple,
@@ -1197,9 +1242,11 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'You made your predictions and tested them.',
+                  l('curiosity_done_sub'),
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Fredoka',
+                    fontFamilyFallback: _fontFallbacks,
                     fontSize: isShort ? 11 : 12.5,
                     color: ColorSystem.plum.withOpacity(0.75),
                   ),
@@ -1217,29 +1264,33 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      VectorAssetHelper.xpStarIcon(size: 20, isFilled: true),
+                      const Icon(Icons.star_rounded, color: ColorSystem.gold, size: 24),
                       const SizedBox(width: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'LEVEL 1 CONCEPT STAR EARNED',
-                            style: TextStyle(
-                              fontFamily: 'Fredoka',
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w900,
-                              color: ColorSystem.plum,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l('curiosity_star_title'),
+                              style: const TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontFamilyFallback: _fontFallbacks,
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w900,
+                                color: ColorSystem.plum,
+                              ),
                             ),
-                          ),
-                          Text(
-                            '1 of 3 Stars (Complete all 5 lessons for full 3-star mastery)',
-                            style: TextStyle(
-                              fontFamily: 'Fredoka',
-                              fontSize: 9,
-                              color: ColorSystem.plum.withOpacity(0.65),
+                            Text(
+                              l('curiosity_star_desc'),
+                              style: TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontFamilyFallback: _fontFallbacks,
+                                fontSize: 9,
+                                color: ColorSystem.plum.withOpacity(0.65),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -1259,12 +1310,13 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                     children: [
                       Row(
                         children: [
-                          VectorAssetHelper.xpStarIcon(size: 16),
+                          const Icon(Icons.star_outline_rounded, color: ColorSystem.purple, size: 18),
                           const SizedBox(width: 5),
-                          const Text(
-                            '+40 XP',
-                            style: TextStyle(
+                          Text(
+                            l('curiosity_reward_xp'),
+                            style: const TextStyle(
                               fontFamily: 'Fredoka',
+                              fontFamilyFallback: _fontFallbacks,
                               fontSize: 12,
                               fontWeight: FontWeight.w900,
                               color: ColorSystem.purple,
@@ -1275,12 +1327,13 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                       const SizedBox(width: 20),
                       Row(
                         children: [
-                          VectorAssetHelper.questCoinIcon(size: 16),
+                          const Icon(Icons.monetization_on_rounded, color: ColorSystem.gold, size: 18),
                           const SizedBox(width: 5),
-                          const Text(
-                            '+5 Quest Coins',
-                            style: TextStyle(
+                          Text(
+                            l('curiosity_reward_coins'),
+                            style: const TextStyle(
                               fontFamily: 'Fredoka',
+                              fontFamilyFallback: _fontFallbacks,
                               fontSize: 12,
                               fontWeight: FontWeight.w900,
                               color: ColorSystem.plum,
@@ -1298,7 +1351,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   children: [
                     Expanded(
                       child: CustomButton(
-                        text: 'ROADMAP',
+                        text: l('curiosity_btn_roadmap'),
                         backgroundColor: ColorSystem.cream,
                         textColor: ColorSystem.plum,
                         height: isShort ? 36 : 40,
@@ -1315,7 +1368,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                     const SizedBox(width: 8),
                     Expanded(
                       child: CustomButton(
-                        text: 'CONTINUE TO NEXT LESSON',
+                        text: l('curiosity_btn_next_lesson'),
                         backgroundColor: ColorSystem.purple,
                         textColor: Colors.white,
                         height: isShort ? 36 : 40,

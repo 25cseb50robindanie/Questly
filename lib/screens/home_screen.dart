@@ -75,13 +75,35 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Active Quest Finder
   Module? _getActiveModule() {
-    if (_student == null || _student!.currentModuleId == null) return null;
-    return Locator.moduleRepository.getModuleById(_student!.currentModuleId!);
+    if (_student == null) return null;
+    if (_student!.currentModuleId != null) {
+      final mod = Locator.moduleRepository.getModuleById(_student!.currentModuleId!);
+      if (mod != null) return mod;
+    }
+    final modules = Locator.moduleRepository.getModules();
+    return modules.isNotEmpty ? modules.first : null;
   }
 
   Lesson? _getActiveLesson() {
-    if (_student == null || _student!.currentLessonId == null) return null;
-    return Locator.moduleRepository.getLessonById(_student!.currentLessonId!);
+    if (_student == null) return null;
+    if (_student!.currentLessonId != null) {
+      final les = Locator.moduleRepository.getLessonById(_student!.currentLessonId!);
+      if (les != null) return les;
+    }
+    final mod = _getActiveModule();
+    if (mod != null) {
+      final progressList = Locator.progressRepository.getProgressList(_student!.questlyId);
+      for (var lvl in mod.levels) {
+        for (var les in lvl.lessons) {
+          final isDone = progressList.any((p) => p.lessonId == les.id && p.status == 'completed');
+          if (!isDone) return les;
+        }
+      }
+      if (mod.levels.isNotEmpty && mod.levels.first.lessons.isNotEmpty) {
+        return mod.levels.first.lessons.first;
+      }
+    }
+    return null;
   }
 
   int _getCompletedLessonsCount(Module? module) {
@@ -302,28 +324,86 @@ class _HomeDashboardView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. Top Panel: Continue learning card & Revision card
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Main Left: Continue Learning
-              Expanded(
-                flex: 12,
-                child: SizedBox(
-                  height: 195,
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Main Left: Continue Learning
+                Expanded(
+                  flex: 12,
                   child: CurrentLearningCard(
                     module: activeModule,
                     lesson: activeLesson,
                     completedCount: completedLessons,
                     totalCount: totalLessons,
                     onContinuePressed: () async {
-                      if (activeLesson != null && activeLesson!.activities.isNotEmpty) {
-                        // Route to Activity Renderer
-                        await Navigator.pushNamed(
-                          context,
-                          '/activity_renderer',
-                          arguments: activeLesson!.activities.first,
-                        );
-                        onStateRefresh(); // Reload student progress
+                      try {
+                        Lesson? targetLesson = activeLesson;
+                        Module? targetModule = activeModule;
+
+                        if (targetLesson == null && targetModule != null) {
+                          for (var lvl in targetModule.levels) {
+                            for (var les in lvl.lessons) {
+                              targetLesson = les;
+                              break;
+                            }
+                            if (targetLesson != null) break;
+                          }
+                        }
+
+                        if (targetLesson == null) {
+                          final mod = Locator.moduleRepository.getModuleById('mod_density');
+                          if (mod != null && mod.levels.isNotEmpty && mod.levels.first.lessons.isNotEmpty) {
+                            targetModule = mod;
+                            targetLesson = mod.levels.first.lessons.first;
+                          }
+                        }
+
+                        if (targetLesson != null) {
+                          final currentStudent = Locator.studentRepository.getCurrentStudent();
+                          if (currentStudent != null) {
+                            final updated = currentStudent.copyWith(
+                              currentModuleId: targetModule?.id ?? 'mod_density',
+                              currentLessonId: targetLesson.id,
+                            );
+                            await Locator.studentRepository.updateStudentProfile(updated);
+                          }
+
+                          if (!context.mounted) return;
+
+                          if (targetLesson.id == 'density_les1' || targetLesson.activityType == 'discovery_curiosity') {
+                            await Navigator.pushNamed(context, '/curiosity_discovery');
+                          } else if (targetLesson.id == 'density_les2' || targetLesson.activityType == 'experiment') {
+                            await Navigator.pushNamed(context, '/density_experiment');
+                          } else if (targetLesson.id == 'density_les3' || targetLesson.activityType == 'apply') {
+                            await Navigator.pushNamed(context, '/density_apply');
+                          } else if (targetLesson.id == 'density_les4' || targetLesson.activityType == 'challenge') {
+                            await Navigator.pushNamed(context, '/density_detective');
+                          } else if (targetLesson.id == 'density_les5' || targetLesson.activityType == 'teach_dendy') {
+                            await Navigator.pushNamed(context, '/density_teach_back');
+                          } else if (targetModule?.id == 'mod_chemistry' || targetLesson.id.contains('titration')) {
+                            await Navigator.pushNamed(context, '/virtual_lab');
+                          } else if (targetModule?.id == 'mod_fractions' || targetLesson.id.contains('fraction')) {
+                            await Navigator.pushNamed(context, '/fraction_module');
+                          } else if (targetLesson.activities.isNotEmpty) {
+                            await Navigator.pushNamed(
+                              context,
+                              '/activity_renderer',
+                              arguments: targetLesson.activities.first,
+                            );
+                          } else {
+                            await Navigator.pushNamed(context, '/roadmap');
+                          }
+                          onStateRefresh();
+                        } else {
+                          await Navigator.pushNamed(context, '/roadmap');
+                          onStateRefresh();
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          await Navigator.pushNamed(context, '/curiosity_discovery');
+                          onStateRefresh();
+                        }
                       }
                     },
                     onExplorePressed: () {
@@ -331,13 +411,10 @@ class _HomeDashboardView extends StatelessWidget {
                     },
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              // Main Right: Revision Card
-              Expanded(
-                flex: 8,
-                child: SizedBox(
-                  height: 195,
+                const SizedBox(width: 16),
+                // Main Right: Revision Card
+                Expanded(
+                  flex: 8,
                   child: RevisionCard(
                     topicName: 'Density Basics',
                     conceptsCount: 3,
@@ -359,8 +436,8 @@ class _HomeDashboardView extends StatelessWidget {
                     },
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           const SizedBox(height: 16),

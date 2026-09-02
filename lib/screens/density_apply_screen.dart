@@ -274,9 +274,9 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
                 color: ColorSystem.purple,
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Text(
-                'LESSON 3: APPLY',
-                style: TextStyle(
+              child: Text(
+                l('lesson_3_apply_header'),
+                style: const TextStyle(
                   fontFamily: 'Fredoka',
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
@@ -287,7 +287,7 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'Density in the Real World',
+              l('lesson_3_apply_title'),
               style: TextStyle(
                 fontFamily: 'Fredoka',
                 fontSize: isShort ? 12 : 14,
@@ -741,9 +741,9 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
                     color: ColorSystem.lavender,
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text(
-                    'LESSON 3 SUMMARY',
-                    style: TextStyle(
+                  child: Text(
+                    l('lesson_3_summary_title'),
+                    style: const TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: 10,
                       fontWeight: FontWeight.w900,
@@ -754,9 +754,9 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                const Text(
-                  'WHAT YOU DISCOVERED',
-                  style: TextStyle(
+                Text(
+                  l('what_you_discovered'),
+                  style: const TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
@@ -766,7 +766,7 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Density is the master key to how materials behave throughout nature and engineering.',
+                  l('density_master_key'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Fredoka',
@@ -778,27 +778,27 @@ class _DensityApplyScreenState extends State<DensityApplyScreen> {
 
                 // 3 Key Discoveries Cards
                 _buildSummaryBullet(
-                  'Average Density Governs Giant Vessels',
-                  'A hollow steel ship floats because the air trapped inside its massive hull lowers its total average density below 1.00 kg/L.',
+                  l('Average Density Governs Giant Vessels'),
+                  l('A hollow steel ship floats because the air trapped inside its massive hull lowers its total average density below 1.00 kg/L.'),
                   ColorSystem.purple,
                 ),
                 const SizedBox(height: 8),
                 _buildSummaryBullet(
-                  'Ice Expands & Defies Normal Solids',
-                  'Water expands when freezing, giving ice a density of 0.92 kg/L. That is why ice floats and supports Arctic life.',
+                  l('Ice Expands & Defies Normal Solids'),
+                  l('Water expands when freezing, giving ice a density of 0.92 kg/L. That is why ice floats and supports Arctic life.'),
                   ColorSystem.coral,
                 ),
                 const SizedBox(height: 8),
                 _buildSummaryBullet(
-                  'Liquids Naturally Layer by Density',
-                  'When immiscible fluids meet, lighter fluids (like oil at ~0.92 kg/L) float on top of denser fluids (like water at 1.00 kg/L).',
+                  l('Liquids Naturally Layer by Density'),
+                  l('When immiscible fluids meet, lighter fluids (like oil at ~0.92 kg/L) float on top of denser fluids (like water at 1.00 kg/L).'),
                   ColorSystem.gold,
                 ),
                 const SizedBox(height: 18),
 
                 // Claim Rewards & Continue CTA
                 CustomButton(
-                  text: 'COMPLETE & UNLOCK CHALLENGE',
+                  text: l('complete_unlock_challenge_btn'),
                   backgroundColor: ColorSystem.green,
                   textColor: Colors.white,
                   height: 42,

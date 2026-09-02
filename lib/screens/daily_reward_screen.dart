@@ -108,13 +108,13 @@ class _DailyRewardScreenState extends State<DailyRewardScreen> with TickerProvid
 
     // Alert notification banner
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
-          'Daily reward claimed! +200 XP, +100 Quest Coins added.',
-          style: TextStyle(fontFamily: 'Fredoka', fontWeight: FontWeight.bold),
+          l('daily_reward_claimed_msg'),
+          style: const TextStyle(fontFamily: 'Fredoka', fontWeight: FontWeight.bold),
         ),
         backgroundColor: ColorSystem.green,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -242,9 +242,9 @@ class _DailyRewardScreenState extends State<DailyRewardScreen> with TickerProvid
                   children: [
                     VectorAssetHelper.xpStarIcon(size: 20),
                     const SizedBox(width: 6),
-                    const Text(
-                      'Daily Reward',
-                      style: TextStyle(
+                    Text(
+                      l('daily_reward_title'),
+                      style: const TextStyle(
                         fontFamily: 'Fredoka',
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
@@ -255,7 +255,7 @@ class _DailyRewardScreenState extends State<DailyRewardScreen> with TickerProvid
                 ),
                 if (!isCompact)
                   Text(
-                    'Complete today\'s learning and claim your reward!',
+                    l('complete_today_quest_reward'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: 11,
@@ -279,11 +279,11 @@ class _DailyRewardScreenState extends State<DailyRewardScreen> with TickerProvid
                 border: Border.all(color: ColorSystem.pink.withOpacity(0.35), width: 1),
               ),
               child: Row(
-                children: const [
-                  Text('🔥 ', style: TextStyle(fontSize: 12)),
+                children: [
+                  const Text('🔥 ', style: TextStyle(fontSize: 12)),
                   Text(
-                    '15 Day Streak',
-                    style: TextStyle(
+                    l('day_streak_count', args: {'count': '15'}),
+                    style: const TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -333,13 +333,12 @@ class _DailyRewardScreenState extends State<DailyRewardScreen> with TickerProvid
   }
 
 
-  // 7-day horizontal calendar track
   Widget _buildCalendarTrack(bool isCompact) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'REWARD TRACKER',
+          l('reward_tracker_title'),
           style: TextStyle(
             fontFamily: 'Fredoka',
             fontSize: 9,
@@ -509,7 +508,7 @@ class _DailyRewardScreenState extends State<DailyRewardScreen> with TickerProvid
               children: [
                 const Text('🔥 ', style: TextStyle(fontSize: 14)),
                 Text(
-                  'learning_streak'.toUpperCase(),
+                  l('learning_streak_title').toUpperCase(),
                   style: const TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 10,
@@ -518,9 +517,9 @@ class _DailyRewardScreenState extends State<DailyRewardScreen> with TickerProvid
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Text(
-                  '15 Days',
-                  style: TextStyle(
+                Text(
+                  l('days_count', args: {'count': '15'}),
+                  style: const TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
@@ -562,10 +561,10 @@ class _DailyRewardScreenState extends State<DailyRewardScreen> with TickerProvid
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildMilestoneNode('7 Days', true, isCompact),
-                _buildMilestoneNode('14 Days', true, isCompact),
-                _buildMilestoneNode('30 Days', false, isCompact),
-                _buildMilestoneNode('60 Days', false, isCompact),
+                _buildMilestoneNode(l('days_count', args: {'count': '7'}), true, isCompact),
+                _buildMilestoneNode(l('days_count', args: {'count': '14'}), true, isCompact),
+                _buildMilestoneNode(l('days_count', args: {'count': '30'}), false, isCompact),
+                _buildMilestoneNode(l('days_count', args: {'count': '60'}), false, isCompact),
               ],
             ),
           ],
@@ -613,9 +612,9 @@ class _DailyRewardScreenState extends State<DailyRewardScreen> with TickerProvid
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'TODAY\'S REWARD',
-                  style: TextStyle(
+                Text(
+                  l('today_label').toUpperCase(),
+                  style: const TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 10,
                     fontWeight: FontWeight.w900,
@@ -642,15 +641,15 @@ class _DailyRewardScreenState extends State<DailyRewardScreen> with TickerProvid
                   children: [
                     _buildTodayRewardItem(VectorAssetHelper.xpStarIcon(size: 14), '+200 XP'),
                     const SizedBox(height: 2),
-                    _buildTodayRewardItem(VectorAssetHelper.questCoinIcon(size: 14), '+100 Quest Coins'),
+                    _buildTodayRewardItem(VectorAssetHelper.questCoinIcon(size: 14), '+100 ${l('quest_coins')}'),
                     const SizedBox(height: 2),
-                    _buildTodayRewardItem(VectorAssetHelper.badgeIcon('Float Master', size: 14), 'Rare Float Badge'),
+                    _buildTodayRewardItem(VectorAssetHelper.badgeIcon('Float Master', size: 14), l('Rare Float Badge')),
                   ],
                 ),
 
                 // Claim Actions
                 CustomButton(
-                  text: _claimed ? 'CLAIMED ✓' : 'CLAIM REWARD',
+                  text: _claimed ? '${l('daily_reward_claimed_msg')} ✓' : l('claim_reward_btn_label'),
                   backgroundColor: _claimed ? ColorSystem.green : ColorSystem.purple,
                   textColor: Colors.white,
                   height: isCompact ? 34 : 38,
@@ -682,8 +681,8 @@ class _DailyRewardScreenState extends State<DailyRewardScreen> with TickerProvid
                   ),
                   child: Text(
                     _claimed
-                        ? "Wow! You claimed today's epic rewards!"
-                        : "Awesome! Complete today's lesson and this reward is yours!",
+                        ? l("Wow! You claimed today's epic rewards!")
+                        : l("Awesome! Complete today's lesson and this reward is yours!"),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontFamily: 'Fredoka',

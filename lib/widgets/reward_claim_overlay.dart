@@ -9,6 +9,7 @@ import '../services/pending_reward_service.dart';
 import 'custom_button.dart';
 import 'dendy_mascot.dart';
 import 'vector_asset_helper.dart';
+import '../services/localization_service.dart';
 
 // Physics-based flying particle using vector assets
 class FlyingParticle {
@@ -315,7 +316,7 @@ class _RewardClaimOverlayState extends State<RewardClaimOverlay> with TickerProv
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          widget.reward.title.toUpperCase(),
+                          l(widget.reward.title).toUpperCase(),
                           style: const TextStyle(
                             fontFamily: 'Fredoka',
                             fontSize: 15,
@@ -326,7 +327,7 @@ class _RewardClaimOverlayState extends State<RewardClaimOverlay> with TickerProv
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          widget.reward.subtitle,
+                          l(widget.reward.subtitle),
                           style: TextStyle(
                             fontFamily: 'Fredoka',
                             fontSize: 10,
@@ -372,16 +373,16 @@ class _RewardClaimOverlayState extends State<RewardClaimOverlay> with TickerProv
                                 text = '+${reward.amount} XP';
                               } else if (reward.type == RewardType.coins) {
                                 iconWidget = VectorAssetHelper.questCoinIcon(size: 16);
-                                text = '+${reward.amount} Quest Coins';
+                                text = '+${reward.amount} ${l('quest_coins')}';
                               } else if (reward.type == RewardType.collectible) {
                                 iconWidget = VectorAssetHelper.collectibleIcon(
                                   reward.assetPath.isNotEmpty ? reward.assetPath : reward.name,
                                   size: 16,
                                 );
-                                text = reward.name;
+                                text = l(reward.name);
                               } else if (reward.type == RewardType.badge) {
                                 iconWidget = VectorAssetHelper.badgeIcon(reward.name, size: 16);
-                                text = '${reward.name} Badge';
+                                text = '${l(reward.name)} ${l('Badge')}';
                               }
 
                               return Padding(
@@ -410,8 +411,8 @@ class _RewardClaimOverlayState extends State<RewardClaimOverlay> with TickerProv
                         // Claim Button
                         CustomButton(
                           text: _claimedConfirmed
-                              ? 'REWARD CLAIMED ✓'
-                              : (_isClaiming ? 'CLAIMING...' : 'CLAIM REWARD'),
+                              ? '${l('daily_reward_claimed_msg')} ✓'
+                              : (_isClaiming ? l('CLAIMING...') : l('claim_reward_btn_label')),
                           backgroundColor: _claimedConfirmed ? ColorSystem.green : ColorSystem.purple,
                           textColor: Colors.white,
                           height: 38,
@@ -441,10 +442,10 @@ class _RewardClaimOverlayState extends State<RewardClaimOverlay> with TickerProv
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: ColorSystem.plum, width: 1.5),
                           ),
-                          child: const Text(
-                            "Awesome! Your adventure paid off! Look what you earned!",
+                          child: Text(
+                            l('awesome_adventure_reward_msg'),
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: 9,
                               color: ColorSystem.plum,

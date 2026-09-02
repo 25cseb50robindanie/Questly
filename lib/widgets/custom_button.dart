@@ -66,70 +66,79 @@ class _CustomButtonState extends State<CustomButton> with SingleTickerProviderSt
   }
 
   void _handleTapUp(TapUpDetails details) {
-    debugPrint("CustomButton: TapUp event received for button '${widget.text}'");
     _controller.reverse();
-    SoundService.playClick();
-    widget.onPressed();
   }
 
   void _handleTapCancel() {
     _controller.reverse();
   }
 
+  void _handleTap() {
+    _controller.reverse();
+    SoundService.playClick();
+    widget.onPressed();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: _handleTapDown,
-      onTapUp: _handleTapUp,
-      onTapCancel: _handleTapCancel,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: Transform.translate(
-              offset: Offset(0, _offsetAnimation.value),
-              child: Opacity(
-                opacity: _opacityAnimation.value,
-                child: Container(
-                  width: widget.width,
-                  height: widget.height,
-                  decoration: BoxDecoration(
-                    color: widget.backgroundColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: widget.hasBorder
-                        ? Border.all(color: ColorSystem.plum, width: 2)
-                        : null,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (widget.icon != null) ...[
-                            Icon(widget.icon, color: widget.textColor, size: 20),
-                            const SizedBox(width: 8),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: _handleTapDown,
+        onTapUp: _handleTapUp,
+        onTapCancel: _handleTapCancel,
+        onTap: _handleTap,
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _scaleAnimation.value,
+              child: Transform.translate(
+                offset: Offset(0, _offsetAnimation.value),
+                child: Opacity(
+                  opacity: _opacityAnimation.value,
+                  child: Container(
+                    width: widget.width,
+                    height: widget.height,
+                    decoration: BoxDecoration(
+                      color: widget.backgroundColor,
+                      borderRadius: BorderRadius.circular(8),
+                      border: widget.hasBorder
+                          ? Border.all(color: ColorSystem.plum, width: 2)
+                          : null,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (widget.icon != null) ...[
+                              Icon(widget.icon, color: widget.textColor, size: 20),
+                              const SizedBox(width: 8),
+                            ],
+                            Text(
+                              widget.text,
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    fontFamily: 'Fredoka',
+                                    fontFamilyFallback: const ['Noto Sans', 'Segoe UI', 'Roboto', 'sans-serif'],
+                                    color: widget.textColor,
+                                    fontSize: 16,
+                                    letterSpacing: 0.5,
+                                  ),
+                            ),
                           ],
-                          Text(
-                            widget.text,
-                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                  fontFamily: 'Fredoka',
-                                  color: widget.textColor,
-                                  fontSize: 16,
-                                  letterSpacing: 0.5,
-                                ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

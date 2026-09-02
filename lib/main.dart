@@ -53,7 +53,7 @@ class QuestlyApp extends StatelessWidget {
       valueListenable: LocalizationService.languageNotifier,
       builder: (context, currentLanguage, _) {
         return MaterialApp(
-          key: ValueKey('questly_app_$currentLanguage'),
+          key: const ValueKey('questly_app'),
           title: 'Questly',
           debugShowCheckedModeBanner: false,
           theme: QuestlyTheme.lightTheme,

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
 import '../services/sound_service.dart';
+import '../services/localization_service.dart';
 
 class DendySpeakButton extends StatefulWidget {
   final String textToSpeak;
+  final String? languageCode;
   final double size;
   final Color? color;
   final Color? activeColor;
@@ -13,6 +15,7 @@ class DendySpeakButton extends StatefulWidget {
   const DendySpeakButton({
     Key? key,
     required this.textToSpeak,
+    this.languageCode,
     this.size = 28,
     this.color,
     this.activeColor,
@@ -59,11 +62,10 @@ class _DendySpeakButtonState extends State<DendySpeakButton> with SingleTickerPr
               if (isPlaying) {
                 Locator.readAloudService.stop();
               } else {
-                final student = Locator.studentRepository.getCurrentStudent();
-                final lang = student?.language ?? 'en';
+                final activeLang = widget.languageCode ?? LocalizationService.currentLanguage;
                 Locator.readAloudService.speak(
                   widget.textToSpeak,
-                  languageCode: lang,
+                  languageCode: activeLang,
                 );
               }
             },

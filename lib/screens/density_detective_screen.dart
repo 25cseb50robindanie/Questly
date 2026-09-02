@@ -403,9 +403,9 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                 color: ColorSystem.purple,
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Text(
-                'LESSON 4: CHALLENGE',
-                style: TextStyle(
+              child: Text(
+                l('lesson_4_challenge_header'),
+                style: const TextStyle(
                   fontFamily: 'Fredoka',
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
@@ -416,7 +416,7 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'Density Detective',
+              l('lesson_4_challenge_title'),
               style: TextStyle(
                 fontFamily: 'Fredoka',
                 fontSize: isShort ? 12 : 14,
@@ -793,9 +793,9 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'WHAT DO YOU DEDUCE?',
-                    style: TextStyle(
+                  Text(
+                    l('WHAT DO YOU DEDUCE?'),
+                    style: const TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
@@ -804,7 +804,7 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Review the clues found on the left and select your deduction:',
+                    l('Review the clues found on the left and select your deduction:'),
                     style: TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: 11,
@@ -860,7 +860,7 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                   // Action Buttons
                   if (!_isDeductionCorrect)
                     CustomButton(
-                      text: 'CHECK DEDUCTION',
+                      text: l('CHECK DEDUCTION'),
                       backgroundColor: _selectedOptionIndex != null ? ColorSystem.purple : Colors.grey.shade400,
                       textColor: Colors.white,
                       height: isShort ? 36 : 42,
@@ -868,7 +868,7 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                     )
                   else
                     CustomButton(
-                      text: _stage == _DetectiveStage.caseC ? 'PROCEED TO FINAL TRICK CASE' : 'NEXT CASE',
+                      text: _stage == _DetectiveStage.caseC ? l('PROCEED TO FINAL TRICK CASE') : l('NEXT CASE'),
                       backgroundColor: ColorSystem.green,
                       textColor: Colors.white,
                       height: isShort ? 36 : 42,
@@ -1051,9 +1051,9 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'ONE LAST CASE: THE MASSIVE DUO',
-                      style: TextStyle(
+                    Text(
+                      l('ONE LAST CASE: THE MASSIVE DUO'),
+                      style: const TextStyle(
                         fontFamily: 'Fredoka',
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
@@ -1066,9 +1066,9 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                         color: ColorSystem.lavender,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Text(
-                        'FINAL TRICK CASE',
-                        style: TextStyle(
+                      child: Text(
+                        l('FINAL TRICK CASE'),
+                        style: const TextStyle(
                           fontFamily: 'Fredoka',
                           fontSize: 9.5,
                           fontWeight: FontWeight.w900,
@@ -1081,7 +1081,7 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                 const SizedBox(height: 6),
 
                 Text(
-                  'Two objects have the EXACT SAME heavy mass of 10.0 kg:',
+                  l('Two objects have the EXACT SAME heavy mass of 10.0 kg:'),
                   style: TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 11,
@@ -1094,20 +1094,20 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildObjectProfileCard('OBJECT A', 'Small compact metal ball', 'Mass: 10.0 kg\nVolume: 1.0 L\nDensity: 10.0 kg/L', ColorSystem.plum),
+                      child: _buildObjectProfileCard(l('OBJECT A'), l('Small compact metal ball'), '${l('mass_label')} 10.0 kg\n${l('volume_label')} 1.0 L\n${l('density_label')} 10.0 kg/L', ColorSystem.plum),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: _buildObjectProfileCard('OBJECT B', 'Large hollow raft frame', 'Mass: 10.0 kg\nVolume: 25.0 L\nDensity: 0.40 kg/L', ColorSystem.purple),
+                      child: _buildObjectProfileCard(l('OBJECT B'), l('Large hollow raft frame'), '${l('mass_label')} 10.0 kg\n${l('volume_label')} 25.0 L\n${l('density_label')} 0.40 kg/L', ColorSystem.purple),
                     ),
                   ],
                 ),
                 SizedBox(height: isShort ? 8 : 12),
 
                 // Question 1: Which is more likely to float?
-                const Text(
-                  '1. Which object is more likely to float on water?',
-                  style: TextStyle(
+                Text(
+                  l('1. Which object is more likely to float on water?'),
+                  style: const TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 11,
                     fontWeight: FontWeight.w900,
@@ -1118,13 +1118,13 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildChoiceChip('Object A (Small)', _trickPart1Selection == 0, () {
+                      child: _buildChoiceChip(l('Object A (Small)'), _trickPart1Selection == 0, () {
                         setState(() => _trickPart1Selection = 0);
                       }),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: _buildChoiceChip('Object B (Large)', _trickPart1Selection == 1, () {
+                      child: _buildChoiceChip(l('Object B (Large)'), _trickPart1Selection == 1, () {
                         setState(() => _trickPart1Selection = 1);
                       }),
                     ),
@@ -1133,9 +1133,9 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                 SizedBox(height: isShort ? 8 : 12),
 
                 // Question 2: Why?
-                const Text(
-                  '2. Why does that object float while the other sinks?',
-                  style: TextStyle(
+                Text(
+                  l('2. Why does that object float while the other sinks?'),
+                  style: const TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 11,
                     fontWeight: FontWeight.w900,
@@ -1143,22 +1143,22 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                _buildChoiceChip('A. Heavy objects always sink regardless of anything else.', _trickPart2Selection == 0, () {
+                _buildChoiceChip(l('A. Heavy objects always sink regardless of anything else.'), _trickPart2Selection == 0, () {
                   setState(() => _trickPart2Selection = 0);
                 }),
                 const SizedBox(height: 4),
-                _buildChoiceChip('B. Size alone determines floating behavior without regard to mass.', _trickPart2Selection == 1, () {
+                _buildChoiceChip(l('B. Size alone determines floating behavior without regard to mass.'), _trickPart2Selection == 1, () {
                   setState(() => _trickPart2Selection = 1);
                 }),
                 const SizedBox(height: 4),
-                _buildChoiceChip('C. The relationship between mass and volume determines density (Mass ÷ Volume).', _trickPart2Selection == 2, () {
+                _buildChoiceChip(l('C. The relationship between mass and volume determines density (Mass ÷ Volume).'), _trickPart2Selection == 2, () {
                   setState(() => _trickPart2Selection = 2);
                 }),
                 SizedBox(height: isShort ? 10 : 14),
 
                 if (!_trickSubmitted)
                   CustomButton(
-                    text: 'SUBMIT FINAL DEDUCTION',
+                    text: l('SUBMIT FINAL DEDUCTION'),
                     backgroundColor: (_trickPart1Selection != null && _trickPart2Selection != null) ? ColorSystem.purple : Colors.grey.shade400,
                     textColor: Colors.white,
                     height: 38,
@@ -1174,8 +1174,8 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                     ),
                     child: Text(
                       _isDeductionCorrect
-                          ? 'EXCELLENT REASONING! Object B spreads 10 kg over 25 L (0.40 kg/L < 1.00 kg/L). Density is the relationship between mass and volume!'
-                          : 'Check your reasoning: Both objects weigh 10 kg, but Object B has a huge volume, bringing its density down to 0.40 kg/L!',
+                          ? l('EXCELLENT REASONING! Object B spreads 10 kg over 25 L (0.40 kg/L < 1.00 kg/L). Density is the relationship between mass and volume!')
+                          : l('Check your reasoning: Both objects weigh 10 kg, but Object B has a huge volume, bringing its density down to 0.40 kg/L!'),
                       style: TextStyle(
                         fontFamily: 'Fredoka',
                         fontSize: 10.5,
@@ -1186,7 +1186,7 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                   ),
                   const SizedBox(height: 8),
                   CustomButton(
-                    text: 'CLOSE ALL CASES',
+                    text: l('CLOSE ALL CASES'),
                     backgroundColor: ColorSystem.green,
                     textColor: Colors.white,
                     height: 38,
@@ -1288,9 +1288,9 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
               ),
               const SizedBox(height: 10),
 
-              const Text(
-                'DENSITY DETECTIVE: CASE CLOSED',
-                style: TextStyle(
+              Text(
+                l('DENSITY DETECTIVE: CASE CLOSED'),
+                style: const TextStyle(
                   fontFamily: 'Fredoka',
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
@@ -1301,7 +1301,7 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
               const SizedBox(height: 6),
 
               Text(
-                'You used evidence from mass, volume, and floating behaviour to solve all the cases! You proved that density is the true relationship between mass and space.',
+                l('You used evidence from mass, volume, and floating behaviour to solve all the cases! You proved that density is the true relationship between mass and space.'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Fredoka',
@@ -1323,13 +1323,13 @@ class _DensityDetectiveScreenState extends State<DensityDetectiveScreen> {
                 child: DendyMascot(
                   size: isShort ? 44 : 50,
                   state: DendyState.success,
-                  message: 'Outstanding detective work! You deduced every mystery using scientific evidence!',
+                  message: l('Outstanding detective work! You deduced every mystery using scientific evidence!'),
                 ),
               ),
               SizedBox(height: isShort ? 14 : 20),
 
               CustomButton(
-                text: 'CLAIM REWARDS & UNLOCK TEACH-BACK',
+                text: l('claim_rewards_return_btn'),
                 backgroundColor: ColorSystem.green,
                 textColor: Colors.white,
                 height: 42,

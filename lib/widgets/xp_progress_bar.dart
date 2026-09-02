@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/theme/color_system.dart';
+import '../services/localization_service.dart';
 
 class XpProgressBar extends StatelessWidget {
   final int currentXp;
@@ -32,7 +33,7 @@ class XpProgressBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'XP PROGRESS',
+                  l('xp_progress_title'),
                   style: TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 10,

@@ -5,6 +5,7 @@ import '../widgets/dendy_mascot.dart';
 import '../widgets/questly_background.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_input.dart';
+import '../services/localization_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -36,7 +37,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (_passwordController.text != _confirmPasswordController.text) {
       setState(() {
-        _errorMessage = 'Passwords do not match.';
+        _errorMessage = l('passwords_not_match_error');
       });
       return;
     }
@@ -68,14 +69,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Welcome, ${_displayNameController.text.trim()}! Your quest begins now.'),
+          content: Text('${l('welcome_back_adventurer')}, ${_displayNameController.text.trim()}!'),
           backgroundColor: ColorSystem.green,
         ),
       );
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
     } else {
       setState(() {
-        _errorMessage = 'Questly ID already taken or registration details invalid.';
+        _errorMessage = l('id_taken_error');
       });
     }
   }
@@ -83,14 +84,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     DendyState mascotState = DendyState.idle;
-    String speechBubble = 'A new explorer! Fill in the fields to construct your profile.';
+    String speechBubble = l('new_explorer_fill_fields');
 
     if (_isLoading) {
       mascotState = DendyState.thinking;
-      speechBubble = 'Saving profile logs...';
+      speechBubble = l('saving_profile_logs');
     } else if (_errorMessage != null) {
       mascotState = DendyState.confused;
-      speechBubble = 'Oops! Check your registration details.';
+      speechBubble = l('oops_check_credentials');
     }
 
     return Scaffold(
@@ -118,32 +119,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             alignment: Alignment.centerLeft,
                           ),
                           const SizedBox(height: 12),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Text(
-                                'Create ',
-                                style: TextStyle(
-                                  fontFamily: 'Fredoka',
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.w900,
-                                  color: ColorSystem.plum,
-                                ),
-                              ),
-                              Text(
-                                'Profile',
-                                style: TextStyle(
-                                  fontFamily: 'Fredoka',
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.w900,
-                                  color: ColorSystem.purple,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            l('create_profile_title'),
+                            style: const TextStyle(
+                              fontFamily: 'Fredoka',
+                              fontSize: 36,
+                              fontWeight: FontWeight.w900,
+                              color: ColorSystem.plum,
+                            ),
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'This sets up your local adventurer profile. All progress is saved on your device.',
+                            l('register_subtitle'),
                             style: TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: 13,
@@ -184,9 +171,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Join the Quest!',
-                          style: TextStyle(
+                        Text(
+                          l('join_the_quest'),
+                          style: const TextStyle(
                             fontFamily: 'Fredoka',
                             fontSize: 24,
                             fontWeight: FontWeight.w800,
@@ -225,23 +212,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ],
 
                         CustomInput(
-                          label: 'QUESTLY ID',
-                          hint: 'e.g. alex2026',
+                          label: l('QUESTLY ID'),
+                          hint: l('enter_id_hint'),
                           controller: _idController,
                           validator: (val) {
-                            if (val == null || val.trim().isEmpty) return 'Enter a Questly ID';
-                            if (val.trim().length < 3) return 'Must be at least 3 characters';
+                            if (val == null || val.trim().isEmpty) return l('enter_id_hint');
+                            if (val.trim().length < 3) return l('Must be at least 3 characters');
                             return null;
                           },
                         ),
                         const SizedBox(height: 14),
 
                         CustomInput(
-                          label: 'DISPLAY NAME',
+                          label: l('DISPLAY NAME'),
                           hint: 'e.g. Alex',
                           controller: _displayNameController,
                           validator: (val) {
-                            if (val == null || val.trim().isEmpty) return 'Enter display name';
+                            if (val == null || val.trim().isEmpty) return l('Enter display name');
                             return null;
                           },
                         ),
@@ -251,13 +238,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           children: [
                             Expanded(
                               child: CustomInput(
-                                label: 'PASSWORD',
-                                hint: 'Min 4 chars',
+                                label: l('PASSWORD'),
+                                hint: l('Min 4 chars'),
                                 controller: _passwordController,
                                 isPassword: true,
                                 validator: (val) {
-                                  if (val == null || val.isEmpty) return 'Enter password';
-                                  if (val.length < 4) return 'Min 4 chars';
+                                  if (val == null || val.isEmpty) return l('please_enter_password');
+                                  if (val.length < 4) return l('Min 4 chars');
                                   return null;
                                 },
                               ),
@@ -265,12 +252,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: CustomInput(
-                                label: 'CONFIRM',
-                                hint: 'Confirm',
+                                label: l('CONFIRM'),
+                                hint: l('CONFIRM'),
                                 controller: _confirmPasswordController,
                                 isPassword: true,
                                 validator: (val) {
-                                  if (val == null || val.isEmpty) return 'Confirm password';
+                                  if (val == null || val.isEmpty) return l('Confirm password');
                                   return null;
                                 },
                               ),
@@ -286,14 +273,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             : Column(
                                 children: [
                                   CustomButton(
-                                    text: 'CREATE ACCOUNT',
+                                    text: l('create_account_btn'),
                                     backgroundColor: ColorSystem.purple,
                                     textColor: Colors.white,
                                     onPressed: _handleRegister,
                                   ),
                                   const SizedBox(height: 10),
                                   CustomButton(
-                                    text: 'CANCEL',
+                                    text: l('cancel_btn'),
                                     backgroundColor: Colors.transparent,
                                     textColor: ColorSystem.plum,
                                     hasBorder: false,

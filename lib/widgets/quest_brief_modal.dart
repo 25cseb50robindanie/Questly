@@ -7,6 +7,7 @@ import '../models/roadmap_enums.dart';
 import '../services/sound_service.dart';
 import 'custom_button.dart';
 import 'vector_asset_helper.dart';
+import '../services/localization_service.dart';
 
 class QuestBriefModal extends StatelessWidget {
   final RoadmapNode node;
@@ -77,7 +78,7 @@ class QuestBriefModal extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            'QUEST ${node.order}',
+                            '${l('quest').toUpperCase()} ${node.order}',
                             style: const TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: 10,
@@ -89,7 +90,7 @@ class QuestBriefModal extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          node.title.toUpperCase(),
+                          l(node.title).toUpperCase(),
                           style: TextStyle(
                             fontFamily: 'Fredoka',
                             fontSize: isShortScreen ? 13 : 15,
@@ -128,9 +129,9 @@ class QuestBriefModal extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'MISSION OBJECTIVE',
-                                style: TextStyle(
+                              Text(
+                                l('mission_objective_title'),
+                                style: const TextStyle(
                                   fontFamily: 'Fredoka',
                                   fontSize: 9,
                                   fontWeight: FontWeight.w900,
@@ -141,8 +142,8 @@ class QuestBriefModal extends StatelessWidget {
                               const SizedBox(height: 3),
                               Text(
                                 node.description.isNotEmpty
-                                    ? node.description
-                                    : 'Master the fundamental physics concepts and complete the interactive lab simulations.',
+                                    ? l(node.description)
+                                    : l('Master the fundamental physics concepts and complete the interactive lab simulations.'),
                                 style: TextStyle(
                                   fontFamily: 'Fredoka',
                                   fontSize: 11,
@@ -157,9 +158,9 @@ class QuestBriefModal extends StatelessWidget {
 
                         // Meta Details: Level Lessons List (for Level 1) or General Info
                         if (node.levelId == 'density_lvl1') ...[
-                          const Text(
-                            'LESSONS IN THIS LEVEL',
-                            style: TextStyle(
+                          Text(
+                            l('lessons_in_this_level'),
+                            style: const TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: 9,
                               fontWeight: FontWeight.w900,
@@ -177,15 +178,15 @@ class QuestBriefModal extends StatelessWidget {
                             ),
                             child: Column(
                               children: [
-                                _buildLessonRow(context, studentId, 'density_les1', '1. Curiosity', isFirst: true),
+                                _buildLessonRow(context, studentId, 'density_les1', '1. ${l('curiosity')}', isFirst: true),
                                 const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'density_les2', '2. Experiment'),
+                                _buildLessonRow(context, studentId, 'density_les2', '2. ${l('experiment')}', isFirst: false),
                                 const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'density_les3', '3. Apply'),
+                                _buildLessonRow(context, studentId, 'density_les3', '3. ${l('apply')}', isFirst: false),
                                 const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'density_les4', '4. Challenge'),
+                                _buildLessonRow(context, studentId, 'density_les4', '4. ${l('challenge')}', isFirst: false),
                                 const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'density_les5', '5. Teach Dendy'),
+                                _buildLessonRow(context, studentId, 'density_les5', '5. ${l('teach_dendy')}', isFirst: false),
                               ],
                             ),
                           ),
@@ -204,12 +205,12 @@ class QuestBriefModal extends StatelessWidget {
                                     border: Border.all(color: ColorSystem.plum.withOpacity(0.12), width: 1),
                                   ),
                                   child: Row(
-                                    children: const [
-                                      Icon(Icons.timer_outlined, color: ColorSystem.purple, size: 14),
-                                      SizedBox(width: 4),
+                                    children: [
+                                      const Icon(Icons.timer_outlined, color: ColorSystem.purple, size: 14),
+                                      const SizedBox(width: 4),
                                       Text(
-                                        '~8 Mins • 3 Activities',
-                                        style: TextStyle(
+                                        l('estimated_time_activities'),
+                                        style: const TextStyle(
                                           fontFamily: 'Fredoka',
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
@@ -255,9 +256,9 @@ class QuestBriefModal extends StatelessWidget {
 
                         // Possible Rewards Breakdown
                         if (rewards.isNotEmpty) ...[
-                          const Text(
-                            'POSSIBLE REWARDS',
-                            style: TextStyle(
+                          Text(
+                            l('possible_rewards_title'),
+                            style: const TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: 9,
                               fontWeight: FontWeight.w900,
@@ -275,10 +276,10 @@ class QuestBriefModal extends StatelessWidget {
                                 rewardText = '+${reward.amount} XP';
                               } else if (reward.type == RewardType.coins) {
                                 rewardIcon = VectorAssetHelper.questCoinIcon(size: 13);
-                                rewardText = '+${reward.amount} Coins';
+                                rewardText = '+${reward.amount} ${l('quest_coins')}';
                               } else {
                                 rewardIcon = VectorAssetHelper.collectibleIcon('diamond', size: 13);
-                                rewardText = reward.name;
+                                rewardText = l(reward.name);
                               }
 
                               return Container(
@@ -319,10 +320,10 @@ class QuestBriefModal extends StatelessWidget {
                 // 3. Bottom CTA Button
                 CustomButton(
                   text: isLocked
-                      ? 'LOCKED QUEST'
+                      ? l('locked_quest')
                       : (isClaimable
-                          ? 'OPEN REWARD CHEST'
-                          : (isCompleted ? 'REPLAY QUEST' : 'START QUEST')),
+                          ? l('open_reward_chest')
+                          : (isCompleted ? l('replay_quest') : l('start_quest'))),
                   backgroundColor: isLocked ? Colors.grey.shade400 : ColorSystem.purple,
                   textColor: Colors.white,
                   height: isShortScreen ? 38 : 42,

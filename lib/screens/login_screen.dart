@@ -5,6 +5,7 @@ import '../widgets/custom_button.dart';
 import '../widgets/custom_input.dart';
 import '../widgets/dendy_mascot.dart';
 import '../widgets/questly_background.dart';
+import '../services/localization_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -52,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacementNamed(context, '/home');
     } else {
       setState(() {
-        _errorMessage = 'Invalid Questly ID or Password.';
+        _errorMessage = l('invalid_credentials_error');
       });
     }
   }
@@ -60,14 +61,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     DendyState mascotState = DendyState.idle;
-    String speechBubble = 'Welcome back adventurer! Ready for today\'s quests?';
+    String speechBubble = l('welcome_adventurer_ready');
 
     if (_isLoading) {
       mascotState = DendyState.thinking;
-      speechBubble = 'Scanning the scroll archives...';
+      speechBubble = l('scanning_archives');
     } else if (_errorMessage != null) {
       mascotState = DendyState.confused;
-      speechBubble = 'Oops! Check your Questly ID credentials.';
+      speechBubble = l('oops_check_credentials');
     }
 
     return Scaffold(
@@ -93,9 +94,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             width: 260,
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) {
-                              return const Text(
-                                'QUESTLY',
-                                style: TextStyle(
+                              return Text(
+                                l('questly').toUpperCase(),
+                                style: const TextStyle(
                                   fontFamily: 'Fredoka',
                                   fontSize: 44,
                                   fontWeight: FontWeight.w900,
@@ -106,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Welcome back, adventurer.',
+                            l('welcome_back_adventurer'),
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                   color: ColorSystem.plum,
                                   fontWeight: FontWeight.w600,
@@ -114,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Log in to resume your offline learning quests and achievements.',
+                            l('login_subtitle'),
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: ColorSystem.plum.withOpacity(0.7),
                                   height: 1.4,
@@ -154,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Student Sign In',
+                          l('student_sign_in'),
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 color: ColorSystem.plum,
                                 fontSize: 24,
@@ -191,12 +192,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
 
                         CustomInput(
-                          label: 'QUESTLY ID',
-                          hint: 'Enter your adventurer ID',
+                          label: l('QUESTLY ID'),
+                          hint: l('enter_id_hint'),
                           controller: _idController,
                           validator: (val) {
                             if (val == null || val.trim().isEmpty) {
-                              return 'Please enter your Questly ID';
+                              return l('please_enter_id');
                             }
                             return null;
                           },
@@ -204,13 +205,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 18),
 
                         CustomInput(
-                          label: 'PASSWORD',
-                          hint: 'Enter password',
+                          label: l('PASSWORD'),
+                          hint: l('enter_password_hint'),
                           controller: _passwordController,
                           isPassword: true,
                           validator: (val) {
                             if (val == null || val.isEmpty) {
-                              return 'Please enter your password';
+                              return l('please_enter_password');
                             }
                             return null;
                           },
@@ -226,14 +227,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             : Column(
                                 children: [
                                   CustomButton(
-                                    text: 'CONTINUE',
+                                    text: l('continue_btn'),
                                     backgroundColor: ColorSystem.purple,
                                     textColor: Colors.white,
                                     onPressed: _handleLogin,
                                   ),
                                   const SizedBox(height: 14),
                                   CustomButton(
-                                    text: 'CREATE NEW ACCOUNT',
+                                    text: l('create_new_account_btn'),
                                     backgroundColor: Colors.transparent,
                                     textColor: ColorSystem.purple,
                                     hasBorder: false,
