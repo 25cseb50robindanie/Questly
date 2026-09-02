@@ -535,57 +535,59 @@ function finishLevel2() {
 function getExperimentReagents() {
   if (selectedExperiment === 'flameTest') {
     return [
-      { id: 'licl', name: 'Lithium Chloride (LiCl)', type: 'primary', desc: 'Crimson Red Salt', req: true },
-      { id: 'hcl_rinse', name: 'Conc. HCl Acid', type: 'secondary', desc: 'Wire Cleaning Solvent', req: true },
-      { id: 'cacl2', name: 'Calcium Chloride', type: 'primary', desc: 'Brick Red (Alternative)', req: false },
-      { id: 'sugar', name: 'Sucrose Sugar', type: 'secondary', desc: 'Organic sugar (Wrong)', req: false },
-      { id: 'kcl', name: 'Potassium Chloride', type: 'primary', desc: 'Lilac Violet (Alternative)', req: false },
-      { id: 'h2o', name: 'Distilled Water', type: 'secondary', desc: 'Rinse Solvent', req: false },
+      { id: 'licl', name: 'Lithium Chloride (LiCl)', desc: 'Crimson Red Salt', req: true },
+      { id: 'hcl_rinse', name: 'Conc. HCl Acid', desc: 'Wire Cleaning Solvent', req: true },
+      { id: 'cacl2', name: 'Calcium Chloride', desc: 'Brick Red Salt', req: true },
+      { id: 'kcl', name: 'Potassium Chloride', desc: 'Lilac Violet Salt', req: true },
+      { id: 'sugar', name: 'Sucrose Sugar', desc: 'Organic sugar (Wrong)', req: false },
+      { id: 'oil', name: 'Cooking Oil', desc: 'Nonpolar liquid (Wrong)', req: false },
     ];
   } else if (selectedExperiment === 'calorimetry') {
     return [
-      { id: 'h2o_mass', name: '100.0 g Distilled Water', type: 'primary', desc: 'Calorimeter Solvent', req: true },
-      { id: 'naoh_solid', name: 'Solid NaOH Pellets', type: 'secondary', desc: 'Exothermic Solute', req: true },
-      { id: 'nacl', name: 'Sodium Chloride', type: 'secondary', desc: 'Neutral Salt (Distractor)', req: false },
-      { id: 'ethanol', name: 'Ethanol Fuel', type: 'primary', desc: 'Organic Solvent (Wrong)', req: false },
-      { id: 'nh4no3', name: 'Ammonium Nitrate', type: 'secondary', desc: 'Endothermic Salt (Extra)', req: false },
-      { id: 'oil', name: 'Mineral Oil', type: 'primary', desc: 'Nonpolar Liquid (Wrong)', req: false },
+      { id: 'h2o_mass', name: '100.0 g Distilled Water', desc: 'Calorimeter Solvent', req: true },
+      { id: 'naoh_solid', name: 'Solid NaOH Pellets', desc: 'Exothermic Solute (+q)', req: true },
+      { id: 'nh4no3', name: 'Ammonium Nitrate', desc: 'Endothermic Salt (-q)', req: true },
+      { id: 'ethanol', name: 'Ethanol Fuel', desc: 'Organic Solvent (Wrong)', req: false },
+      { id: 'sand', name: 'Silica Sand', desc: 'Insoluble solid (Wrong)', req: false },
+      { id: 'oil', name: 'Mineral Oil', desc: 'Nonpolar Liquid (Wrong)', req: false },
     ];
   } else if (selectedExperiment === 'smelting') {
     return [
-      { id: 'hematite', name: 'Hematite Ore (Fe₂O₃)', type: 'primary', desc: 'Iron Oxide Source', req: true },
-      { id: 'coke', name: 'Carbon Coke Fuel', type: 'secondary', desc: 'CO Gas Reducer', req: true },
-      { id: 'limestone', name: 'Limestone (CaCO₃)', type: 'secondary', desc: 'Slag Flux Builder', req: false },
-      { id: 'sand', name: 'Quartz Sand', type: 'primary', desc: 'Silica (Impurity)', req: false },
-      { id: 'copper_ore', name: 'Chalcopyrite', type: 'primary', desc: 'Copper ore (Wrong)', req: false },
-      { id: 'charcoal', name: 'Wood Charcoal', type: 'secondary', desc: 'Biomass Fuel (Extra)', req: false },
+      { id: 'hematite', name: 'Hematite Ore (Fe₂O₃)', desc: 'Iron Oxide Source', req: true },
+      { id: 'coke', name: 'Carbon Coke Fuel', desc: 'CO Gas Reducer', req: true },
+      { id: 'limestone', name: 'Limestone (CaCO₃)', desc: 'Slag Flux Builder', req: true },
+      { id: 'sand', name: 'Quartz Sand', desc: 'Silica Impurity (Distractor)', req: false },
+      { id: 'copper_ore', name: 'Chalcopyrite', desc: 'Copper ore (Wrong)', req: false },
+      { id: 'water', name: 'Liquid Water', desc: 'Quenching agent (Wrong)', req: false },
     ];
   } else {
     // Titration
     return [
-      { id: 'hcl', name: '0.100 M HCl Acid', type: 'primary', desc: 'Analyte Solution', req: true },
-      { id: 'phenolphthalein', name: 'Phenolphthalein', type: 'secondary', desc: 'pH 8.2-10.0 Indicator', req: true },
-      { id: 'naoh', name: '0.100 M NaOH Standard', type: 'secondary', desc: 'Titrant in Burette', req: false },
-      { id: 'ch3cooh', name: '0.100 M CH₃COOH', type: 'primary', desc: 'Acetic Acid (Distractor)', req: false },
-      { id: 'methyl_orange', name: 'Methyl Orange', type: 'secondary', desc: 'pH 3.1-4.4 Indicator', req: false },
-      { id: 'h2o', name: 'Distilled H₂O', type: 'secondary', desc: 'Rinse Solvent', req: false },
+      { id: 'hcl', name: '0.100 M HCl Acid', desc: 'Analyte Solution in Flask', req: true },
+      { id: 'naoh', name: '0.100 M NaOH Standard', desc: 'Standard Titrant in Burette', req: true },
+      { id: 'phenolphthalein', name: 'Phenolphthalein', desc: 'pH 8.2-10.0 Indicator', req: true },
+      { id: 'ch3cooh', name: '0.100 M Acetic Acid', desc: 'Weak Acid (Distractor)', req: false },
+      { id: 'methyl_orange', name: 'Methyl Orange', desc: 'pH 3.1-4.4 Indicator (Distractor)', req: false },
+      { id: 'oil', name: 'Mineral Oil', desc: 'Nonpolar Liquid (Wrong)', req: false },
     ];
   }
 }
 
+const selectedReagentsSet = new Set();
+
 function renderReagentsGrid() {
-  setFoxySpeech('"Level 3: Select both the primary reactant and secondary chemical solution for this experiment!"');
+  setFoxySpeech('"Level 3: Select at least 2 active chemical reagents required for this experiment!"');
   const grid = document.getElementById('reagentsGrid');
   grid.innerHTML = '';
   document.getElementById('reagentErrorMsg').style.display = 'none';
 
   const reagents = getExperimentReagents();
   reagents.forEach(r => {
-    const isSel = (selectedReagent1 === r.id) || (selectedReagent2 === r.id);
+    const isSel = selectedReagentsSet.has(r.id);
     const card = document.createElement('div');
     card.className = `bottle-card ${isSel ? 'selected' : ''}`;
     card.id = `bot_${r.id}`;
-    card.onclick = () => tapReagent(r.id, r.type, r.req);
+    card.onclick = () => tapReagent(r.id, r.req);
     card.innerHTML = `
       <div class="bottle-icon-wrap">${isSel ? '✅' : '🧪'}</div>
       <div class="bottle-info">
@@ -600,22 +602,20 @@ function renderReagentsGrid() {
   updateReagentButtons();
 }
 
-function tapReagent(id, type, isRequired) {
+function tapReagent(id, isRequired) {
   const errMsg = document.getElementById('reagentErrorMsg');
   if (isRequired) {
     sound.playPop();
     errMsg.style.display = 'none';
-    if (type === 'primary') {
-      selectedReagent1 = id;
-      reagentStep1Done = true;
+    if (selectedReagentsSet.has(id)) {
+      selectedReagentsSet.delete(id);
     } else {
-      selectedReagent2 = id;
-      reagentStep2Done = true;
+      selectedReagentsSet.add(id);
     }
     renderReagentsGrid();
 
-    if (reagentStep1Done && reagentStep2Done) {
-      showHurrahModal('Level 3: Solutions Ready!', 'Both chemical reagents are measured and prepared!', 'Start Lab Simulator ➜', () => {
+    if (selectedReagentsSet.size >= 2) {
+      showHurrahModal('Level 3: Solutions Ready!', 'Chemical reagents are measured and prepared!', 'Start Lab Simulator ➜', () => {
         goToLevel(4);
       });
     }
@@ -627,7 +627,7 @@ function tapReagent(id, type, isRequired) {
 }
 
 function updateReagentButtons() {
-  const isDone = reagentStep1Done && reagentStep2Done;
+  const isDone = selectedReagentsSet.size >= 2;
   const counter = document.getElementById('reagentsCount');
   const btn = document.getElementById('btnFinishLevel3');
 
@@ -637,15 +637,15 @@ function updateReagentButtons() {
     btn.classList.remove('disabled');
     btn.innerText = 'START LAB SIMULATOR ➜';
   } else {
-    counter.innerText = 'Select Pair';
+    counter.innerText = `${selectedReagentsSet.size} / 2 Selected`;
     counter.style.color = '#FF6B6B';
     btn.classList.add('disabled');
-    btn.innerText = 'Select both required chemical solutions';
+    btn.innerText = `Select at least 2 active chemical solutions (${selectedReagentsSet.size}/2)`;
   }
 }
 
 function finishLevel3() {
-  if (reagentStep1Done && reagentStep2Done) {
+  if (selectedReagentsSet.size >= 2) {
     goToLevel(4);
   }
 }
@@ -698,7 +698,8 @@ function setupLevel4Simulator() {
     `;
     panel.innerHTML = `
       <button class="ctrl-btn btn-castle" onclick="addDrop(0.05)">+0.05 mL Drop 💧</button>
-      <button class="ctrl-btn btn-purple" onclick="addDrop(0.50)">+0.50 mL Fast 🌊</button>
+      <button class="ctrl-btn btn-purple" onclick="addDrop(1.00)">+1.00 mL Fast 🌊</button>
+      <button class="ctrl-btn" style="background:#6366F1" onclick="addDrop(5.00)">+5.00 mL Pour 🧪</button>
       <button class="ctrl-btn btn-lavender" id="btnContinuous" onclick="toggleContinuous()">▶ Continuous</button>
       <button class="ctrl-btn btn-blue" onclick="triggerSwirl()">🌀 Swirl Flask</button>
       <button class="ctrl-btn btn-green" onclick="verifyLevel4()">🎯 Verify Endpoint</button>
