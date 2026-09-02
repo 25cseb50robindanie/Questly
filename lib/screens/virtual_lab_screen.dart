@@ -609,12 +609,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         ),
         const SizedBox(height: 8),
 
-        // 4 Clean Playable Cards (2x2 Grid)
+        // 4 Clean Playable Cards (Compact Fixed-Height Grid)
         Expanded(
           child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.6,
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 420,
+              mainAxisExtent: 64,
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
             ),
@@ -625,43 +625,50 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
 
               return InkWell(
                 onTap: () => _chooseExperiment(m['id'] as LabExperiment),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  padding: const EdgeInsets.all(10),
+                  height: 64,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: col.withOpacity(0.5), width: 1.6),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: col.withOpacity(0.4), width: 1.4),
                     boxShadow: [
                       BoxShadow(color: ColorSystem.plum.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2)),
                     ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Row(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(color: col.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
-                            child: Icon(m['icon'] as IconData, size: 20, color: col),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                            decoration: BoxDecoration(color: ColorSystem.green.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
-                            child: const Text('5 LEVELS', style: TextStyle(fontFamily: 'Fredoka', fontSize: 7.5, fontWeight: FontWeight.w900, color: ColorSystem.green)),
-                          ),
-                        ],
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(color: col.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                        child: Icon(m['icon'] as IconData, size: 20, color: col),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(m['title'] as String, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.w900, color: ColorSystem.plum)),
-                          Text(m['subtitle'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 8, color: ColorSystem.plum.withOpacity(0.65)), maxLines: 1, overflow: TextOverflow.ellipsis),
-                        ],
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(color: col.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                                  child: Text(m['tag'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 7, fontWeight: FontWeight.w900, color: col)),
+                                ),
+                                const SizedBox(width: 5),
+                                const Text('5 LEVELS', style: TextStyle(fontFamily: 'Fredoka', fontSize: 7, fontWeight: FontWeight.w900, color: ColorSystem.green)),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(m['title'] as String, style: const TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.w900, color: ColorSystem.plum), maxLines: 1),
+                            Text(m['subtitle'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 8, color: ColorSystem.plum.withOpacity(0.65)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                          ],
+                        ),
                       ),
+                      Icon(Icons.arrow_forward_ios_rounded, size: 12, color: col),
                     ],
                   ),
                 ),
@@ -1165,12 +1172,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
           child: Padding(
             padding: const EdgeInsets.all(8),
             child: GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 2.8,
-                crossAxisSpacing: 6,
-                mainAxisSpacing: 6,
+              physics: const BouncingScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 400,
+                mainAxisExtent: 52,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
               ),
               itemCount: tools.length,
               itemBuilder: (ctx, idx) {
@@ -1181,7 +1188,8 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                   onTap: () => _toggleApparatus(item['id'] as String, item['req'] as bool),
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    height: 52,
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: isAdded ? ColorSystem.green.withOpacity(0.12) : const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(8),
@@ -1192,15 +1200,15 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     ),
                     child: Row(
                       children: [
-                        Icon(isAdded ? Icons.check_circle_rounded : Icons.science_outlined, size: 18, color: isAdded ? ColorSystem.green : ColorSystem.castlePurple),
-                        const SizedBox(width: 6),
+                        Icon(isAdded ? Icons.check_circle_rounded : Icons.science_outlined, size: 20, color: isAdded ? ColorSystem.green : ColorSystem.castlePurple),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(item['name'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.w900, color: isAdded ? ColorSystem.green : ColorSystem.plum), maxLines: 1),
-                              Text(item['desc'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 7.5, color: ColorSystem.plum.withOpacity(0.6)), maxLines: 1),
+                              Text(item['name'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: isAdded ? ColorSystem.green : ColorSystem.plum), maxLines: 1),
+                              Text(item['desc'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 8, color: ColorSystem.plum.withOpacity(0.6)), maxLines: 1),
                             ],
                           ),
                         ),
@@ -1285,12 +1293,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
           child: Padding(
             padding: const EdgeInsets.all(8),
             child: GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 2.8,
-                crossAxisSpacing: 6,
-                mainAxisSpacing: 6,
+              physics: const BouncingScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 400,
+                mainAxisExtent: 52,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
               ),
               itemCount: reagents.length,
               itemBuilder: (ctx, idx) {
@@ -1301,7 +1309,8 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                   onTap: () => _toggleReagent(item['id'] as String, item['req'] as bool),
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    height: 52,
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: isSelected ? ColorSystem.green.withOpacity(0.12) : const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(8),
@@ -1312,15 +1321,15 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     ),
                     child: Row(
                       children: [
-                        Icon(isSelected ? Icons.check_circle_rounded : Icons.opacity_rounded, size: 18, color: isSelected ? ColorSystem.green : ColorSystem.castlePurple),
-                        const SizedBox(width: 6),
+                        Icon(isSelected ? Icons.check_circle_rounded : Icons.opacity_rounded, size: 20, color: isSelected ? ColorSystem.green : ColorSystem.castlePurple),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(item['name'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.w900, color: isSelected ? ColorSystem.green : ColorSystem.plum), maxLines: 1),
-                              Text(item['desc'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 7.5, color: ColorSystem.plum.withOpacity(0.6)), maxLines: 1),
+                              Text(item['name'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: isSelected ? ColorSystem.green : ColorSystem.plum), maxLines: 1),
+                              Text(item['desc'] as String, style: TextStyle(fontFamily: 'Fredoka', fontSize: 8, color: ColorSystem.plum.withOpacity(0.6)), maxLines: 1),
                             ],
                           ),
                         ),
