@@ -1184,5 +1184,5 @@ function claimLabTrophy() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Init
+  startExperiment('titration');
 });
