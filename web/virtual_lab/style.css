@@ -1,5 +1,5 @@
 /* ==========================================================================
-   QUESTLY VIRTUAL LAB - MOBILE FIRST ENHANCED LAB STYLES
+   QUESTLY VIRTUAL LAB - COMPLETE MULTI-EXPERIMENT & MODAL STYLES
    ========================================================================== */
 
 :root {
@@ -120,7 +120,7 @@ body {
 .xp-pill { color: var(--color-purple); }
 .gold-pill { color: #D97706; }
 
-/* 0. Experiment Selection Grid */
+/* Experiment Selection Grid */
 .exp-grid {
   flex: 1;
   display: grid;
@@ -148,10 +148,6 @@ body {
 .active-card {
   border-color: var(--color-castle);
   box-shadow: 0 4px 12px rgba(74, 52, 117, 0.15);
-}
-
-.disabled-card {
-  opacity: 0.7;
 }
 
 .exp-icon-bubble {
@@ -184,7 +180,7 @@ body {
   font-weight: 900;
 }
 
-/* Stepper Pills */
+/* Stepper */
 .level-stepper {
   display: flex;
   gap: 4px;
@@ -219,7 +215,7 @@ body {
   opacity: 0.6;
 }
 
-/* Foxy Teacher */
+/* Foxy Guidance */
 .foxy-teacher-card {
   background: white;
   border: 1.5px solid rgba(19, 26, 38, 0.15);
@@ -267,7 +263,7 @@ body {
   padding: 2px;
 }
 
-/* Active Level Container */
+/* Active Level View Container */
 .active-level-container {
   flex: 1;
   background: white;
@@ -287,6 +283,18 @@ body {
 
 .level-card.active {
   display: flex;
+}
+
+/* Error Banner */
+.error-banner {
+  margin: 0 8px 4px;
+  padding: 4px 8px;
+  background: rgba(255, 107, 107, 0.15);
+  border: 1px solid var(--color-coral);
+  border-radius: 6px;
+  font-size: 8.5px;
+  font-weight: bold;
+  color: var(--color-coral);
 }
 
 /* Concept Slides */
@@ -463,7 +471,7 @@ body {
 .btn-green-solid { background: var(--color-green) !important; }
 .disabled { background: #CBD5E1 !important; cursor: not-allowed !important; }
 
-/* Level 2: 6 Glassware Grid */
+/* Grid Layouts */
 .level-header-row {
   padding: 6px 8px 3px;
   display: flex;
@@ -483,7 +491,7 @@ body {
   color: var(--color-green);
 }
 
-.apparatus-grid {
+.apparatus-grid, .reagents-grid {
   flex: 1;
   padding: 4px 6px;
   display: grid;
@@ -491,7 +499,7 @@ body {
   gap: 5px;
 }
 
-.apparatus-card {
+.apparatus-card, .bottle-card {
   background: #F8FAFC;
   border: 1.2px solid rgba(19, 26, 38, 0.15);
   border-radius: 8px;
@@ -502,26 +510,26 @@ body {
   cursor: pointer;
 }
 
-.apparatus-card.placed {
+.apparatus-card.placed, .bottle-card.selected {
   background: rgba(6, 214, 160, 0.12);
   border-color: var(--color-green);
 }
 
-.glassware-icon {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+.apparatus-card.wrong-flash {
+  background: rgba(255, 107, 107, 0.15);
+  border-color: var(--color-coral);
 }
 
-.app-info h5 {
+.app-icon, .bottle-icon-wrap {
+  font-size: 18px;
+}
+
+.app-info h5, .bottle-info h5 {
   font-size: 8.5px;
   font-weight: 900;
 }
 
-.app-info p {
+.app-info p, .bottle-info p {
   font-size: 7px;
   color: rgba(19, 26, 38, 0.6);
 }
@@ -529,82 +537,6 @@ body {
 .check-mark {
   font-size: 11px;
   margin-left: auto;
-}
-
-/* Level 3: 6 Reagents Bottle Grid */
-.reagents-grid {
-  flex: 1;
-  padding: 4px 6px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5px;
-}
-
-.bottle-card {
-  background: #F8FAFC;
-  border: 1.2px solid rgba(19, 26, 38, 0.15);
-  border-radius: 8px;
-  padding: 4px 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.bottle-card.selected {
-  background: rgba(6, 214, 160, 0.12);
-  border-color: var(--color-green);
-}
-
-.bottle-icon {
-  width: 22px;
-  height: 26px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.bottle-cap {
-  width: 8px;
-  height: 4px;
-  background: #1E293B;
-  border-radius: 1px;
-}
-
-.bottle-body {
-  width: 20px;
-  height: 22px;
-  border-radius: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(19, 26, 38, 0.4);
-}
-
-.bottle-label {
-  font-size: 6.5px;
-  font-weight: 900;
-  background: white;
-  padding: 0 1px;
-  border-radius: 1px;
-}
-
-.red-bottle .bottle-body { background: #FF6B6B; color: #7F1D1D; }
-.pink-bottle .bottle-body { background: #EC4899; color: #831843; }
-.purple-bottle .bottle-body { background: #8B5CF6; color: #3B0764; }
-.orange-bottle .bottle-body { background: #F97316; color: #7C2D12; }
-.yellow-bottle .bottle-body { background: #F59E0B; color: #78350F; }
-.blue-bottle .bottle-body { background: #38BDF8; color: #0C4A6E; }
-
-.bottle-info h5 {
-  font-size: 8.5px;
-  font-weight: 900;
-}
-
-.bottle-info p {
-  font-size: 7px;
-  color: rgba(19, 26, 38, 0.6);
 }
 
 /* Level 4: Simulator */
@@ -688,8 +620,93 @@ body {
 .report-row {
   display: flex;
   justify-content: space-between;
-  font-size: 9px;
+  font-size: 8.5px;
 }
 
 .report-row span { color: rgba(19, 26, 38, 0.7); font-weight: 700; }
 .report-row strong { color: var(--color-plum); font-weight: 900; }
+
+/* ================= HURRAH POPUP MODAL ================= */
+.hurrah-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(19, 26, 38, 0.6);
+  display: flex;
+  align-items: flex-end;
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.hurrah-modal-card {
+  width: 100%;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 -8px 25px rgba(0,0,0,0.15);
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.hurrah-confetti {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.hurrah-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--color-green);
+  letter-spacing: 0.3px;
+}
+
+.hurrah-subtitle {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--color-plum);
+  margin: 2px 0 4px;
+}
+
+.hurrah-desc {
+  font-size: 9px;
+  color: rgba(19, 26, 38, 0.7);
+  margin-bottom: 10px;
+}
+
+.hurrah-badges {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.h-badge {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.xp-badge {
+  background: rgba(134, 103, 194, 0.15);
+  color: var(--color-purple);
+  border: 1px solid var(--color-purple);
+}
+
+.gold-badge {
+  background: rgba(255, 209, 102, 0.2);
+  color: #D97706;
+  border: 1px solid #D97706;
+}

@@ -40,65 +40,65 @@
           </svg>
         </div>
         <div class="foxy-speech-box">
-          <p class="foxy-speech-text">"Welcome to Questly Virtual Labs! Choose an experiment module to enter your hands-on 5-level lab simulation!"</p>
+          <p class="foxy-speech-text">"Welcome to Questly Labs! Choose ANY of the 4 science experiments below to begin your hands-on 5-level simulation!"</p>
         </div>
-        <button class="speak-btn" onclick="speakText('Welcome to Questly Virtual Labs! Choose an experiment module to enter your hands-on 5-level lab simulation!')">🔊</button>
+        <button class="speak-btn" onclick="speakText('Welcome to Questly Labs! Choose any of the 4 science experiments below to begin!')">🔊</button>
       </div>
 
+      <!-- All 4 Active & Playable Modules -->
       <div class="exp-grid">
         <div class="exp-card active-card" onclick="startExperiment('titration')">
           <div class="exp-icon-bubble">⚗️</div>
           <div class="exp-info">
             <span class="exp-tag">CHEMISTRY • 5 LEVELS</span>
             <h4>Acid–Base Titration</h4>
-            <p>Quantitative neutralization & molarity analysis</p>
+            <p>Quantitative neutralization & molarity (HCl + NaOH)</p>
           </div>
           <span class="exp-arrow">➜</span>
         </div>
 
-        <div class="exp-card disabled-card" onclick="alert('Starting with Acid-Base Titration module!')">
+        <div class="exp-card active-card" onclick="startExperiment('flameTest')">
           <div class="exp-icon-bubble">🌈</div>
           <div class="exp-info">
-            <span class="exp-tag">OPTICAL PHYSICS</span>
+            <span class="exp-tag">PHYSICS • 5 LEVELS</span>
             <h4>Flame Emission Spectra</h4>
-            <p>Characteristic wavelengths of metal salt cations</p>
+            <p>Metal cation excitation (Li⁺, Na⁺, K⁺, Cu²⁺)</p>
           </div>
-          <span class="exp-arrow">🔒</span>
+          <span class="exp-arrow">➜</span>
         </div>
 
-        <div class="exp-card disabled-card" onclick="alert('Starting with Acid-Base Titration module!')">
+        <div class="exp-card active-card" onclick="startExperiment('calorimetry')">
           <div class="exp-icon-bubble">🔥</div>
           <div class="exp-info">
-            <span class="exp-tag">THERMODYNAMICS</span>
+            <span class="exp-tag">THERMODYNAMICS • 5 LEVELS</span>
             <h4>Solution Calorimetry</h4>
-            <p>Measure enthalpy change & specific heat (q=mcΔT)</p>
+            <p>Measure enthalpy & heat capacity (q=mcΔT)</p>
           </div>
-          <span class="exp-arrow">🔒</span>
+          <span class="exp-arrow">➜</span>
         </div>
 
-        <div class="exp-card disabled-card" onclick="alert('Starting with Acid-Base Titration module!')">
+        <div class="exp-card active-card" onclick="startExperiment('smelting')">
           <div class="exp-icon-bubble">🌋</div>
           <div class="exp-info">
-            <span class="exp-tag">METALLURGY</span>
+            <span class="exp-tag">METALLURGY • 5 LEVELS</span>
             <h4>Blast Furnace Smelting</h4>
-            <p>Pyrometallurgical extraction of iron from hematite</p>
+            <p>Hematite reduction to liquid iron at 1500°C</p>
           </div>
-          <span class="exp-arrow">🔒</span>
+          <span class="exp-arrow">➜</span>
         </div>
       </div>
     </div>
 
     <!-- ================= 1. ACTIVE 5-LEVEL EXPERIMENT SCREEN ================= -->
     <div id="screenActiveLab" class="screen-view">
-      <!-- Top App Header -->
       <header class="app-header">
         <div class="header-left">
           <button class="back-btn" onclick="exitToExperimentSelect()" title="Back to Experiments">
             <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
           </button>
           <div class="header-titles">
-            <span class="app-title">VIRTUAL CHEMISTRY LAB</span>
-            <span class="sub-title" id="headerSubtitle">LEVEL 1 OF 5 • ACID–BASE TITRATION</span>
+            <span class="app-title">VIRTUAL SCIENCE LAB</span>
+            <span class="sub-title" id="headerSubtitle">LEVEL 1 OF 5</span>
           </div>
         </div>
         <div class="header-stats">
@@ -107,7 +107,6 @@
         </div>
       </header>
 
-      <!-- Level Stepper Pills -->
       <nav class="level-stepper" id="levelStepper">
         <div class="level-pill active" id="pill1">Level 1</div>
         <div class="level-pill locked" id="pill2">🔒 Level 2</div>
@@ -116,7 +115,6 @@
         <div class="level-pill locked" id="pill5">🔒 Level 5</div>
       </nav>
 
-      <!-- Foxy Teacher Guidance Box -->
       <div class="foxy-teacher-card">
         <div class="foxy-mascot-wrapper">
           <svg viewBox="0 0 100 100" class="foxy-svg">
@@ -134,48 +132,35 @@
           </svg>
         </div>
         <div class="foxy-speech-box">
-          <p class="foxy-speech-text" id="foxySpeech">"Hi! I'm Dendy, your lab tutor! Read the neutralization theory below, then answer the checkpoint question to begin!"</p>
+          <p class="foxy-speech-text" id="foxySpeech">"Hi! I'm Dendy, your lab tutor! Read the theory below, then answer the checkpoint question to begin!"</p>
         </div>
         <button class="speak-btn" onclick="speakFoxyText()" title="Listen">🔊</button>
       </div>
 
-      <!-- Main Container: Exactly 1 Active Level Screen at a Time -->
       <main class="active-level-container">
 
-        <!-- LEVEL 1: CONCEPT LEARNING (4 SLIDES) -->
+        <!-- LEVEL 1: CONCEPT LEARNING -->
         <section class="level-card active" id="level1Card">
           <div class="concept-slide-area" id="conceptSlideArea">
             <div class="concept-slide active" id="cSlide0">
               <div class="formula-banner">
                 <span class="formula-icon">⚗️</span>
-                <code>HCl (aq) + NaOH (aq) ➔ NaCl (aq) + H₂O (l)</code>
+                <code id="formulaCode">HCl (aq) + NaOH (aq) ➔ NaCl (aq) + H₂O (l)</code>
               </div>
               <div class="concept-text-box">
-                <p>Titration is a volumetric analysis method used in analytical chemistry to calculate the unknown concentration of an acid by reacting it with measured volumes of a standard base until neutralization is reached.</p>
+                <p id="formulaDesc">Titration is a volumetric analysis method used in analytical chemistry to calculate the unknown concentration of an acid by reacting it with measured volumes of a standard base until neutralization is reached.</p>
               </div>
             </div>
 
             <div class="concept-slide" id="cSlide1">
               <div class="two-col-cards">
                 <div class="info-card acid-card">
-                  <div class="real-flask-svg">
-                    <svg viewBox="0 0 40 40" width="30" height="30">
-                      <path d="M17 4 L23 4 L23 12 L35 34 L5 34 L17 12 Z" fill="rgba(186, 230, 253, 0.45)" stroke="#334155" stroke-width="1.8"/>
-                    </svg>
-                  </div>
-                  <h4>1. Analyte Acid</h4>
-                  <p><strong>Hydrochloric Acid (HCl)</strong><br>Volume: 20.00 mL<br>Placed in Conical Flask</p>
+                  <h4 id="slide2Col1Title">1. Analyte Acid</h4>
+                  <p id="slide2Col1Desc">Hydrochloric Acid (HCl)<br>Volume: 20.00 mL in Flask</p>
                 </div>
                 <div class="info-card base-card">
-                  <div class="real-burette-svg">
-                    <svg viewBox="0 0 40 40" width="30" height="30">
-                      <rect x="17" y="4" width="6" height="24" fill="rgba(186, 230, 253, 0.5)" stroke="#475569" stroke-width="1.5"/>
-                      <circle cx="20" cy="30" r="2.5" fill="#EF4444"/>
-                      <line x1="20" y1="30" x2="20" y2="36" stroke="#475569" stroke-width="1.5"/>
-                    </svg>
-                  </div>
-                  <h4>2. Standard Titrant</h4>
-                  <p><strong>Sodium Hydroxide (NaOH)</strong><br>Concentration: 0.100 M<br>Filled into Burette</p>
+                  <h4 id="slide2Col2Title">2. Standard Titrant</h4>
+                  <p id="slide2Col2Desc">Sodium Hydroxide (NaOH)<br>Concentration: 0.100 M in Burette</p>
                 </div>
               </div>
             </div>
@@ -183,33 +168,20 @@
             <div class="concept-slide" id="cSlide2">
               <div class="two-col-cards">
                 <div class="info-card clear-card">
-                  <span class="card-icon">💧</span>
-                  <h4>Acidic pH (&lt; 8.2)</h4>
-                  <p><strong>COLORLESS / CLEAR</strong><br>Indicator stays completely clear in acidic solution.</p>
+                  <h4 id="slide3Col1Title">Acidic pH (&lt; 8.2)</h4>
+                  <p id="slide3Col1Desc">COLORLESS / CLEAR<br>Indicator stays clear in acid.</p>
                 </div>
                 <div class="info-card pink-card">
-                  <span class="card-icon">✨</span>
-                  <h4>Endpoint (pH 8.2)</h4>
-                  <p><strong>FAINT PERSISTENT PINK</strong><br>Signals exact stoichiometric equivalence point!</p>
+                  <h4 id="slide3Col2Title">Endpoint (pH 8.2)</h4>
+                  <p id="slide3Col2Desc">FAINT PERSISTENT PINK<br>Stoichiometric equivalence!</p>
                 </div>
               </div>
             </div>
 
             <div class="concept-slide" id="cSlide3">
-              <h4 class="quiz-prompt">CHECKPOINT: What is the color change of Phenolphthalein at the titration endpoint?</h4>
-              <div class="quiz-options-list">
-                <button class="quiz-option-btn" onclick="selectQuizOption(0)">
-                  <span class="opt-badge">A</span>
-                  <span class="opt-txt">Colorless in Acid ➔ Pale Persistent Pink at Endpoint</span>
-                </button>
-                <button class="quiz-option-btn" onclick="selectQuizOption(1)">
-                  <span class="opt-badge">B</span>
-                  <span class="opt-txt">Turns Dark Blue in Acid ➔ Red at Endpoint</span>
-                </button>
-                <button class="quiz-option-btn" onclick="selectQuizOption(2)">
-                  <span class="opt-badge">C</span>
-                  <span class="opt-txt">Remains completely clear regardless of pH</span>
-                </button>
+              <h4 class="quiz-prompt" id="quizQuestion">CHECKPOINT: What is the color change of Phenolphthalein at the titration endpoint?</h4>
+              <div class="quiz-options-list" id="quizOptionsList">
+                <!-- dynamic options injected -->
               </div>
             </div>
           </div>
@@ -221,229 +193,87 @@
           </footer>
         </section>
 
-        <!-- LEVEL 2: APPARATUS WORKBENCH ASSEMBLY (6 REALISTIC GLASSWARE ITEMS) -->
+        <!-- LEVEL 2: APPARATUS WORKBENCH ASSEMBLY -->
         <section class="level-card" id="level2Card">
           <div class="level-header-row">
-            <span class="level-title">SELECT REQUIRED APPARATUS (4 OF 6)</span>
+            <span class="level-title">SELECT REQUIRED APPARATUS (4 ITEMS)</span>
             <span class="status-counter" id="apparatusCount">0 Selected</span>
           </div>
-          <div class="apparatus-grid">
-            <div class="apparatus-card" id="app_stand" onclick="toggleApparatus('stand')">
-              <div class="glassware-icon">
-                <svg viewBox="0 0 40 40" width="28" height="28">
-                  <rect x="5" y="32" width="30" height="4" fill="#1E293B" rx="1"/>
-                  <line x1="12" y1="32" x2="12" y2="6" stroke="#334155" stroke-width="2.5"/>
-                  <line x1="12" y1="16" x2="26" y2="16" stroke="#334155" stroke-width="2"/>
-                </svg>
-              </div>
-              <div class="app-info">
-                <h5>Retort Stand</h5>
-                <p>Clamps burette vertically</p>
-              </div>
-              <span class="check-mark">⭕</span>
-            </div>
-
-            <div class="apparatus-card" id="app_burette" onclick="toggleApparatus('burette')">
-              <div class="glassware-icon">
-                <svg viewBox="0 0 40 40" width="28" height="28">
-                  <rect x="17" y="4" width="6" height="24" fill="rgba(186, 230, 253, 0.5)" stroke="#475569" stroke-width="1.2"/>
-                  <circle cx="20" cy="30" r="2.5" fill="#EF4444"/>
-                  <line x1="20" y1="30" x2="20" y2="36" stroke="#475569" stroke-width="1.5"/>
-                </svg>
-              </div>
-              <div class="app-info">
-                <h5>50 mL Burette</h5>
-                <p>Dispenses titrant dropwise</p>
-              </div>
-              <span class="check-mark">⭕</span>
-            </div>
-
-            <div class="apparatus-card" id="app_flask" onclick="toggleApparatus('flask')">
-              <div class="glassware-icon">
-                <svg viewBox="0 0 40 40" width="28" height="28">
-                  <path d="M17 6 L23 6 L23 14 L33 34 L7 34 L17 14 Z" fill="rgba(186, 230, 253, 0.45)" stroke="#334155" stroke-width="1.5"/>
-                </svg>
-              </div>
-              <div class="app-info">
-                <h5>Conical Flask</h5>
-                <p>Reaction vessel for swirling</p>
-              </div>
-              <span class="check-mark">⭕</span>
-            </div>
-
-            <div class="apparatus-card" id="app_pipette" onclick="toggleApparatus('pipette')">
-              <div class="glassware-icon">
-                <svg viewBox="0 0 40 40" width="28" height="28">
-                  <ellipse cx="20" cy="8" rx="4" ry="3.5" fill="#DC2626"/>
-                  <rect x="18.5" y="11" width="3" height="22" fill="rgba(186, 230, 253, 0.5)" stroke="#475569" stroke-width="0.8"/>
-                </svg>
-              </div>
-              <div class="app-info">
-                <h5>20 mL Pipette</h5>
-                <p>Measures exact acid aliquot</p>
-              </div>
-              <span class="check-mark">⭕</span>
-            </div>
-
-            <div class="apparatus-card" id="app_beaker" onclick="toggleApparatus('beaker')">
-              <div class="glassware-icon">
-                <svg viewBox="0 0 40 40" width="28" height="28">
-                  <rect x="8" y="10" width="24" height="22" rx="2" fill="rgba(186, 230, 253, 0.4)" stroke="#475569" stroke-width="1.5"/>
-                  <line x1="22" y1="16" x2="28" y2="16" stroke="#FFF" stroke-width="1"/>
-                  <line x1="22" y1="22" x2="28" y2="22" stroke="#FFF" stroke-width="1"/>
-                </svg>
-              </div>
-              <div class="app-info">
-                <h5>100 mL Beaker</h5>
-                <p>Holding stock solutions</p>
-              </div>
-              <span class="check-mark">⭕</span>
-            </div>
-
-            <div class="apparatus-card" id="app_burner" onclick="toggleApparatus('burner')">
-              <div class="glassware-icon">
-                <svg viewBox="0 0 40 40" width="28" height="28">
-                  <rect x="17" y="16" width="6" height="16" fill="#94A3B8"/>
-                  <rect x="10" y="32" width="20" height="3" fill="#334155"/>
-                  <path d="M17 16 Q20 4 23 16 Z" fill="#38BDF8"/>
-                </svg>
-              </div>
-              <div class="app-info">
-                <h5>Bunsen Burner</h5>
-                <p>Heating source (Extra tool)</p>
-              </div>
-              <span class="check-mark">⭕</span>
-            </div>
+          <div id="apparatusErrorMsg" class="error-banner" style="display: none;"></div>
+          <div class="apparatus-grid" id="apparatusGrid">
+            <!-- dynamic 6 tools injected -->
           </div>
           <footer class="slide-footer">
-            <button class="btn-primary btn-full disabled" id="btnFinishLevel2" onclick="finishLevel2()">Select Stand, Burette, Flask & Pipette</button>
+            <button class="btn-primary btn-full disabled" id="btnFinishLevel2" onclick="finishLevel2()">Select all 4 required apparatus tools</button>
           </footer>
         </section>
 
-        <!-- LEVEL 3: REAGENTS PREPARATION (6 REALISTIC REAGENT BOTTLES) -->
+        <!-- LEVEL 3: REAGENTS PREPARATION -->
         <section class="level-card" id="level3Card">
           <div class="level-header-row">
-            <span class="level-title">CHEMICAL REAGENTS SHELF (SELECT ACID & INDICATOR)</span>
+            <span class="level-title">CHEMICAL REAGENTS SHELF</span>
             <span class="status-counter" id="reagentsCount">Select Pair</span>
           </div>
-          <div class="reagents-grid">
-            <div class="bottle-card" id="bot_hcl" onclick="selectReagent('hcl', 'acid')">
-              <div class="bottle-icon red-bottle">
-                <div class="bottle-cap"></div>
-                <div class="bottle-body"><span class="bottle-label">HCl</span></div>
-              </div>
-              <div class="bottle-info">
-                <h5>0.100 M HCl</h5>
-                <p>Analyte Solution</p>
-              </div>
-              <span class="check-mark" id="chk_hcl">⭕</span>
-            </div>
-
-            <div class="bottle-card" id="bot_phenolphthalein" onclick="selectReagent('phenolphthalein', 'indicator')">
-              <div class="bottle-icon pink-bottle">
-                <div class="bottle-cap"></div>
-                <div class="bottle-body"><span class="bottle-label">PhPh</span></div>
-              </div>
-              <div class="bottle-info">
-                <h5>Phenolphthalein</h5>
-                <p>Indicator (pH 8.2)</p>
-              </div>
-              <span class="check-mark" id="chk_phenolphthalein">⭕</span>
-            </div>
-
-            <div class="bottle-card" id="bot_naoh" onclick="selectReagent('naoh', 'base')">
-              <div class="bottle-icon purple-bottle">
-                <div class="bottle-cap"></div>
-                <div class="bottle-body"><span class="bottle-label">NaOH</span></div>
-              </div>
-              <div class="bottle-info">
-                <h5>0.100 M NaOH</h5>
-                <p>Standard Titrant</p>
-              </div>
-              <span class="check-mark" id="chk_naoh">⭕</span>
-            </div>
-
-            <div class="bottle-card" id="bot_ch3cooh" onclick="selectReagent('ch3cooh', 'acid')">
-              <div class="bottle-icon orange-bottle">
-                <div class="bottle-cap"></div>
-                <div class="bottle-body"><span class="bottle-label">HAc</span></div>
-              </div>
-              <div class="bottle-info">
-                <h5>0.100 M CH₃COOH</h5>
-                <p>Acetic Acid (Extra)</p>
-              </div>
-              <span class="check-mark" id="chk_ch3cooh">⭕</span>
-            </div>
-
-            <div class="bottle-card" id="bot_methyl_orange" onclick="selectReagent('methyl_orange', 'indicator')">
-              <div class="bottle-icon yellow-bottle">
-                <div class="bottle-cap"></div>
-                <div class="bottle-body"><span class="bottle-label">MO</span></div>
-              </div>
-              <div class="bottle-info">
-                <h5>Methyl Orange</h5>
-                <p>pH 3.1-4.4 Indicator</p>
-              </div>
-              <span class="check-mark" id="chk_methyl_orange">⭕</span>
-            </div>
-
-            <div class="bottle-card" id="bot_h2o" onclick="selectReagent('h2o', 'solvent')">
-              <div class="bottle-icon blue-bottle">
-                <div class="bottle-cap"></div>
-                <div class="bottle-body"><span class="bottle-label">H₂O</span></div>
-              </div>
-              <div class="bottle-info">
-                <h5>Distilled H₂O</h5>
-                <p>Rinse Solvent</p>
-              </div>
-              <span class="check-mark" id="chk_h2o">⭕</span>
-            </div>
+          <div id="reagentErrorMsg" class="error-banner" style="display: none;"></div>
+          <div class="reagents-grid" id="reagentsGrid">
+            <!-- dynamic 6 reagent bottles injected -->
           </div>
           <footer class="slide-footer">
-            <button class="btn-primary btn-full disabled" id="btnFinishLevel3" onclick="finishLevel3()">Select 0.1M HCl and Phenolphthalein</button>
+            <button class="btn-primary btn-full disabled" id="btnFinishLevel3" onclick="finishLevel3()">Select both required chemical solutions</button>
           </footer>
         </section>
 
-        <!-- LEVEL 4: INTERACTIVE TITRATION SIMULATOR -->
+        <!-- LEVEL 4: INTERACTIVE LAB SIMULATOR -->
         <section class="level-card" id="level4Card">
-          <div class="titration-sim-view">
+          <div class="titration-sim-view" id="simViewContainer">
             <div class="canvas-panel">
               <canvas id="titrationCanvas" width="220" height="230"></canvas>
-              <div class="hud-readout">
+              <div class="hud-readout" id="hudContainer">
                 <div>V: <strong id="hudVol">0.00 mL</strong></div>
                 <div>pH: <strong id="hudPH">1.00</strong></div>
               </div>
             </div>
 
-            <div class="controls-panel">
+            <div class="controls-panel" id="controlsPanel">
               <button class="ctrl-btn btn-castle" onclick="addDrop(0.05)">+0.05 mL Drop 💧</button>
               <button class="ctrl-btn btn-purple" onclick="addDrop(0.50)">+0.50 mL Fast 🌊</button>
               <button class="ctrl-btn btn-lavender" id="btnContinuous" onclick="toggleContinuous()">▶ Continuous</button>
               <button class="ctrl-btn btn-blue" onclick="triggerSwirl()">🌀 Swirl Flask</button>
-              <button class="ctrl-btn btn-green" onclick="verifyEndpoint()">🎯 Verify Endpoint</button>
+              <button class="ctrl-btn btn-green" onclick="verifyLevel4()">🎯 Verify Endpoint</button>
             </div>
           </div>
         </section>
 
-        <!-- LEVEL 5: REPORT & REWARDS -->
+        <!-- LEVEL 5: COMPREHENSIVE OVERALL PERFORMANCE ANALYSIS -->
         <section class="level-card" id="level5Card">
           <div class="level-header-row">
-            <span class="level-title">FINAL LAB REPORT</span>
-            <span class="status-counter text-green" id="reportAccuracy">Accuracy: 100.0%</span>
+            <span class="level-title">OVERALL PERFORMANCE ANALYSIS</span>
+            <span class="status-counter text-green">⭐⭐⭐ 100% Mastery</span>
           </div>
-          <div class="report-table">
-            <div class="report-row"><span>Analyte Solution</span><strong>20.00 mL HCl (0.100 M)</strong></div>
-            <div class="report-row"><span>Titrant Standard</span><strong>0.100 M NaOH</strong></div>
-            <div class="report-row"><span>Endpoint Volume</span><strong id="repEndpointVol">20.00 mL</strong></div>
-            <div class="report-row"><span>Calculated Molarity</span><strong id="repMolarity">0.1000 M</strong></div>
-            <div class="report-row"><span>Equivalence Ratio</span><strong>1 : 1 Neutralization</strong></div>
+          <div class="report-table" id="performanceReportTable">
+            <!-- dynamic analysis rows -->
           </div>
           <footer class="slide-footer">
-            <button class="btn-primary btn-full btn-green-solid" onclick="claimLabTrophy()">CLAIM 60 XP & FINISH LAB 🏆</button>
+            <button class="btn-primary btn-full btn-green-solid" onclick="claimLabTrophy()">CLAIM 60 XP & COMPLETE MODULE 🏆</button>
           </footer>
         </section>
 
       </main>
+    </div>
+
+    <!-- ================= HURRAH TASK COMPLETED POPUP MODAL ================= -->
+    <div id="hurrahModal" class="hurrah-modal-backdrop" style="display: none;">
+      <div class="hurrah-modal-card">
+        <div class="hurrah-confetti">🎉</div>
+        <h3 class="hurrah-title">HURRAH! TASK COMPLETED!</h3>
+        <h4 class="hurrah-subtitle" id="hurrahSubTitle">Level 1: Theory Mastered!</h4>
+        <p class="hurrah-desc" id="hurrahDesc">You accurately completed the task with high scientific precision!</p>
+        <div class="hurrah-badges">
+          <span class="h-badge xp-badge">+15 XP</span>
+          <span class="h-badge gold-badge">+5 Coins</span>
+        </div>
+        <button class="btn-primary btn-full btn-green-solid" id="btnHurrahNext" onclick="closeHurrahModal()">Next Task ➜</button>
+      </div>
     </div>
 
   </div>
