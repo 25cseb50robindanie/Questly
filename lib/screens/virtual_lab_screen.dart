@@ -1357,16 +1357,18 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                       children: [
                         AnimatedBuilder(
                           animation: _animController,
-                          builder: (context, _) => CustomPaint(
-                            size: Size.infinite,
-                            painter: _MobileTitrationPainter(
-                              buretteVolume: _buretteVolume,
-                              maxVolume: 50.0,
-                              liquidColor: liquidColor,
-                              dripProgress: _dripAnimController.value,
-                              isSwirling: _isSwirling,
-                              swirlProgress: _swirlAnimController.value,
-                              animTime: _animController.value,
+                          builder: (context, _) => LayoutBuilder(
+                            builder: (context, constraints) => CustomPaint(
+                              size: Size(constraints.maxWidth, constraints.maxHeight),
+                              painter: _MobileTitrationPainter(
+                                buretteVolume: _buretteVolume,
+                                maxVolume: 50.0,
+                                liquidColor: liquidColor,
+                                dripProgress: _dripAnimController.value,
+                                isSwirling: _isSwirling,
+                                swirlProgress: _swirlAnimController.value,
+                                animTime: _animController.value,
+                              ),
                             ),
                           ),
                         ),
@@ -1442,13 +1444,15 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                       children: [
                         AnimatedBuilder(
                           animation: _animController,
-                          builder: (ctx, _) => CustomPaint(
-                            size: Size.infinite,
-                            painter: _FlameCanvasPainter(
-                              flameColor: flameColor,
-                              flicker: _animController.value,
-                              isWireInFlame: _wireInFlame,
-                              wireHasSalt: _wireHasSalt,
+                          builder: (ctx, _) => LayoutBuilder(
+                            builder: (ctx, constraints) => CustomPaint(
+                              size: Size(constraints.maxWidth, constraints.maxHeight),
+                              painter: _FlameCanvasPainter(
+                                flameColor: flameColor,
+                                flicker: _animController.value,
+                                isWireInFlame: _wireInFlame,
+                                wireHasSalt: _wireHasSalt,
+                              ),
                             ),
                           ),
                         ),
@@ -1510,13 +1514,15 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(12), border: Border.all(color: ColorSystem.plum.withOpacity(0.12))),
                     child: AnimatedBuilder(
                       animation: _animController,
-                      builder: (ctx, _) => CustomPaint(
-                        size: Size.infinite,
-                        painter: _CalorimeterPainter(
-                          temperature: _waterTemp,
-                          isStirring: _magneticStirring,
-                          hasSolute: _soluteAdded,
-                          animProgress: _animController.value,
+                      builder: (ctx, _) => LayoutBuilder(
+                        builder: (ctx, constraints) => CustomPaint(
+                          size: Size(constraints.maxWidth, constraints.maxHeight),
+                          painter: _CalorimeterPainter(
+                            temperature: _waterTemp,
+                            isStirring: _magneticStirring,
+                            hasSolute: _soluteAdded,
+                            animProgress: _animController.value,
+                          ),
                         ),
                       ),
                     ),
@@ -1582,14 +1588,16 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(12)),
                     child: AnimatedBuilder(
                       animation: _animController,
-                      builder: (ctx, _) => CustomPaint(
-                        size: Size.infinite,
-                        painter: _BlastFurnacePainter(
-                          chargeLoaded: _chargeLoaded,
-                          blastOn: _tuyereBlastOn,
-                          furnaceTemp: _furnaceTemp,
-                          isTapped: _tapHoleOpened,
-                          animProgress: _animController.value,
+                      builder: (ctx, _) => LayoutBuilder(
+                        builder: (ctx, constraints) => CustomPaint(
+                          size: Size(constraints.maxWidth, constraints.maxHeight),
+                          painter: _BlastFurnacePainter(
+                            chargeLoaded: _chargeLoaded,
+                            blastOn: _tuyereBlastOn,
+                            furnaceTemp: _furnaceTemp,
+                            isTapped: _tapHoleOpened,
+                            animProgress: _animController.value,
+                          ),
                         ),
                       ),
                     ),
