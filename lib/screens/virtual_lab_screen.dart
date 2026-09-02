@@ -30,79 +30,91 @@ class VirtualLabScreen extends StatefulWidget {
 class _VirtualLabScreenState extends State<VirtualLabScreen>
     with TickerProviderStateMixin {
   Student? _student;
-  LabExperiment? _selectedExperiment; // null = Selection Menu
+  LabExperiment? _selectedExperiment;
   int _currentLevel = 1; // 1 to 5
   int _unlockedLevel = 1;
   bool _isCompleted = false;
 
-  // Level 1: Concept Slides
+  // --- Level 1: Concepts ---
   int _conceptSlide = 0;
   int? _selectedQuizIndex;
   bool _quizCorrect = false;
 
-  // Level 2: Apparatus
+  // --- Level 2: Apparatus ---
   final Set<String> _assembledApparatus = {};
   String? _wrongApparatusFeedback;
 
-  // Level 3: Reagents
+  // --- Level 3: Reagents ---
   String? _selectedReagent1;
   String? _selectedReagent2;
   bool _reagentStep1Done = false;
   bool _reagentStep2Done = false;
   String? _wrongReagentFeedback;
 
-  // Level 4: Titration State
+  // --- Level 4: Titration Simulator State ---
   double _buretteVolume = 0.0;
   final double _targetEndpoint = 20.00;
   bool _isContinuousDripping = false;
   Timer? _continuousTimer;
   bool _isSwirling = false;
+  double _localPinkIntensity = 0.0;
 
-  // Level 4: Flame Test State
+  // --- Level 4: Flame Test Interactive State ---
   String _selectedFlameSalt = 'licl';
+  bool _wireInFlame = false;
+  bool _wireHasSalt = false;
   bool _airCollarOpen = true;
 
-  // Level 4: Calorimetry State
+  // --- Level 4: Calorimetry Interactive State ---
   double _waterTemp = 22.0;
+  double _targetTemp = 22.0;
+  bool _calorimeterLidOpen = true;
   bool _soluteAdded = false;
+  bool _magneticStirring = false;
+  Timer? _tempRiseTimer;
 
-  // Level 4: Smelting State
+  // --- Level 4: Smelting Interactive State ---
   bool _chargeLoaded = false;
-  bool _blastOn = false;
+  bool _tuyereBlastOn = false;
   double _furnaceTemp = 250.0;
+  bool _tapHoleOpened = false;
+  double _moltenIronTapped = 0.0;
+  Timer? _furnaceTimer;
 
-  // Animation Controllers
+  // --- Animation Controllers ---
+  late AnimationController _animController;
   late AnimationController _dripAnimController;
   late AnimationController _swirlAnimController;
-  late AnimationController _flameAnimController;
 
   @override
   void initState() {
     super.initState();
     _loadStudent();
 
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
+
     _dripAnimController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 280),
+      duration: const Duration(milliseconds: 260),
     );
 
     _swirlAnimController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-
-    _flameAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _continuousTimer?.cancel();
+    _tempRiseTimer?.cancel();
+    _furnaceTimer?.cancel();
+    _animController.dispose();
     _dripAnimController.dispose();
     _swirlAnimController.dispose();
-    _flameAnimController.dispose();
     super.dispose();
   }
 
@@ -113,9 +125,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     });
   }
 
-  // Choose Experiment
   void _chooseExperiment(LabExperiment exp) {
     SoundService.playClick();
+    _continuousTimer?.cancel();
+    _tempRiseTimer?.cancel();
+    _furnaceTimer?.cancel();
+
     setState(() {
       _selectedExperiment = exp;
       _currentLevel = 1;
@@ -130,28 +145,40 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       _reagentStep1Done = false;
       _reagentStep2Done = false;
       _wrongReagentFeedback = null;
+
+      // Reset Simulation variables
       _buretteVolume = 0.0;
       _isContinuousDripping = false;
+      _localPinkIntensity = 0.0;
       _selectedFlameSalt = 'licl';
+      _wireInFlame = false;
+      _wireHasSalt = false;
       _airCollarOpen = true;
       _waterTemp = 22.0;
+      _targetTemp = 22.0;
+      _calorimeterLidOpen = true;
       _soluteAdded = false;
+      _magneticStirring = false;
       _chargeLoaded = false;
-      _blastOn = false;
+      _tuyereBlastOn = false;
       _furnaceTemp = 250.0;
+      _tapHoleOpened = false;
+      _moltenIronTapped = 0.0;
     });
   }
 
   void _backToMenu() {
     SoundService.playClick();
     _continuousTimer?.cancel();
+    _tempRiseTimer?.cancel();
+    _furnaceTimer?.cancel();
     setState(() {
       _selectedExperiment = null;
       _isContinuousDripping = false;
     });
   }
 
-  // --- Hurrah Task Completed Modal ---
+  // --- Hurrah Modal ---
   void _showHurrahModal({
     required String title,
     required String message,
@@ -258,7 +285,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     }
   }
 
-  // --- Level 2 Actions with Correct / Wrong Indication ---
+  // --- Level 2 Actions ---
   void _tapApparatus(String id, bool isRequiredForThisExp) {
     if (isRequiredForThisExp) {
       SoundService.playCorrect();
@@ -277,7 +304,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         if (_unlockedLevel < 3) _unlockedLevel = 3;
         _showHurrahModal(
           title: 'Level 2: Workbench Assembled!',
-          message: 'All required apparatus items are accurately placed on the workbench.',
+          message: 'All 4 required apparatus tools are correctly placed on the active bench.',
           nextButtonText: 'Start Chemical Reagents ➜',
           onNext: () {
             Navigator.pop(context);
@@ -286,10 +313,9 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         );
       }
     } else {
-      // Wrong apparatus selected!
       SoundService.playStarPop();
       setState(() {
-        _wrongApparatusFeedback = 'Incorrect tool! This item is not needed for ${_getExpName()}. Choose the required tools!';
+        _wrongApparatusFeedback = 'Incorrect tool! This item is not needed for ${_getExpName()}. Choose the 4 required tools!';
       });
     }
   }
@@ -314,8 +340,8 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         if (_unlockedLevel < 4) _unlockedLevel = 4;
         _showHurrahModal(
           title: 'Level 3: Solutions Ready!',
-          message: 'Both required chemical reagents have been measured and prepared in the flask.',
-          nextButtonText: 'Start Lab Simulator ➜',
+          message: 'Both required chemicals are prepared and measured for the simulator.',
+          nextButtonText: 'Start Virtual Lab Simulator ➜',
           onNext: () {
             Navigator.pop(context);
             setState(() => _currentLevel = 4);
@@ -325,12 +351,151 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     } else {
       SoundService.playStarPop();
       setState(() {
-        _wrongReagentFeedback = 'Incorrect chemical! Check formula and select the active reagents for this reaction.';
+        _wrongReagentFeedback = 'Incorrect chemical! Check formulas and select the active reagents for this reaction.';
       });
     }
   }
 
-  // --- Level 4 Experiment Verification ---
+  // ==========================================
+  // LEVEL 4 LAB SIMULATOR INTERACTION LOGIC
+  // ==========================================
+
+  // 1. Titration Methods
+  void _addDrop({double amount = 0.05}) {
+    if (_buretteVolume >= 50.0) return;
+    SoundService.playStarPop();
+    _dripAnimController.forward(from: 0.0);
+
+    setState(() {
+      _buretteVolume = (_buretteVolume + amount).clamp(0.0, 50.0);
+      if (_buretteVolume >= 19.5 && _buretteVolume < 20.0) {
+        _localPinkIntensity = 0.4;
+      } else if (_buretteVolume >= 20.0) {
+        _localPinkIntensity = 1.0;
+      }
+    });
+  }
+
+  void _toggleContinuous() {
+    SoundService.playClick();
+    setState(() => _isContinuousDripping = !_isContinuousDripping);
+
+    if (_isContinuousDripping) {
+      _continuousTimer = Timer.periodic(const Duration(milliseconds: 180), (timer) {
+        if (!mounted || _buretteVolume >= 50.0) {
+          timer.cancel();
+          if (mounted) setState(() => _isContinuousDripping = false);
+          return;
+        }
+        _addDrop(amount: 0.15);
+      });
+    } else {
+      _continuousTimer?.cancel();
+    }
+  }
+
+  void _swirlFlask() {
+    SoundService.playStarPop();
+    setState(() => _isSwirling = true);
+    _swirlAnimController.forward(from: 0.0).then((_) {
+      if (mounted) {
+        setState(() {
+          _isSwirling = false;
+          if (_buretteVolume < 20.0) {
+            _localPinkIntensity = 0.0;
+          }
+        });
+      }
+    });
+  }
+
+  // 2. Flame Test Interactive Methods
+  void _dipWireInSalt(String salt) {
+    SoundService.playPop();
+    setState(() {
+      _selectedFlameSalt = salt;
+      _wireHasSalt = true;
+      _wireInFlame = false;
+    });
+  }
+
+  void _holdWireInFlame() {
+    SoundService.playCorrect();
+    setState(() {
+      _wireInFlame = true;
+    });
+  }
+
+  void _cleanWireLoop() {
+    SoundService.playStarPop();
+    setState(() {
+      _wireHasSalt = false;
+      _wireInFlame = false;
+    });
+  }
+
+  // 3. Calorimetry Interactive Methods
+  void _addCalorimeterSolute() {
+    SoundService.playStarPop();
+    setState(() {
+      _soluteAdded = true;
+      _targetTemp = 31.8; // Exothermic dissolution
+    });
+
+    _tempRiseTimer?.cancel();
+    _tempRiseTimer = Timer.periodic(const Duration(milliseconds: 150), (t) {
+      if (!mounted || _waterTemp >= _targetTemp) {
+        t.cancel();
+        return;
+      }
+      setState(() {
+        _waterTemp = (_waterTemp + 0.4).clamp(22.0, _targetTemp);
+      });
+    });
+  }
+
+  void _toggleStirring() {
+    SoundService.playClick();
+    setState(() => _magneticStirring = !_magneticStirring);
+  }
+
+  // 4. Smelting Interactive Methods
+  void _loadBlastFurnaceCharge() {
+    SoundService.playPop();
+    setState(() {
+      _chargeLoaded = true;
+    });
+  }
+
+  void _toggleTuyereBlast() {
+    SoundService.playCorrect();
+    setState(() {
+      _tuyereBlastOn = !_tuyereBlastOn;
+    });
+
+    if (_tuyereBlastOn) {
+      _furnaceTimer?.cancel();
+      _furnaceTimer = Timer.periodic(const Duration(milliseconds: 200), (t) {
+        if (!mounted || _furnaceTemp >= 1520.0) {
+          t.cancel();
+          return;
+        }
+        setState(() {
+          _furnaceTemp = (_furnaceTemp + 65.0).clamp(250.0, 1520.0);
+        });
+      });
+    }
+  }
+
+  void _tapMoltenIron() {
+    SoundService.playSuccess();
+    setState(() {
+      _tapHoleOpened = true;
+      _moltenIronTapped = 125.0; // Tonnes
+    });
+  }
+
+  // --- Complete Level 4 Verification ---
   void _verifyLevel4() {
     _continuousTimer?.cancel();
     setState(() => _isContinuousDripping = false);
@@ -349,18 +514,22 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         success = true;
       }
     } else if (_selectedExperiment == LabExperiment.flameTest) {
-      success = true;
-    } else if (_selectedExperiment == LabExperiment.calorimetry) {
-      if (_soluteAdded) {
+      if (_wireInFlame && _wireHasSalt) {
         success = true;
       } else {
-        feedback = 'Add the exothermic solute into the calorimeter first!';
+        feedback = 'Dip the wire loop into a salt first, then hold it in the hot flame zone!';
+      }
+    } else if (_selectedExperiment == LabExperiment.calorimetry) {
+      if (_soluteAdded && _waterTemp > 25.0) {
+        success = true;
+      } else {
+        feedback = 'Add the exothermic solute and let the temperature stabilize!';
       }
     } else if (_selectedExperiment == LabExperiment.smelting) {
-      if (_chargeLoaded && _blastOn) {
+      if (_chargeLoaded && _tuyereBlastOn && _tapHoleOpened) {
         success = true;
       } else {
-        feedback = 'Load raw ore and activate hot blast tuyeres first!';
+        feedback = 'Load raw charge, activate 1500°C blast, and tap the molten iron stream!';
       }
     }
 
@@ -369,7 +538,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       if (_unlockedLevel < 5) _unlockedLevel = 5;
       _showHurrahModal(
         title: 'Level 4: Experiment Succeeded!',
-        message: 'You completed the physical laboratory simulation with high scientific accuracy!',
+        message: 'You completed the physical simulation with authentic laboratory precision!',
         nextButtonText: 'View Performance Analysis ➜',
         onNext: () {
           Navigator.pop(context);
@@ -384,7 +553,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     }
   }
 
-  // --- Level 5: Final Claim ---
+  // --- Level 5 Claim ---
   Future<void> _claimTrophy() async {
     if (_isCompleted) return;
     _isCompleted = true;
@@ -415,7 +584,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       await QuestCompletionDialog.show(
         context: context,
         title: 'LAB MASTERED! 🏆',
-        message: 'You scored 100% precision across all 5 levels in ${_getExpName()}!',
+        message: 'You achieved 100% laboratory proficiency across all 5 levels in ${_getExpName()}!',
         xpReward: 60,
         goldReward: 15,
         earnedStars: 3,
@@ -458,6 +627,33 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     }
   }
 
+  double _getCalculatedPH() {
+    final molesAcid = 0.002;
+    final molesBase = (_buretteVolume / 1000.0) * 0.1;
+    final totalVol = (20.0 + _buretteVolume) / 1000.0;
+
+    if (molesAcid > molesBase) {
+      final excess = molesAcid - molesBase;
+      return (-log(excess / totalVol) / ln10).clamp(1.0, 6.9);
+    } else if ((molesAcid - molesBase).abs() < 0.00001) {
+      return 7.0;
+    } else {
+      final excess = molesBase - molesAcid;
+      return (14.0 - (-log(excess / totalVol) / ln10)).clamp(7.1, 13.5);
+    }
+  }
+
+  Color _getFlaskColor() {
+    final ph = _getCalculatedPH();
+    if (_buretteVolume >= 20.0) {
+      return ph > 9.0 ? const Color(0xDDDB2777) : const Color(0x99F472B6);
+    } else if (_localPinkIntensity > 0) {
+      return Color.lerp(const Color(0x44BAE6FD), const Color(0x99F472B6), _localPinkIntensity)!;
+    } else {
+      return const Color(0x44BAE6FD);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -475,9 +671,9 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     );
   }
 
-  // =========================================================================
-  // 1. ALL 4 PLAYABLE EXPERIMENT MODULES MENU
-  // =========================================================================
+  // ==========================================
+  // 1. CHOOSE ANY EXPERIMENT MODULE MENU
+  // ==========================================
   Widget _buildExperimentMenu() {
     final modules = [
       {
@@ -499,7 +695,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       {
         'id': LabExperiment.calorimetry,
         'title': 'Solution Calorimetry',
-        'subtitle': 'Measure enthalpy change & heat capacity (q=mcΔT)',
+        'subtitle': 'Measure enthalpy & heat capacity (q=mcΔT)',
         'color': const Color(0xFF0284C7),
         'icon': Icons.thermostat_rounded,
         'tag': 'THERMODYNAMICS • 5 LEVELS',
@@ -529,20 +725,13 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                   onPressed: () => Navigator.pop(context),
                 ),
                 const SizedBox(width: 8),
-                const Text(
-                  'VIRTUAL SCIENCE LABS',
-                  style: TextStyle(fontFamily: 'Fredoka', fontSize: 13, fontWeight: FontWeight.w900, color: ColorSystem.plum),
-                ),
+                const Text('VIRTUAL SCIENCE LABS', style: TextStyle(fontFamily: 'Fredoka', fontSize: 13, fontWeight: FontWeight.w900, color: ColorSystem.plum)),
               ],
             ),
             if (_student != null)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: ColorSystem.plum.withOpacity(0.15)),
-                ),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: ColorSystem.plum.withOpacity(0.15))),
                 child: Row(
                   children: [
                     VectorAssetHelper.xpStarIcon(size: 13),
@@ -558,11 +747,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         // Dendy Teacher Card
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: ColorSystem.plum.withOpacity(0.15)),
-          ),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: ColorSystem.plum.withOpacity(0.15))),
           child: Row(
             children: [
               const DendyMascot(state: DendyState.idle, size: 36),
@@ -580,7 +765,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
         ),
         const SizedBox(height: 6),
 
-        // Grid of 4 All-Playable Modules
+        // 4 Playable Cards
         Expanded(
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -614,10 +799,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                         children: [
                           Container(
                             padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: (m['color'] as Color).withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                            decoration: BoxDecoration(color: (m['color'] as Color).withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
                             child: Icon(m['icon'] as IconData, size: 20, color: m['color'] as Color),
                           ),
                           Container(
@@ -646,9 +828,9 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     );
   }
 
-  // =========================================================================
+  // ==========================================
   // 2. ACTIVE 5-LEVEL EXPERIMENT WORKFLOW
-  // =========================================================================
+  // ==========================================
   Widget _buildActiveExperimentWorkflow() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -812,7 +994,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
       case 3:
         return _buildLevel3View();
       case 4:
-        return _buildLevel4View();
+        return _buildLevel4InteractiveWorkbench();
       case 5:
       default:
         return _buildLevel5PerformanceAnalysis();
@@ -1047,19 +1229,19 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // =========================================================================
-  // LEVEL 2: APPARATUS SELECTION (WITH CORRECT / WRONG FEEDBACK)
+  // LEVEL 2: APPARATUS SELECTION (WITH INSTANT WRONG/CORRECT ERROR FEEDBACK)
   // =========================================================================
   Widget _buildLevel2View() {
     List<Map<String, dynamic>> tools;
 
     if (_selectedExperiment == LabExperiment.flameTest) {
       tools = [
-        {'id': 'burner', 'name': 'Bunsen Burner Rig', 'desc': 'Provides heating flame', 'req': true},
-        {'id': 'loop', 'name': 'Platinum Wire Loop', 'desc': 'Inert sample carrier', 'req': true},
-        {'id': 'watchglass', 'name': 'Watch Glass Dish', 'desc': 'Holds metal salt crystals', 'req': true},
-        {'id': 'clamp', 'name': 'Retort Clamp Holder', 'desc': 'Secures burner safely', 'req': true},
-        {'id': 'burette', 'name': '50 mL Glass Burette', 'desc': 'Volumetric dispenser (Wrong tool)', 'req': false},
-        {'id': 'calorimeter', 'name': 'Insulated Cup', 'desc': 'Heat calorimeter (Wrong tool)', 'req': false},
+        {'id': 'burner', 'name': 'Bunsen Burner Rig', 'desc': 'Heating flame', 'req': true},
+        {'id': 'loop', 'name': 'Platinum Wire Loop', 'desc': 'Sample carrier', 'req': true},
+        {'id': 'watchglass', 'name': 'Watch Glass Dish', 'desc': 'Holds salt crystals', 'req': true},
+        {'id': 'clamp', 'name': 'Retort Clamp', 'desc': 'Secures burner safely', 'req': true},
+        {'id': 'burette', 'name': '50 mL Burette', 'desc': 'Titration dispenser (Wrong tool)', 'req': false},
+        {'id': 'calorimeter', 'name': 'Insulated Cup', 'desc': 'Calorimeter (Wrong tool)', 'req': false},
       ];
     } else if (_selectedExperiment == LabExperiment.calorimetry) {
       tools = [
@@ -1173,7 +1355,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // =========================================================================
-  // LEVEL 3: CHEMICAL REAGENTS PREPARATION (WITH ERROR FEEDBACK)
+  // LEVEL 3: REAGENTS PREPARATION (WITH ERROR FEEDBACK)
   // =========================================================================
   Widget _buildLevel3View() {
     List<Map<String, dynamic>> reagents;
@@ -1287,7 +1469,7 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(color: const Color(0xFFF8FAFC), border: Border(top: BorderSide(color: ColorSystem.plum.withOpacity(0.1)))),
           child: CustomButton(
-            text: isDone ? 'START SIMULATOR ➜' : 'Select both required chemical solutions',
+            text: isDone ? 'START VIRTUAL LAB SIMULATOR ➜' : 'Select both required chemical solutions',
             backgroundColor: isDone ? ColorSystem.green : Colors.grey.shade400,
             textColor: Colors.white,
             onPressed: isDone ? () => setState(() => _currentLevel = 4) : () {},
@@ -1298,21 +1480,22 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 
   // =========================================================================
-  // LEVEL 4: INTERACTIVE LAB SIMULATORS FOR ALL 4 EXPERIMENTS
+  // LEVEL 4: INTERACTIVE LAB WORKBENCHES WITH REALISTIC APPARATUS BEHAVIOR
   // =========================================================================
-  Widget _buildLevel4View() {
+  Widget _buildLevel4InteractiveWorkbench() {
     if (_selectedExperiment == LabExperiment.flameTest) {
-      return _buildLevel4FlameSimulator();
+      return _buildLevel4FlameInteractive();
     } else if (_selectedExperiment == LabExperiment.calorimetry) {
-      return _buildLevel4CalorimetrySimulator();
+      return _buildLevel4CalorimetryInteractive();
     } else if (_selectedExperiment == LabExperiment.smelting) {
-      return _buildLevel4SmeltingSimulator();
+      return _buildLevel4SmeltingInteractive();
     } else {
-      return _buildLevel4TitrationSimulator();
+      return _buildLevel4TitrationInteractive();
     }
   }
 
-  Widget _buildLevel4TitrationSimulator() {
+  // 1. Titration Interactive View
+  Widget _buildLevel4TitrationInteractive() {
     final ph = _getCalculatedPH();
     final liquidColor = _getFlaskColor();
 
@@ -1332,15 +1515,19 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        CustomPaint(
-                          size: Size.infinite,
-                          painter: _MobileTitrationPainter(
-                            buretteVolume: _buretteVolume,
-                            maxVolume: 50.0,
-                            liquidColor: liquidColor,
-                            dripProgress: _dripAnimController.value,
-                            isSwirling: _isSwirling,
-                            swirlProgress: _swirlAnimController.value,
+                        AnimatedBuilder(
+                          animation: _animController,
+                          builder: (context, _) => CustomPaint(
+                            size: Size.infinite,
+                            painter: _MobileTitrationPainter(
+                              buretteVolume: _buretteVolume,
+                              maxVolume: 50.0,
+                              liquidColor: liquidColor,
+                              dripProgress: _dripAnimController.value,
+                              isSwirling: _isSwirling,
+                              swirlProgress: _swirlAnimController.value,
+                              animTime: _animController.value,
+                            ),
                           ),
                         ),
                         Positioned(
@@ -1385,19 +1572,21 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     );
   }
 
-  Widget _buildLevel4FlameSimulator() {
-    final Map<String, Color> flameColors = {
-      'licl': const Color(0xFFEF4444),
-      'nacl': const Color(0xFFFBBF24),
-      'kcl': const Color(0xFFA855F7),
-      'cuso4': const Color(0xFF10B981),
+  // 2. Flame Test Interactive View
+  Widget _buildLevel4FlameInteractive() {
+    final Map<String, dynamic> salts = {
+      'licl': {'name': 'LiCl (Lithium)', 'color': const Color(0xFFEF4444), 'lambda': '670 nm Crimson'},
+      'nacl': {'name': 'NaCl (Sodium)', 'color': const Color(0xFFFBBF24), 'lambda': '589 nm Golden Yellow'},
+      'kcl': {'name': 'KCl (Potassium)', 'color': const Color(0xFFA855F7), 'lambda': '766 nm Lilac Violet'},
+      'cuso4': {'name': 'CuSO₄ (Copper)', 'color': const Color(0xFF10B981), 'lambda': '510 nm Emerald Green'},
     };
-    final activeColor = flameColors[_selectedFlameSalt] ?? const Color(0xFFEF4444);
+    final activeSaltInfo = salts[_selectedFlameSalt] ?? salts['licl']!;
+    final Color flameColor = _wireInFlame && _wireHasSalt ? (activeSaltInfo['color'] as Color) : const Color(0xFF38BDF8);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildFoxyTeacherBanner('"Level 4: Dip the platinum wire into different metal salts and observe the spectral flame emission wavelengths!"', DendyState.thinking),
+        _buildFoxyTeacherBanner('"Level 4: Dip the platinum wire into different metal salts and hold it in the flame to see spectral emissions!"', DendyState.thinking),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(6),
@@ -1410,18 +1599,29 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        CustomPaint(
-                          size: Size.infinite,
-                          painter: _FlameCanvasPainter(
-                            flameColor: _airCollarOpen ? activeColor : const Color(0xFFF59E0B),
-                            flicker: _flameAnimController.value,
-                            isBlueBase: _airCollarOpen,
+                        AnimatedBuilder(
+                          animation: _animController,
+                          builder: (ctx, _) => CustomPaint(
+                            size: Size.infinite,
+                            painter: _FlameCanvasPainter(
+                              flameColor: flameColor,
+                              flicker: _animController.value,
+                              isWireInFlame: _wireInFlame,
+                              wireHasSalt: _wireHasSalt,
+                            ),
                           ),
                         ),
                         Positioned(
                           top: 4,
                           left: 4,
-                          child: Text('Salt: ${_selectedFlameSalt.toUpperCase()} (1400°C)', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 8.5, color: Colors.white70)),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(color: Colors.black.withOpacity(0.6), borderRadius: BorderRadius.circular(4)),
+                            child: Text(
+                              _wireInFlame && _wireHasSalt ? 'Wavelength: ${activeSaltInfo['lambda']}' : 'Status: Blue Flame (1400°C)',
+                              style: TextStyle(fontFamily: 'Fredoka', fontSize: 8, color: _wireInFlame && _wireHasSalt ? (activeSaltInfo['color'] as Color) : Colors.cyanAccent),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -1434,10 +1634,11 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CustomButton(text: '🔴 LiCl (Crimson Red)', backgroundColor: const Color(0xFFEF4444), textColor: Colors.white, onPressed: () => setState(() => _selectedFlameSalt = 'licl')),
-                      CustomButton(text: '🟡 NaCl (Golden Yellow)', backgroundColor: const Color(0xFFF59E0B), textColor: Colors.white, onPressed: () => setState(() => _selectedFlameSalt = 'nacl')),
-                      CustomButton(text: '🟣 KCl (Lilac Violet)', backgroundColor: const Color(0xFFA855F7), textColor: Colors.white, onPressed: () => setState(() => _selectedFlameSalt = 'kcl')),
-                      CustomButton(text: '🟢 CuSO₄ (Emerald Green)', backgroundColor: const Color(0xFF10B981), textColor: Colors.white, onPressed: () => setState(() => _selectedFlameSalt = 'cuso4')),
+                      CustomButton(text: '🔴 Dip in LiCl (Crimson)', backgroundColor: const Color(0xFFEF4444), textColor: Colors.white, onPressed: () => _dipWireInSalt('licl')),
+                      CustomButton(text: '🟡 Dip in NaCl (Yellow)', backgroundColor: const Color(0xFFF59E0B), textColor: Colors.white, onPressed: () => _dipWireInSalt('nacl')),
+                      CustomButton(text: '🟣 Dip in KCl (Lilac)', backgroundColor: const Color(0xFFA855F7), textColor: Colors.white, onPressed: () => _dipWireInSalt('kcl')),
+                      CustomButton(text: '🟢 Dip in CuSO₄ (Green)', backgroundColor: const Color(0xFF10B981), textColor: Colors.white, onPressed: () => _dipWireInSalt('cuso4')),
+                      CustomButton(text: _wireInFlame ? '🔥 Wire in Flame' : '👉 Hold Wire in Flame', backgroundColor: ColorSystem.castlePurple, textColor: Colors.white, onPressed: _holdWireInFlame),
                       CustomButton(text: '🎯 Complete Flame Lab', backgroundColor: ColorSystem.green, textColor: Colors.white, onPressed: _verifyLevel4),
                     ],
                   ),
@@ -1450,7 +1651,8 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     );
   }
 
-  Widget _buildLevel4CalorimetrySimulator() {
+  // 3. Calorimetry Interactive View
+  Widget _buildLevel4CalorimetryInteractive() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -1464,14 +1666,16 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                   flex: 5,
                   child: Container(
                     decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(10), border: Border.all(color: ColorSystem.plum.withOpacity(0.12))),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.thermostat_rounded, size: 36, color: ColorSystem.coral),
-                          Text('${_waterTemp.toStringAsFixed(1)} °C', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 22, fontWeight: FontWeight.w900, color: ColorSystem.coral)),
-                          const Text('Mass: 100.0 g • c = 4.184 J/g°C', style: TextStyle(fontFamily: 'Fredoka', fontSize: 8, color: Colors.blueGrey)),
-                        ],
+                    child: AnimatedBuilder(
+                      animation: _animController,
+                      builder: (ctx, _) => CustomPaint(
+                        size: Size.infinite,
+                        painter: _CalorimeterPainter(
+                          temperature: _waterTemp,
+                          isStirring: _magneticStirring,
+                          hasSolute: _soluteAdded,
+                          animProgress: _animController.value,
+                        ),
                       ),
                     ),
                   ),
@@ -1484,25 +1688,28 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       CustomButton(
-                        text: _soluteAdded ? '✓ Solute Added' : 'Add NaOH Pellets 🔥',
-                        backgroundColor: ColorSystem.coral,
+                        text: _soluteAdded ? '✓ NaOH Pellets Added' : 'Drop NaOH Pellets 🔥',
+                        backgroundColor: _soluteAdded ? ColorSystem.green : ColorSystem.coral,
                         textColor: Colors.white,
-                        onPressed: () {
-                          SoundService.playStarPop();
-                          setState(() {
-                            _soluteAdded = true;
-                            _waterTemp = 30.4;
-                          });
-                        },
+                        onPressed: _addCalorimeterSolute,
                       ),
                       CustomButton(
-                        text: 'Reset Water 22.0°C ❄️',
+                        text: _magneticStirring ? '🌀 Stirring Active' : '▶ Start Magnetic Stirrer',
+                        backgroundColor: const Color(0xFF0EA5E9),
+                        textColor: Colors.white,
+                        onPressed: _toggleStirring,
+                      ),
+                      CustomButton(
+                        text: 'Reset Water (22.0°C) ❄️',
                         backgroundColor: ColorSystem.lavender,
                         textColor: Colors.white,
-                        onPressed: () => setState(() {
-                          _waterTemp = 22.0;
-                          _soluteAdded = false;
-                        }),
+                        onPressed: () {
+                          setState(() {
+                            _soluteAdded = false;
+                            _waterTemp = 22.0;
+                            _targetTemp = 22.0;
+                          });
+                        },
                       ),
                       CustomButton(text: '🎯 Complete Calorimetry', backgroundColor: ColorSystem.green, textColor: Colors.white, onPressed: _verifyLevel4),
                     ],
@@ -1516,11 +1723,12 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
     );
   }
 
-  Widget _buildLevel4SmeltingSimulator() {
+  // 4. Smelting Interactive View
+  Widget _buildLevel4SmeltingInteractive() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildFoxyTeacherBanner('"Level 4: Load the hematite ore charge into the furnace, then activate the 1500°C hot blast tuyeres!"', DendyState.thinking),
+        _buildFoxyTeacherBanner('"Level 4: Load the ore charge, activate the 1500°C blast, and tap the glowing molten pig iron!"', DendyState.thinking),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(6),
@@ -1529,15 +1737,18 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                 Expanded(
                   flex: 5,
                   child: Container(
-                    decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(10)),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.fireplace_rounded, size: 36, color: _blastOn ? const Color(0xFFF97316) : Colors.grey),
-                          Text('${_furnaceTemp.toStringAsFixed(0)} °C', style: TextStyle(fontFamily: 'Fredoka', fontSize: 20, fontWeight: FontWeight.w900, color: _blastOn ? const Color(0xFFF97316) : Colors.white70)),
-                          Text(_blastOn ? 'Hot Blast Active (1500°C)' : 'Furnace Idle', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 8, color: Colors.white54)),
-                        ],
+                    decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(10)),
+                    child: AnimatedBuilder(
+                      animation: _animController,
+                      builder: (ctx, _) => CustomPaint(
+                        size: Size.infinite,
+                        painter: _BlastFurnacePainter(
+                          chargeLoaded: _chargeLoaded,
+                          blastOn: _tuyereBlastOn,
+                          furnaceTemp: _furnaceTemp,
+                          isTapped: _tapHoleOpened,
+                          animProgress: _animController.value,
+                        ),
                       ),
                     ),
                   ),
@@ -1553,18 +1764,21 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
                         text: _chargeLoaded ? '✓ Charge Loaded' : 'Load Ore & Coke ⛰️',
                         backgroundColor: ColorSystem.castlePurple,
                         textColor: Colors.white,
-                        onPressed: () => setState(() => _chargeLoaded = true),
+                        onPressed: _loadBlastFurnaceCharge,
                       ),
                       CustomButton(
-                        text: _blastOn ? '🔥 1500°C Blast On' : 'Activate Tuyere Blast 🔥',
+                        text: _tuyereBlastOn ? '🔥 1500°C Blast Active' : 'Start 1500°C Hot Blast 🔥',
                         backgroundColor: const Color(0xFFF97316),
                         textColor: Colors.white,
-                        onPressed: () => setState(() {
-                          _blastOn = true;
-                          _furnaceTemp = 1520.0;
-                        }),
+                        onPressed: _toggleTuyereBlast,
                       ),
-                      CustomButton(text: '🎯 Tap Liquid Pig Iron', backgroundColor: ColorSystem.green, textColor: Colors.white, onPressed: _verifyLevel4),
+                      CustomButton(
+                        text: _tapHoleOpened ? '✓ Molten Iron Tapped' : 'Drill Tap Hole & Pour ⛏️',
+                        backgroundColor: const Color(0xFFDC2626),
+                        textColor: Colors.white,
+                        onPressed: _tapMoltenIron,
+                      ),
+                      CustomButton(text: '🎯 Finish Smelting Lab', backgroundColor: ColorSystem.green, textColor: Colors.white, onPressed: _verifyLevel4),
                     ],
                   ),
                 ),
@@ -1650,7 +1864,11 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
   }
 }
 
-// Painters for Titration and Flame
+// ==========================================
+// HIGH FIDELITY CUSTOM PAINTERS
+// ==========================================
+
+// 1. Titration Custom Painter
 class _MobileTitrationPainter extends CustomPainter {
   final double buretteVolume;
   final double maxVolume;
@@ -1658,6 +1876,7 @@ class _MobileTitrationPainter extends CustomPainter {
   final double dripProgress;
   final bool isSwirling;
   final double swirlProgress;
+  final double animTime;
 
   _MobileTitrationPainter({
     required this.buretteVolume,
@@ -1666,18 +1885,21 @@ class _MobileTitrationPainter extends CustomPainter {
     required this.dripProgress,
     required this.isSwirling,
     required this.swirlProgress,
+    required this.animTime,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width * 0.55;
-    final standX = size.width * 0.22;
+    final standX = size.width * 0.20;
 
+    // Retort Stand Base & Rod
     final standPaint = Paint()..color = const Color(0xFF334155)..strokeWidth = 3.5..strokeCap = StrokeCap.round;
     canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(standX, size.height * 0.94), width: 45, height: 7), const Radius.circular(2)), Paint()..color = const Color(0xFF1E293B));
     canvas.drawLine(Offset(standX, size.height * 0.94), Offset(standX, size.height * 0.06), standPaint);
     canvas.drawLine(Offset(standX, size.height * 0.26), Offset(cx, size.height * 0.26), standPaint..strokeWidth = 2.5);
 
+    // Burette Body
     final bTop = size.height * 0.08;
     final bBottom = size.height * 0.54;
     final bWidth = 11.0;
@@ -1688,8 +1910,9 @@ class _MobileTitrationPainter extends CustomPainter {
     canvas.drawRect(Rect.fromLTRB(cx - bWidth / 2 + 1, liqTop, cx + bWidth / 2 - 1, bBottom), Paint()..color = const Color(0x66BAE6FD));
     canvas.drawRect(bRect, Paint()..color = const Color(0xFF475569)..strokeWidth = 1.0..style = PaintingStyle.stroke);
 
+    // Stopcock & Tip
     final valveY = bBottom + 6;
-    canvas.drawCircle(Offset(cx, valveY), 3, Paint()..color = const Color(0xFFEF4444));
+    canvas.drawCircle(Offset(cx, valveY), 3.5, Paint()..color = const Color(0xFFEF4444));
     canvas.drawLine(Offset(cx, valveY), Offset(cx, valveY + 10), Paint()..color = const Color(0xFF475569)..strokeWidth = 1.5);
 
     if (dripProgress > 0.0 && dripProgress < 1.0) {
@@ -1697,6 +1920,7 @@ class _MobileTitrationPainter extends CustomPainter {
       canvas.drawCircle(Offset(cx, dropY), 2.5, Paint()..color = const Color(0xFF38BDF8));
     }
 
+    // Conical Flask
     final fTop = size.height * 0.66;
     final fBottom = size.height * 0.92;
     final fPath = Path()
@@ -1728,34 +1952,166 @@ class _MobileTitrationPainter extends CustomPainter {
   bool shouldRepaint(covariant _MobileTitrationPainter oldDelegate) => true;
 }
 
+// 2. Flame Test Custom Painter
 class _FlameCanvasPainter extends CustomPainter {
   final Color flameColor;
   final double flicker;
-  final bool isBlueBase;
+  final bool isWireInFlame;
+  final bool wireHasSalt;
 
-  _FlameCanvasPainter({required this.flameColor, required this.flicker, required this.isBlueBase});
+  _FlameCanvasPainter({
+    required this.flameColor,
+    required this.flicker,
+    required this.isWireInFlame,
+    required this.wireHasSalt,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height * 0.65;
 
-    canvas.drawRect(Rect.fromCenter(center: Offset(cx, cy + 30), width: 16, height: 40), Paint()..color = const Color(0xFF94A3B8));
-    canvas.drawRect(Rect.fromCenter(center: Offset(cx, cy + 50), width: 50, height: 8), Paint()..color = const Color(0xFF334155));
+    // Bunsen Burner
+    canvas.drawRect(Rect.fromCenter(center: Offset(cx, cy + 30), width: 18, height: 40), Paint()..color = const Color(0xFF64748B));
+    canvas.drawRect(Rect.fromCenter(center: Offset(cx, cy + 50), width: 54, height: 8), Paint()..color = const Color(0xFF1E293B));
 
-    final flameH = 50 + (flicker * 8);
+    // Flame Cones
+    final flameH = 50 + sin(flicker * pi * 2) * 6;
     final outerFlame = Path()
-      ..moveTo(cx - 10, cy + 10)
-      ..quadraticBezierTo(cx - 12, cy - flameH * 0.5, cx, cy - flameH)
-      ..quadraticBezierTo(cx + 12, cy - flameH * 0.5, cx + 10, cy + 10)
+      ..moveTo(cx - 12, cy + 10)
+      ..quadraticBezierTo(cx - 14, cy - flameH * 0.5, cx, cy - flameH)
+      ..quadraticBezierTo(cx + 14, cy - flameH * 0.5, cx + 12, cy + 10)
       ..close();
     canvas.drawPath(outerFlame, Paint()..color = flameColor.withOpacity(0.85));
 
-    final wire = Paint()..color = Colors.white70..strokeWidth = 1.5;
-    canvas.drawLine(Offset(cx + 30, cy), Offset(cx, cy - 8), wire);
-    canvas.drawCircle(Offset(cx, cy - 8), 2.5, Paint()..color = Colors.white..style = PaintingStyle.stroke);
+    // Inner Cone
+    final innerFlame = Path()
+      ..moveTo(cx - 6, cy + 10)
+      ..quadraticBezierTo(cx - 7, cy - flameH * 0.25, cx, cy - flameH * 0.5)
+      ..quadraticBezierTo(cx + 7, cy - flameH * 0.25, cx + 6, cy + 10)
+      ..close();
+    canvas.drawPath(innerFlame, Paint()..color = const Color(0xFF38BDF8).withOpacity(0.9));
+
+    // Platinum Wire
+    final wireX = isWireInFlame ? cx : cx + 32;
+    final wireY = isWireInFlame ? cy - 18 : cy + 15;
+    final wirePaint = Paint()..color = Colors.white70..strokeWidth = 1.6;
+    canvas.drawLine(Offset(size.width - 8, size.height * 0.3), Offset(wireX, wireY), wirePaint);
+    canvas.drawCircle(Offset(wireX, wireY), 3.0, Paint()..color = wireHasSalt ? Colors.amberAccent : Colors.white..style = PaintingStyle.stroke..strokeWidth = 1.2);
   }
 
   @override
   bool shouldRepaint(covariant _FlameCanvasPainter oldDelegate) => true;
+}
+
+// 3. Calorimeter Custom Painter
+class _CalorimeterPainter extends CustomPainter {
+  final double temperature;
+  final bool isStirring;
+  final bool hasSolute;
+  final double animProgress;
+
+  _CalorimeterPainter({
+    required this.temperature,
+    required this.isStirring,
+    required this.hasSolute,
+    required this.animProgress,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height * 0.55;
+
+    // Outer Insulated Cup
+    final cup = Rect.fromCenter(center: Offset(cx, cy), width: 70, height: 80);
+    canvas.drawRRect(RRect.fromRectAndRadius(cup, const Radius.circular(8)), Paint()..color = const Color(0xFFE2E8F0));
+    canvas.drawRRect(RRect.fromRectAndRadius(cup, const Radius.circular(8)), Paint()..color = const Color(0xFF94A3B8)..style = PaintingStyle.stroke..strokeWidth = 2);
+
+    // Water
+    final water = Rect.fromCenter(center: Offset(cx, cy + 8), width: 62, height: 56);
+    canvas.drawRRect(RRect.fromRectAndRadius(water, const Radius.circular(6)), Paint()..color = const Color(0x6638BDF8));
+
+    // Stir Bar
+    if (isStirring) {
+      final angle = animProgress * pi * 2;
+      canvas.save();
+      canvas.translate(cx, cy + 28);
+      canvas.rotate(angle);
+      canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset.zero, width: 18, height: 4), const Radius.circular(2)), Paint()..color = Colors.white);
+      canvas.restore();
+    }
+
+    // Thermometer Probe
+    canvas.drawRect(Rect.fromLTWH(cx + 12, cy - 50, 4, 75), Paint()..color = const Color(0xFFEF4444));
+
+    // Digital Readout Box
+    final box = Rect.fromCenter(center: Offset(cx, cy - 35), width: 60, height: 18);
+    canvas.drawRRect(RRect.fromRectAndRadius(box, const Radius.circular(4)), Paint()..color = const Color(0xFF1E293B));
+    final tp = TextPainter(
+      text: TextSpan(text: '${temperature.toStringAsFixed(1)} °C', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.bold, color: Colors.amberAccent)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(canvas, Offset(cx - tp.width / 2, cy - 41));
+  }
+
+  @override
+  bool shouldRepaint(covariant _CalorimeterPainter oldDelegate) => true;
+}
+
+// 4. Blast Furnace Custom Painter
+class _BlastFurnacePainter extends CustomPainter {
+  final bool chargeLoaded;
+  final bool blastOn;
+  final double furnaceTemp;
+  final bool isTapped;
+  final double animProgress;
+
+  _BlastFurnacePainter({
+    required this.chargeLoaded,
+    required this.blastOn,
+    required this.furnaceTemp,
+    required this.isTapped,
+    required this.animProgress,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+
+    // Blast Furnace Stack
+    final path = Path()
+      ..moveTo(cx - 15, size.height * 0.12)
+      ..lineTo(cx + 15, size.height * 0.12)
+      ..lineTo(cx + 28, size.height * 0.65)
+      ..lineTo(cx + 20, size.height * 0.88)
+      ..lineTo(cx - 20, size.height * 0.88)
+      ..lineTo(cx - 28, size.height * 0.65)
+      ..close();
+
+    canvas.drawPath(path, Paint()..color = const Color(0xFF334155));
+    canvas.drawPath(path, Paint()..color = const Color(0xFF64748B)..style = PaintingStyle.stroke..strokeWidth = 2);
+
+    // Charge Layers
+    if (chargeLoaded) {
+      canvas.drawRect(Rect.fromCenter(center: Offset(cx, size.height * 0.32), width: 34, height: 16), Paint()..color = const Color(0xFF78350F));
+      canvas.drawRect(Rect.fromCenter(center: Offset(cx, size.height * 0.48), width: 44, height: 16), Paint()..color = const Color(0xFF1E293B));
+    }
+
+    // 1500°C Tuyere Hot Blast Zone
+    if (blastOn) {
+      final flameP = Paint()..color = Color.lerp(const Color(0xFFF97316), const Color(0xFFEF4444), animProgress)!;
+      canvas.drawCircle(Offset(cx, size.height * 0.76), 14, flameP);
+    }
+
+    // Molten Iron Tapping Stream
+    if (isTapped) {
+      final tapPaint = Paint()..color = const Color(0xFFF97316)..strokeWidth = 3.5;
+      canvas.drawLine(Offset(cx + 18, size.height * 0.84), Offset(size.width - 10, size.height * 0.92), tapPaint);
+      canvas.drawCircle(Offset(size.width - 10, size.height * 0.92), 4, Paint()..color = Colors.amberAccent);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _BlastFurnacePainter oldDelegate) => true;
 }

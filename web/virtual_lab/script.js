@@ -1,5 +1,5 @@
 /**
- * QUESTLY VIRTUAL LAB - COMPLETE MULTI-EXPERIMENT ENGINE
+ * QUESTLY VIRTUAL LAB - REALISTIC LABORATORY INTERACTION ENGINE
  */
 
 let selectedExperiment = 'titration'; // titration | flameTest | calorimetry | smelting
@@ -17,7 +17,7 @@ let selectedReagent2 = null;
 let reagentStep1Done = false;
 let reagentStep2Done = false;
 
-// Titration Simulation
+// 1. Titration Interactive Simulation State
 let buretteVolume = 0.0;
 const targetEndpoint = 20.00;
 let isContinuous = false;
@@ -26,17 +26,26 @@ let isSwirling = false;
 let dripProgress = 0;
 let dripAnim = null;
 
-// Flame Simulation
+// 2. Flame Test Interactive State
 let selectedFlameSalt = 'licl';
+let isWireHasSalt = false;
+let isWireInFlame = false;
+let flameAnim = null;
+let flameTick = 0;
 
-// Calorimetry Simulation
+// 3. Calorimetry Interactive State
 let waterTemp = 22.0;
+let targetTemp = 22.0;
 let soluteAdded = false;
+let isStirring = false;
+let tempRiseInterval = null;
 
-// Smelting Simulation
+// 4. Smelting Interactive State
 let chargeLoaded = false;
 let blastOn = false;
 let furnaceTemp = 250;
+let isTapped = false;
+let smeltingTimer = null;
 
 // Pending Action for Modal
 let nextActionAfterHurrah = null;
@@ -140,14 +149,21 @@ function startExperiment(expId) {
   selectedReagent2 = null;
   reagentStep1Done = false;
   reagentStep2Done = false;
+
+  // Simulator resets
   buretteVolume = 0.0;
   isContinuous = false;
   selectedFlameSalt = 'licl';
+  isWireHasSalt = false;
+  isWireInFlame = false;
   waterTemp = 22.0;
+  targetTemp = 22.0;
   soluteAdded = false;
+  isStirring = false;
   chargeLoaded = false;
   blastOn = false;
   furnaceTemp = 250;
+  isTapped = false;
 
   renderExperimentLevel1();
   goToLevel(1);
@@ -156,6 +172,8 @@ function startExperiment(expId) {
 function exitToExperimentSelect() {
   sound.playClick();
   if (isContinuous) toggleContinuous();
+  if (tempRiseInterval) clearInterval(tempRiseInterval);
+  if (smeltingTimer) clearInterval(smeltingTimer);
   document.getElementById('screenActiveLab').classList.remove('active');
   document.getElementById('screenExpSelect').classList.add('active');
 }
@@ -482,7 +500,6 @@ function tapApparatus(id, isRequired) {
       });
     }
   } else {
-    // Incorrect Apparatus
     sound.playPop();
     card.classList.add('wrong-flash');
     errMsg.innerText = `❌ Incorrect Tool: That apparatus is not needed for this experiment! Choose the 4 required tools.`;
@@ -634,39 +651,42 @@ function finishLevel3() {
 }
 
 // ---------------------------------------------------------------------------
-// LEVEL 4: INTERACTIVE SIMULATORS
+// LEVEL 4: INTERACTIVE BENCHES (DYNAMIC WORKING PHYSICS)
 // ---------------------------------------------------------------------------
 function setupLevel4Simulator() {
   const panel = document.getElementById('controlsPanel');
   const hud = document.getElementById('hudContainer');
 
   if (selectedExperiment === 'flameTest') {
-    setFoxySpeech('"Level 4: Dip the platinum wire into different metal salts and observe the spectral flame emission wavelengths!"');
-    hud.innerHTML = '<div>Zone: <strong>1400°C Blue Flame</strong></div>';
+    setFoxySpeech('"Level 4: Dip the platinum wire loop into metal salt crystals, then hold it directly in the flame cone!"');
+    hud.innerHTML = '<div>State: <strong id="flameStatus">Clean Wire</strong></div>';
     panel.innerHTML = `
-      <button class="ctrl-btn" style="background:#EF4444" onclick="setFlame('licl')">🔴 LiCl (Crimson Red)</button>
-      <button class="ctrl-btn" style="background:#F59E0B" onclick="setFlame('nacl')">🟡 NaCl (Golden Yellow)</button>
-      <button class="ctrl-btn" style="background:#A855F7" onclick="setFlame('kcl')">🟣 KCl (Lilac Violet)</button>
-      <button class="ctrl-btn" style="background:#10B981" onclick="setFlame('cuso4')">🟢 CuSO₄ (Emerald Green)</button>
+      <button class="ctrl-btn" style="background:#EF4444" onclick="dipWire('licl')">🔴 Dip LiCl (Crimson)</button>
+      <button class="ctrl-btn" style="background:#F59E0B" onclick="dipWire('nacl')">🟡 Dip NaCl (Yellow)</button>
+      <button class="ctrl-btn" style="background:#A855F7" onclick="dipWire('kcl')">🟣 Dip KCl (Lilac)</button>
+      <button class="ctrl-btn" style="background:#10B981" onclick="dipWire('cuso4')">🟢 Dip CuSO₄ (Green)</button>
+      <button class="ctrl-btn btn-castle" onclick="holdWireInFlame()">🔥 Hold Wire in Flame</button>
       <button class="ctrl-btn btn-green" onclick="verifyLevel4()">🎯 Complete Flame Lab</button>
     `;
-    renderFlameCanvas();
+    startFlameLoop();
   } else if (selectedExperiment === 'calorimetry') {
-    setFoxySpeech('"Level 4: Add the measured solute into the calorimeter, stir, and observe the temperature rise ΔT!"');
-    hud.innerHTML = '<div>System: <strong>Insulated Cup</strong></div>';
+    setFoxySpeech('"Level 4: Add measured exothermic solute into calorimeter, start magnetic stirrer, and observe ΔT temperature rise!"');
+    hud.innerHTML = '<div>Temp: <strong id="calTemp">22.0 °C</strong></div>';
     panel.innerHTML = `
-      <button class="ctrl-btn btn-castle" onclick="addCalorimeterSolute()">Add NaOH Pellets 🔥</button>
-      <button class="ctrl-btn btn-lavender" onclick="resetCalorimeter()">Reset Water 22.0°C ❄️</button>
+      <button class="ctrl-btn btn-castle" onclick="addCalorimeterSolute()">Drop NaOH Pellets 🔥</button>
+      <button class="ctrl-btn btn-blue" id="btnStir" onclick="toggleCalorimeterStir()">▶ Start Stirrer 🌀</button>
+      <button class="ctrl-btn btn-lavender" onclick="resetCalorimeter()">Reset Water (22.0°C) ❄️</button>
       <button class="ctrl-btn btn-green" onclick="verifyLevel4()">🎯 Complete Calorimetry</button>
     `;
     renderCalorimetryCanvas();
   } else if (selectedExperiment === 'smelting') {
-    setFoxySpeech('"Level 4: Load the hematite ore charge into the furnace, then activate the 1500°C hot blast tuyeres!"');
-    hud.innerHTML = '<div>State: <strong>Blast Furnace</strong></div>';
+    setFoxySpeech('"Level 4: Load ore charge, turn on 1500°C blast, and tap glowing molten pig iron into the ladle!"');
+    hud.innerHTML = '<div>Furnace: <strong id="furnaceTempHud">250 °C</strong></div>';
     panel.innerHTML = `
       <button class="ctrl-btn btn-castle" onclick="loadFurnaceCharge()">Load Ore & Coke ⛰️</button>
-      <button class="ctrl-btn" style="background:#F97316" onclick="activateTuyereBlast()">Activate 1500°C Blast 🔥</button>
-      <button class="ctrl-btn btn-green" onclick="verifyLevel4()">🎯 Tap Liquid Pig Iron</button>
+      <button class="ctrl-btn" style="background:#F97316" id="btnBlast" onclick="toggleTuyereBlast()">Start 1500°C Blast 🔥</button>
+      <button class="ctrl-btn" style="background:#DC2626" onclick="tapMoltenIron()">Drill Tap Hole & Pour ⛏️</button>
+      <button class="ctrl-btn btn-green" onclick="verifyLevel4()">🎯 Finish Smelting Lab</button>
     `;
     renderSmeltingCanvas();
   } else {
@@ -689,12 +709,14 @@ function setupLevel4Simulator() {
 
 function verifyLevel4() {
   if (isContinuous) toggleContinuous();
-  showHurrahModal('Level 4: Experiment Succeeded!', 'You completed the laboratory simulation with high accuracy!', 'View Performance Report ➜', () => {
+  showHurrahModal('Level 4: Experiment Succeeded!', 'You completed the laboratory simulation with authentic precision!', 'View Performance Report ➜', () => {
     goToLevel(5);
   });
 }
 
-// Titration Helpers
+// ---------------------------------------------------------------------------
+// 1. TITRATION SIMULATION LOGIC
+// ---------------------------------------------------------------------------
 function calculatePH() {
   const molesAcid = 0.002;
   const molesBase = (buretteVolume / 1000.0) * 0.1;
@@ -860,11 +882,37 @@ function renderCanvas() {
   ctx.stroke();
 }
 
-// Flame test canvas
-function setFlame(salt) {
+// ---------------------------------------------------------------------------
+// 2. FLAME TEST INTERACTIVE SIMULATION
+// ---------------------------------------------------------------------------
+function dipWire(salt) {
   sound.playPop();
   selectedFlameSalt = salt;
-  renderFlameCanvas();
+  isWireHasSalt = true;
+  isWireInFlame = false;
+  document.getElementById('flameStatus').innerText = `Wire coated in ${salt.toUpperCase()}`;
+}
+
+function holdWireInFlame() {
+  if (!isWireHasSalt) {
+    alert('Dip the wire loop into a metal salt first!');
+    return;
+  }
+  sound.playCorrect();
+  isWireInFlame = true;
+  document.getElementById('flameStatus').innerText = `Emission: ${selectedFlameSalt.toUpperCase()}`;
+}
+
+function startFlameLoop() {
+  if (flameAnim) cancelAnimationFrame(flameAnim);
+  function loop() {
+    flameTick += 0.08;
+    renderFlameCanvas();
+    if (currentLevel === 4 && selectedExperiment === 'flameTest') {
+      flameAnim = requestAnimationFrame(loop);
+    }
+  }
+  flameAnim = requestAnimationFrame(loop);
 }
 
 function renderFlameCanvas() {
@@ -877,44 +925,97 @@ function renderFlameCanvas() {
   ctx.fillRect(0, 0, w, h);
 
   const cx = w * 0.5;
-  const cy = h * 0.7;
+  const cy = h * 0.72;
 
-  // Burner
-  ctx.fillStyle = '#94A3B8';
-  ctx.fillRect(cx - 8, cy, 16, 40);
-  ctx.fillStyle = '#334155';
-  ctx.fillRect(cx - 25, cy + 35, 50, 8);
+  // Bunsen Burner Barrel & Base
+  ctx.fillStyle = '#64748B';
+  ctx.fillRect(cx - 8, cy - 20, 16, 45);
+  ctx.fillStyle = '#1E293B';
+  ctx.fillRect(cx - 25, cy + 25, 50, 8);
 
-  // Flame
+  // Flame Color
   const colors = {
     licl: '#EF4444',
     nacl: '#FBBF24',
     kcl: '#A855F7',
     cuso4: '#10B981'
   };
-  const fc = colors[selectedFlameSalt] || '#EF4444';
-  ctx.fillStyle = fc;
+  const activeColor = (isWireInFlame && isWireHasSalt) ? (colors[selectedFlameSalt] || '#EF4444') : '#38BDF8';
+
+  // Outer Flame Plume
+  const flameH = 50 + Math.sin(flameTick) * 6;
+  ctx.fillStyle = activeColor;
   ctx.beginPath();
-  ctx.moveTo(cx - 12, cy);
-  ctx.quadraticBezierTo(cx - 15, cy - 45, cx, cy - 65);
-  ctx.quadraticBezierTo(cx + 15, cy - 45, cx + 12, cy);
+  ctx.moveTo(cx - 12, cy - 20);
+  ctx.quadraticBezierTo(cx - 15, cy - 20 - flameH * 0.5, cx, cy - 20 - flameH);
+  ctx.quadraticBezierTo(cx + 15, cy - 20 - flameH * 0.5, cx + 12, cy - 20);
   ctx.closePath();
   ctx.fill();
+
+  // Inner Hot Blue Cone
+  ctx.fillStyle = '#38BDF8';
+  ctx.beginPath();
+  ctx.moveTo(cx - 6, cy - 20);
+  ctx.quadraticBezierTo(cx - 7, cy - 20 - flameH * 0.25, cx, cy - 20 - flameH * 0.5);
+  ctx.quadraticBezierTo(cx + 7, cy - 20 - flameH * 0.25, cx + 6, cy - 20);
+  ctx.closePath();
+  ctx.fill();
+
+  // Platinum Wire Loop
+  const wireX = isWireInFlame ? cx : cx + 36;
+  const wireY = isWireInFlame ? cy - 45 : cy - 10;
+  ctx.strokeStyle = '#CBD5E1';
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(w - 10, h * 0.25);
+  ctx.lineTo(wireX, wireY);
+  ctx.stroke();
+
+  ctx.strokeStyle = isWireHasSalt ? '#FDE047' : '#FFFFFF';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(wireX, wireY, 3, 0, Math.PI * 2);
+  ctx.stroke();
 }
 
-// Calorimetry test canvas
+// ---------------------------------------------------------------------------
+// 3. CALORIMETRY INTERACTIVE SIMULATION
+// ---------------------------------------------------------------------------
 function addCalorimeterSolute() {
   sound.playPop();
   soluteAdded = true;
-  waterTemp = 30.4;
+  targetTemp = 31.8;
+
+  if (tempRiseInterval) clearInterval(tempRiseInterval);
+  tempRiseInterval = setInterval(() => {
+    if (waterTemp < targetTemp) {
+      waterTemp += 0.4;
+      document.getElementById('calTemp').innerText = `${waterTemp.toFixed(1)} °C`;
+      renderCalorimetryCanvas();
+    } else {
+      clearInterval(tempRiseInterval);
+    }
+  }, 150);
+}
+
+function toggleCalorimeterStir() {
+  sound.playClick();
+  isStirring = !isStirring;
+  const btn = document.getElementById('btnStir');
+  btn.innerText = isStirring ? '⏸ Pause Stirrer' : '▶ Start Stirrer 🌀';
   renderCalorimetryCanvas();
 }
+
 function resetCalorimeter() {
   sound.playClick();
+  if (tempRiseInterval) clearInterval(tempRiseInterval);
   soluteAdded = false;
   waterTemp = 22.0;
+  targetTemp = 22.0;
+  document.getElementById('calTemp').innerText = '22.0 °C';
   renderCalorimetryCanvas();
 }
+
 function renderCalorimetryCanvas() {
   const canvas = document.getElementById('titrationCanvas');
   if (!canvas) return;
@@ -923,27 +1024,76 @@ function renderCalorimetryCanvas() {
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
 
+  const cx = w * 0.5;
+  const cy = h * 0.55;
+
+  // Insulated Cup
+  ctx.fillStyle = '#E2E8F0';
+  ctx.fillRect(cx - 35, cy - 40, 70, 80);
+  ctx.strokeStyle = '#94A3B8';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(cx - 35, cy - 40, 70, 80);
+
+  // Water Solution
+  ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+  ctx.fillRect(cx - 30, cy - 20, 60, 56);
+
+  // Stir bar
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(cx - 10, cy + 22, 20, 5);
+
+  // Thermometer
+  ctx.fillStyle = '#EF4444';
+  ctx.fillRect(cx + 12, cy - 65, 4, 85);
+
+  // Temperature Box
   ctx.fillStyle = '#1E293B';
-  ctx.font = 'bold 18px Fredoka, sans-serif';
+  ctx.fillRect(cx - 35, cy - 60, 70, 18);
+  ctx.fillStyle = '#FDE047';
+  ctx.font = 'bold 10px Fredoka, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText(`🌡️ ${waterTemp.toFixed(1)} °C`, w / 2, h / 2 - 10);
-  ctx.font = '10px Fredoka, sans-serif';
-  ctx.fillStyle = '#64748B';
-  ctx.fillText('Mass: 100.0g • c = 4.184 J/g°C', w / 2, h / 2 + 15);
+  ctx.fillText(`${waterTemp.toFixed(1)} °C`, cx, cy - 47);
 }
 
-// Smelting test canvas
+// ---------------------------------------------------------------------------
+// 4. BLAST FURNACE INTERACTIVE SIMULATION
+// ---------------------------------------------------------------------------
 function loadFurnaceCharge() {
   sound.playPop();
   chargeLoaded = true;
   renderSmeltingCanvas();
 }
-function activateTuyereBlast() {
-  sound.playPop();
-  blastOn = true;
-  furnaceTemp = 1520;
+
+function toggleTuyereBlast() {
+  sound.playCorrect();
+  blastOn = !blastOn;
+  const btn = document.getElementById('btnBlast');
+  btn.innerText = blastOn ? '⏸ Blast Active' : 'Start 1500°C Blast 🔥';
+
+  if (blastOn) {
+    if (smeltingTimer) clearInterval(smeltingTimer);
+    smeltingTimer = setInterval(() => {
+      if (furnaceTemp < 1520) {
+        furnaceTemp += 65;
+        document.getElementById('furnaceTempHud').innerText = `${furnaceTemp} °C`;
+        renderSmeltingCanvas();
+      } else {
+        clearInterval(smeltingTimer);
+      }
+    }, 180);
+  }
+}
+
+function tapMoltenIron() {
+  if (!blastOn || furnaceTemp < 1000) {
+    alert('Furnace is not hot enough! Activate 1500°C hot blast first!');
+    return;
+  }
+  sound.playSuccess();
+  isTapped = true;
   renderSmeltingCanvas();
 }
+
 function renderSmeltingCanvas() {
   const canvas = document.getElementById('titrationCanvas');
   if (!canvas) return;
@@ -953,13 +1103,54 @@ function renderSmeltingCanvas() {
   ctx.fillStyle = '#0F172A';
   ctx.fillRect(0, 0, w, h);
 
-  ctx.fillStyle = blastOn ? '#F97316' : '#94A3B8';
-  ctx.font = 'bold 18px Fredoka, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(`🔥 ${furnaceTemp} °C`, w / 2, h / 2 - 10);
-  ctx.font = '10px Fredoka, sans-serif';
-  ctx.fillStyle = '#E2E8F0';
-  ctx.fillText(blastOn ? 'Hot Blast Active (1500°C)' : 'Furnace Idle', w / 2, h / 2 + 15);
+  const cx = w * 0.5;
+
+  // Furnace Stack
+  ctx.fillStyle = '#334155';
+  ctx.beginPath();
+  ctx.moveTo(cx - 15, h * 0.12);
+  ctx.lineTo(cx + 15, h * 0.12);
+  ctx.lineTo(cx + 28, h * 0.65);
+  ctx.lineTo(cx + 20, h * 0.88);
+  ctx.lineTo(cx - 20, h * 0.88);
+  ctx.lineTo(cx - 28, h * 0.65);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = '#64748B';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Charge layers
+  if (chargeLoaded) {
+    ctx.fillStyle = '#78350F';
+    ctx.fillRect(cx - 17, h * 0.3, 34, 16);
+    ctx.fillStyle = '#1E293B';
+    ctx.fillRect(cx - 22, h * 0.46, 44, 16);
+  }
+
+  // Tuyere Flame
+  if (blastOn) {
+    ctx.fillStyle = '#F97316';
+    ctx.beginPath();
+    ctx.arc(cx, h * 0.76, 14, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Molten Iron Stream
+  if (isTapped) {
+    ctx.strokeStyle = '#F97316';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(cx + 18, h * 0.84);
+    ctx.lineTo(w - 10, h * 0.92);
+    ctx.stroke();
+
+    ctx.fillStyle = '#FDE047';
+    ctx.beginPath();
+    ctx.arc(w - 10, h * 0.92, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
 
 // ---------------------------------------------------------------------------
