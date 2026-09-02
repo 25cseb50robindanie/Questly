@@ -1,0 +1,285 @@
+{
+  "module_id": "density_buoyancy_master",
+  "title": "Density & Buoyancy Master Knowledge Base",
+  "grade": 8,
+  "subject": "Physics & General Science",
+  "alias_dictionary": {
+    "density": ["density", "denseness", "dense", "packed", "heavier for same size", "stuff packed", "tightly packed", "thickness of matter"],
+    "buoyancy": ["buoyancy", "buoyant force", "upthrust", "floating force", "upward push", "water push", "archimedes push", "water holds object"],
+    "mass": ["mass", "amount of matter", "stuff inside", "weight vs mass", "matter in object", "mass definition"],
+    "volume": ["volume", "space occupied", "amount of space", "capacity", "displacement", "measuring cylinder", "volume definition"],
+    "floating": ["float", "floating", "why float", "floats", "stay on top", "stay afloat"],
+    "sinking": ["sink", "sinking", "why sink", "sinks", "goes down", "settle at bottom"],
+    "ships": ["ship", "ships", "boat", "boats", "vessel", "steel ship", "why do ships float", "huge boat", "submarines", "cruise ship"],
+    "ice": ["ice", "iceberg", "frozen water", "ice cube", "why does ice float", "freezing water", "ice density"],
+    "oil": ["oil", "cooking oil", "grease", "density of oil", "oil and water", "why does oil float", "oil lighter than water"],
+    "wood": ["wood", "wooden block", "log", "why wood floats", "wood density"],
+    "water": ["water", "density of water", "liquid water", "pure water", "water density"],
+    "materials_table": ["common materials", "density table", "list of densities", "density chart", "materials density", "gold density", "steel density", "aluminium density", "iron density", "air density", "plastic density"],
+    "relative_density": ["relative density", "compare with water", "specific gravity", "relative density formula"],
+    "pressure": ["water pressure", "pressure deeper down", "deep water pressure", "hydrostatic pressure"],
+    "quiz": ["quiz", "quiz me", "test me", "practice question", "ask me a question", "challenge me"]
+  },
+  "materials_table": [
+    {"material": "Air", "density_g_cm3": 0.0012, "floats": "—"},
+    {"material": "Wood", "density_g_cm3": 0.40, "floats": "Yes"},
+    {"material": "Oil", "density_g_cm3": 0.80, "floats": "Yes"},
+    {"material": "Plastic", "density_g_cm3": 0.85, "floats": "Usually"},
+    {"material": "Ice", "density_g_cm3": 0.92, "floats": "Yes"},
+    {"material": "Water", "density_g_cm3": 1.00, "floats": "—"},
+    {"material": "Aluminium", "density_g_cm3": 2.70, "floats": "No"},
+    {"material": "Steel", "density_g_cm3": 7.80, "floats": "No"},
+    {"material": "Iron", "density_g_cm3": 7.90, "floats": "No"},
+    {"material": "Gold", "density_g_cm3": 19.30, "floats": "No"}
+  ],
+  "concepts": {
+    "density": {
+      "id": "density",
+      "name": "Density",
+      "definition": "Density is the amount of mass packed into a given volume.",
+      "formula": "Density = Mass ÷ Volume (ρ = m/V)",
+      "response_styles": {
+        "standard": "Density is the amount of mass packed into a given volume. If two objects occupy the same amount of space, the one with greater mass has greater density.",
+        "simple": "Imagine two boxes that are exactly the same size. One feels much heavier. The heavier one has greater density.",
+        "simplest": "More stuff squeezed into the same space means higher density.",
+        "real_life": "Think of a cricket ball vs a sponge, a brick vs thermocol, or a steel block vs a wooden block of the exact same size!",
+        "exam": "Density is defined as the mass contained in a unit volume of a substance (Formula: ρ = m/V, SI Unit: kg/m³, CGS Unit: g/cm³)."
+      },
+      "units": {
+        "kg_m3": "kg/m³ (Standard SI unit)",
+        "g_cm3": "g/cm³ (School science & laboratory standard)",
+        "g_mL": "g/mL (Commonly used for liquids)"
+      },
+      "formula_faqs": {
+        "formula": "Density = Mass ÷ Volume (D = M/V)",
+        "find_mass": "Mass = Density × Volume (M = D × V)",
+        "find_volume": "Volume = Mass ÷ Density (V = M/D)"
+      },
+      "suggested_chips": ["What is the formula?", "Explain simply.", "Real-life examples.", "What is buoyancy?", "Quiz me."]
+    },
+    "mass": {
+      "id": "mass",
+      "name": "Mass",
+      "definition": "Mass is the amount of matter in an object.",
+      "units": ["gram (g)", "kilogram (kg)"],
+      "response_styles": {
+        "standard": "Mass is the amount of matter in an object. Unlike weight, mass never changes whether you are on Earth, the Moon, or floating in space.",
+        "simple": "Mass is simply how much 'stuff' makes up an object. You measure it in grams or kilograms.",
+        "simplest": "The total stuff inside something.",
+        "real_life": "Your mass on Earth is 40 kg, and on the Moon it is still exactly 40 kg!",
+        "exam": "Mass is the quantitative measure of inertia and the fundamental property representing the amount of matter in a body (SI unit: kilogram, kg)."
+      },
+      "mass_vs_weight": {
+        "mass": "Amount of matter, does not change with location, measured in kg or g.",
+        "weight": "Downward force due to gravity pulling on mass (Weight = Mass × Gravity), changes with location, measured in Newtons (N)."
+      },
+      "suggested_chips": ["Is mass same as weight?", "How to find mass?", "What is volume?", "Explain simply.", "Quiz me."]
+    },
+    "volume": {
+      "id": "volume",
+      "name": "Volume",
+      "definition": "Volume is the amount of space an object occupies.",
+      "units": ["cm³", "m³", "mL", "L"],
+      "response_styles": {
+        "standard": "Volume is the amount of three-dimensional space an object occupies. It is measured in cubic centimeters (cm³), cubic meters (m³), milliliters (mL), or liters (L).",
+        "simple": "A larger container usually has more volume because it holds more space.",
+        "simplest": "How much 3D room an object takes up.",
+        "real_life": "Dropping a stone into a measuring cylinder causes water to rise by the exact volume of the stone (water displacement).",
+        "exam": "Volume is the three-dimensional space enclosed by a boundary or occupied by a substance (SI unit: cubic meter, m³)."
+      },
+      "suggested_chips": ["How to find volume?", "What is displacement?", "Explain simply.", "What is density?", "Quiz me."]
+    },
+    "floating_and_sinking": {
+      "id": "floating_and_sinking",
+      "name": "Floating and Sinking",
+      "golden_rule": "An object floats if its density is less than the fluid (D_object < D_fluid). It is suspended if equal, and sinks if its density is greater (D_object > D_fluid).",
+      "response_styles": {
+        "standard": "An object floats when its density is less than the fluid, and sinks when its density is greater than the fluid. An object floats because the upward buoyant force balances or exceeds its downward weight.",
+        "simple": "Water pushes upward. If the object is light enough for its size (less dense than water), that upward push makes it float!",
+        "simplest": "Less dense floats on top; more dense sinks to the bottom.",
+        "real_life": "Wood and ice float on water because they are less dense than 1.0 g/cm³, while rocks and coins sink because they are more dense.",
+        "exam": "According to the principle of floatation, a body will float in a liquid if the density of the body is less than the density of the liquid, such that the upthrust equals the weight of the body."
+      },
+      "suggested_chips": ["Why does wood float?", "Why do ships float?", "Why do pebbles sink?", "Explain simply.", "Quiz me."]
+    },
+    "buoyancy": {
+      "id": "buoyancy",
+      "name": "Buoyancy & Upthrust",
+      "definition": "Buoyancy is the upward force exerted by a fluid on an object placed in it.",
+      "response_styles": {
+        "standard": "Buoyancy (or upthrust) is the upward force exerted by a fluid opposing the weight of an immersed object. Discovered by Archimedes, the upward buoyant force equals the weight of fluid displaced.",
+        "simple": "Water pushes upward on objects placed inside it.",
+        "simplest": "Water helps hold objects up.",
+        "real_life": "A boat floating on a river, an ice cube bobbing in a glass, a person swimming, or wearing a life jacket!",
+        "exam": "Buoyant force (upthrust) is the net upward force exerted on an object immersed in a fluid due to the pressure difference between the top and bottom of the object."
+      },
+      "suggested_chips": ["Everyday examples of buoyancy.", "Why do ships float?", "Explain simply.", "What is Archimedes principle?", "Quiz me."]
+    },
+    "water": {
+      "id": "water",
+      "name": "Water",
+      "density_value": "1.0 g/cm³ (or 1000 kg/m³)",
+      "response_styles": {
+        "standard": "Pure water has a density of exactly 1.0 g/cm³ (or 1000 kg/m³) at 4°C. It serves as the standard reference for comparing the density of all other substances.",
+        "simple": "Water has a density of 1.0 g/cm³. Anything with density less than 1.0 floats in water; anything greater sinks.",
+        "simplest": "Water's density is 1.0. It is the benchmark for floating and sinking.",
+        "real_life": "Because water is denser than oil (0.80 g/cm³) and ice (0.92 g/cm³), both oil and ice float on top of water!",
+        "exam": "Water has a maximum density of 1.000 g/cm³ (1000 kg/m³) at 3.98°C, and its relative density is defined as exactly 1.0."
+      },
+      "faqs": {
+        "water_vs_oil": "Water is denser than oil (1.0 g/cm³ vs 0.8 g/cm³), so oil floats on top.",
+        "water_vs_ice": "Water is denser than ice (1.0 g/cm³ vs 0.92 g/cm³) because water molecules in liquid form are packed more closely than in ice crystals."
+      },
+      "suggested_chips": ["Compare water and oil.", "Why does ice float?", "Density of water value.", "Explain simply.", "Quiz me."]
+    },
+    "oil": {
+      "id": "oil",
+      "name": "Oil",
+      "density_value": "Approximately 0.80 g/cm³",
+      "response_styles": {
+        "standard": "Cooking and mineral oils have a density of approximately 0.80 g/cm³. Because oil is less dense than water (1.00 g/cm³), it floats on top.",
+        "simple": "Oil floats because it is lighter for its size than water. Its density is only 0.80 g/cm³ compared to water's 1.00 g/cm³.",
+        "simplest": "Oil is less dense than water, so it rests on top.",
+        "real_life": "When cooking oil or petroleum is poured into water, it forms a distinct layer floating right on the surface.",
+        "exam": "Vegetable and hydrocarbon oils exhibit a density of ~0.80 g/cm³. Being immiscible and possessing lower density than water (1.00 g/cm³), oil forms the upper layer in a water-oil mixture."
+      },
+      "suggested_chips": ["Why does oil float?", "Compare water and oil.", "What is the density of oil?", "Explain simply.", "Quiz me."]
+    },
+    "ice": {
+      "id": "ice",
+      "name": "Ice",
+      "density_value": "0.92 g/cm³",
+      "response_styles": {
+        "standard": "Ice has a density of 0.92 g/cm³. Because ice is less dense than liquid water (1.00 g/cm³), it floats.",
+        "simple": "When water freezes into ice, it expands! That expansion makes the same mass take up more space, so ice is less dense and floats.",
+        "simplest": "Frozen water expands, becomes less dense, and floats.",
+        "real_life": "Ice cubes bobbing in a drinking glass, or giant icebergs floating in polar oceans protecting sea life underneath in winter!",
+        "exam": "Due to anomalous expansion below 4°C, water forms an open hexagonal lattice structure upon freezing, resulting in a lower density of 0.92 g/cm³ compared to 1.00 g/cm³ for liquid water."
+      },
+      "suggested_chips": ["Why does ice float?", "Density of ice.", "Why does water expand?", "Explain simply.", "Quiz me."]
+    },
+    "ships": {
+      "id": "ships",
+      "name": "Why Ships Float",
+      "response_styles": {
+        "standard": "Ships are made of dense steel (7.80 g/cm³), but their hollow hull shape encloses a vast volume of air. This huge volume reduces their overall average density well below that of water (1.00 g/cm³), allowing them to float.",
+        "simple": "A steel ship is hollow and traps a huge amount of air inside, making the whole ship lightweight for its giant size!",
+        "simplest": "Big air-filled ships become 'lighter for their size' than water.",
+        "real_life": "A solid iron nail sinks immediately, but the same mass of iron beaten into a hollow bowl floats effortlessly!",
+        "exam": "Although the density of steel is 7.80 g/cm³, a ship's hollow construction encloses large air cavities, reducing its mean density below 1.00 g/cm³ so the buoyant upthrust balances its total weight."
+      },
+      "follow_ups": {
+        "submarines": "Submarines dive by filling ballast tanks with seawater (increasing average density above water) and surface by blowing water out with compressed air (decreasing density below water).",
+        "steel_blocks": "A solid steel block has no trapped air, so its density is purely 7.8 g/cm³ (much higher than water) and it sinks.",
+        "shape_matters": "Shape determines how much volume and air is enclosed, directly controlling the object's average density and displaced water volume."
+      },
+      "suggested_chips": ["What about submarines?", "Why don't steel blocks float?", "Why does shape matter?", "Explain simply.", "Quiz me."]
+    },
+    "relative_density": {
+      "id": "relative_density",
+      "name": "Relative Density",
+      "definition": "Relative density compares the density of a substance with the density of pure water.",
+      "formula": "Relative Density = Density of Substance ÷ Density of Water",
+      "response_styles": {
+        "standard": "Relative density (or specific gravity) is the ratio of the density of a substance to the density of pure water at 4°C. Because it is a ratio of two identical units, relative density has no units.",
+        "simple": "Relative density tells you how many times heavier or lighter a substance is compared to the same amount of water.",
+        "simplest": "Comparing any material's density directly to water (Water = 1.0).",
+        "real_life": "Gold has a relative density of 19.3, meaning a piece of gold is 19.3 times heavier than the exact same volume of water!",
+        "exam": "Relative density is a dimensionless quantity defined as RD = ρ_substance / ρ_water. A substance with RD < 1 floats in water; RD > 1 sinks."
+      },
+      "suggested_chips": ["What is the formula?", "Relative density of gold.", "Does relative density have units?", "Explain simply.", "Quiz me."]
+    },
+    "pressure": {
+      "id": "pressure",
+      "name": "Water Pressure & Depth",
+      "definition": "Water pressure increases with depth because deeper water has more weight of water above it pushing downward.",
+      "response_styles": {
+        "standard": "Water pressure is greater deeper down because the weight of the column of water above exerts downward force (P = h × ρ × g). This pressure difference between the top and bottom of an object generates the upward buoyant force.",
+        "simple": "The deeper you dive into water, the more water is stacked on top of you pressing down, so the pressure increases!",
+        "simplest": "Deeper water has more water pushing on top of it.",
+        "real_life": "Deep-sea submarines require extremely thick titanium hulls to withstand crushing deep-ocean water pressure.",
+        "exam": "Hydrostatic pressure is directly proportional to depth and fluid density (P = hρg). The vertical pressure gradient in a fluid produces buoyant upthrust."
+      },
+      "suggested_chips": ["Why does water pressure increase?", "How is pressure connected to buoyancy?", "Explain simply.", "Quiz me."]
+    }
+  },
+  "misconceptions": [
+    {
+      "id": "heavy_objects_sink",
+      "student_phrase": "Heavy objects always sink.",
+      "trigger_patterns": ["heavy objects always sink", "heavy things sink", "heavy sink", "light things float", "if it is heavy it sinks", "heavy objects sink"],
+      "correction": "Density depends on both mass AND volume, not weight or mass alone! A 50,000-ton steel cruise ship is extremely heavy, but it floats because its hollow shape encloses a vast volume of air, making its average density less than water (1.0 g/cm³). Meanwhile, a tiny 2-gram pebble sinks because its density is higher than water.",
+      "suggested_chips": ["Why do ships float?", "What is density?", "Explain simply.", "Quiz me."]
+    },
+    {
+      "id": "bigger_things_float",
+      "student_phrase": "Bigger things float better.",
+      "trigger_patterns": ["bigger things float better", "size determines floating", "bigger floats", "small things sink", "bigger objects float"],
+      "correction": "Size alone does not decide floating! A giant 10-ton wooden log floats easily, while a tiny 1-gram iron nail sinks immediately. Floating is decided by density (Mass ÷ Volume) compared to water (1.0 g/cm³), not physical dimensions.",
+      "suggested_chips": ["Why does wood float?", "What is density?", "Explain simply.", "Quiz me."]
+    },
+    {
+      "id": "steel_cannot_float",
+      "student_phrase": "Steel cannot float.",
+      "trigger_patterns": ["steel cannot float", "steel never floats", "metal cannot float", "steel always sinks", "metals cannot float"],
+      "correction": "A solid block of steel sinks because steel's density is 7.80 g/cm³ (greater than water). But when crafted into a hollow ship, the vast volume of trapped air lowers the ship's overall average density below 1.00 g/cm³, allowing massive steel ships to float safely!",
+      "suggested_chips": ["Why do ships float?", "What about submarines?", "Explain simply.", "Quiz me."]
+    },
+    {
+      "id": "mass_equals_weight",
+      "student_phrase": "Mass equals weight.",
+      "trigger_patterns": ["mass equals weight", "mass is the same as weight", "mass and weight are identical", "mass is weight"],
+      "correction": "Mass and weight are two different concepts! Mass is the amount of matter in an object (measured in kg, never changes anywhere in space). Weight is the downward force of gravity pulling on that mass (measured in Newtons, changes on the Moon or in orbit).",
+      "suggested_chips": ["Difference between mass and weight.", "Units of mass.", "Explain simply.", "Quiz me."]
+    },
+    {
+      "id": "water_pushes_downward",
+      "student_phrase": "Water pushes downward.",
+      "trigger_patterns": ["water pushes downward", "water only pushes down", "fluid pushes down", "water pushes down"],
+      "correction": "While gravity pulls water downward creating hydrostatic pressure, fluids also push upward with a powerful buoyant force (upthrust) on any submerged object!",
+      "suggested_chips": ["What is buoyancy?", "What is upthrust?", "Explain simply.", "Quiz me."]
+    }
+  ],
+  "quiz_bank": [
+    {
+      "id": "quiz_1",
+      "type": "mcq",
+      "question": "Which has greater density?",
+      "options": ["Oil", "Water"],
+      "answer": "Water",
+      "explanation": "Water has a density of 1.00 g/cm³ while oil is only ~0.80 g/cm³. That is why oil floats on top of water!"
+    },
+    {
+      "id": "quiz_2",
+      "type": "true_false",
+      "question": "Ice is denser than liquid water.",
+      "options": ["True", "False"],
+      "answer": "False",
+      "explanation": "Ice has a density of 0.92 g/cm³, which is lower than liquid water (1.00 g/cm³) because water expands as it freezes."
+    },
+    {
+      "id": "quiz_3",
+      "type": "one_word",
+      "question": "What is the standard SI unit of density?",
+      "options": ["kg/m³", "g/cm³", "g/mL", "Newtons"],
+      "answer": "kg/m³",
+      "explanation": "The official SI unit for density is kilograms per cubic meter (kg/m³), although g/cm³ is commonly used in school labs."
+    },
+    {
+      "id": "quiz_4",
+      "type": "scenario",
+      "question": "A wooden block has a density of 0.40 g/cm³. When placed into water (1.00 g/cm³), why does it float?",
+      "options": ["It is less dense than water", "It is heavier than water", "Water has no buoyancy", "Wood absorbs all water"],
+      "answer": "It is less dense than water",
+      "explanation": "Any object with a density lower than the fluid (0.40 < 1.00) floats because the upward buoyant force supports its weight."
+    },
+    {
+      "id": "quiz_5",
+      "type": "mcq",
+      "question": "How do you calculate Volume from Mass and Density?",
+      "options": ["Volume = Mass ÷ Density", "Volume = Mass × Density", "Volume = Density ÷ Mass"],
+      "answer": "Volume = Mass ÷ Density",
+      "explanation": "From the formula Density = Mass ÷ Volume, rearranging gives Volume = Mass ÷ Density (V = M/D)."
+    }
+  ]
+}

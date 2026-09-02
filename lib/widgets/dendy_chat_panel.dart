@@ -13,11 +13,17 @@ class DendyChatMessage {
   final String text;
   final bool isUser;
   final DateTime timestamp;
+  final List<String> suggestedChips;
+  final bool isMisconception;
+  final Map<String, dynamic>? quizData;
 
   DendyChatMessage({
     required this.text,
     required this.isUser,
     DateTime? timestamp,
+    this.suggestedChips = const [],
+    this.isMisconception = false,
+    this.quizData,
   }) : timestamp = timestamp ?? DateTime.now();
 }
 
@@ -90,6 +96,7 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
         DendyChatMessage(
           text: l('ask_me_anything'),
           isUser: false,
+          suggestedChips: const ["What is density?", "Why do ships float?", "Compare water and oil.", "Quiz me."],
         ),
       );
     }
@@ -140,16 +147,23 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
     final tokenBuffer = StringBuffer();
 
     try {
-      await for (final token in Locator.aiTutorService.askDendyStream(question: text, moduleId: 'mod_density')) {
+      final result = await Locator.aiTutorService.askDendyDirect(question: text, moduleId: 'mod_density');
+      final words = result.text.split(' ');
+
+      for (int i = 0; i < words.length; i++) {
         if (!mounted) break;
-        tokenBuffer.write(token);
+        tokenBuffer.write((i == words.length - 1) ? words[i] : '${words[i]} ');
         setState(() {
           _messages[dendyMsgIndex] = DendyChatMessage(
             text: tokenBuffer.toString(),
             isUser: false,
+            suggestedChips: (i == words.length - 1) ? result.suggestedChips : const [],
+            isMisconception: result.isMisconception,
+            quizData: result.quizData,
           );
         });
         _scrollToBottom();
+        await Future.delayed(const Duration(milliseconds: 15));
       }
       SoundService.playStarPop();
     } catch (e) {
@@ -159,6 +173,7 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
           _messages[dendyMsgIndex] = DendyChatMessage(
             text: fallbackAnswer,
             isUser: false,
+            suggestedChips: const ["What is density?", "Why do ships float?", "Quiz me."],
           );
         });
       }
@@ -250,9 +265,9 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            offset: const Offset(-4, 0),
+            color: ColorSystem.plum.withOpacity(0.25),
             blurRadius: 16,
+            offset: const Offset(-4, 0),
           ),
         ],
       ),
@@ -269,22 +284,18 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
             ),
             child: Row(
               children: [
-                DendyMascot(
-                  size: 38,
-                  mood: _isGenerating
-                      ? DendyMood.thinking
-                      : (_isListening ? DendyMood.thinking : DendyMood.happy),
-                ),
-                const SizedBox(width: 10),
+                const DendyMascot(size: 32, mood: DendyMood.happy, enableChatShortcut: false),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        l('ask_dendy'),
+                        l('ask_dendy').toUpperCase(),
                         style: const TextStyle(
                           fontFamily: 'Fredoka',
-                          fontSize: 14,
+                          fontSize: 13,
                           fontWeight: FontWeight.w900,
                           color: ColorSystem.purple,
                           letterSpacing: 0.5,
@@ -293,10 +304,10 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
                       Row(
                         children: [
                           Container(
-                            width: 7,
-                            height: 7,
+                            width: 6,
+                            height: 6,
                             decoration: const BoxDecoration(
-                              color: ColorSystem.green,
+                              color: ColorSystem.mint,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -519,68 +530,118 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
       );
     } else {
       return Padding(
-        padding: const EdgeInsets.only(bottom: 10, right: 24),
-        child: Row(
+        padding: const EdgeInsets.only(bottom: 12, right: 16),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const DendyMascot(size: 26, mood: DendyMood.explaining),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(2),
-                    topRight: Radius.circular(12),
-                    bottomLeft: Radius.circular(12),
-                    bottomRight: Radius.circular(12),
-                  ),
-                  border: Border.all(color: ColorSystem.plum.withOpacity(0.15)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: ColorSystem.plum.withOpacity(0.04),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      message.text,
-                      style: const TextStyle(
-                        fontFamily: 'Fredoka',
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w600,
-                        color: ColorSystem.plum,
-                        height: 1.3,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const DendyMascot(size: 26, mood: DendyMood.explaining, enableChatShortcut: false),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: message.isMisconception ? const Color(0xFFFFF7ED) : Colors.white,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(2),
+                        topRight: Radius.circular(12),
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Dendy AI',
-                          style: TextStyle(
-                            fontFamily: 'Fredoka',
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w900,
-                            color: ColorSystem.purple.withOpacity(0.6),
-                          ),
-                        ),
-                        DendySpeakButton(
-                          textToSpeak: message.text,
-                          size: 22,
+                      border: Border.all(
+                        color: message.isMisconception ? const Color(0xFFF97316) : ColorSystem.plum.withOpacity(0.15),
+                        width: message.isMisconception ? 1.5 : 1.0,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ColorSystem.plum.withOpacity(0.04),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                  ],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          message.text,
+                          style: TextStyle(
+                            fontFamily: 'Fredoka',
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: message.isMisconception ? const Color(0xFF9A3412) : ColorSystem.plum,
+                            height: 1.35,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              message.isMisconception ? '⚠️ Misconception Alert' : 'Dendy AI',
+                              style: TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.w900,
+                                color: message.isMisconception ? const Color(0xFFEA580C) : ColorSystem.purple,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            DendySpeakButton(
+                              textToSpeak: message.text,
+                              size: 22,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Clickable Follow-up Suggestion Chips
+            if (message.suggestedChips.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Padding(
+                padding: const EdgeInsets.only(left: 32),
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: message.suggestedChips.map((chipText) {
+                    return GestureDetector(
+                      onTap: () => _sendMessage(chipText),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: ColorSystem.lavender.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: ColorSystem.purple.withOpacity(0.3)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.arrow_forward_rounded, size: 10, color: ColorSystem.purple),
+                            const SizedBox(width: 4),
+                            Text(
+                              chipText,
+                              style: const TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.bold,
+                                color: ColorSystem.purple,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       );

@@ -1,0 +1,132 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "hi",
+        "hello",
+        "hey",
+        "howdy",
+        "greetings",
+        "good morning",
+        "good afternoon",
+        "good evening",
+        "what's up",
+        "how are you",
+        "hey there"
+      ],
+      "responses": [
+        "Hello there! I'm Dendy, your Questly learning buddy! 🦊 Ready to explore science and math quests with you. What would you like to discover today?",
+        "Hi! Ready to dive into today's learning quest? Ask me anything about science, math, or density!",
+        "Hey! Great to see you. I'm here to help you understand density, buoyancy, and solve fun science questions."
+      ],
+      "suggested_chips": ["What is density?", "Why do ships float?", "What is buoyancy?", "Quiz me."]
+    },
+    {
+      "tag": "thanks",
+      "patterns": [
+        "thank you",
+        "thanks",
+        "thanks a lot",
+        "thank you so much",
+        "i appreciate it",
+        "appreciated",
+        "cheers"
+      ],
+      "responses": [
+        "You're very welcome! 🦊 Keep asking great questions!",
+        "Glad I could help! You're doing awesome work on your quest.",
+        "Anytime! I love exploring science concepts with you. What's next?"
+      ],
+      "suggested_chips": ["Quiz me.", "What is buoyancy?", "Compare water and oil.", "Why does ice float?"]
+    },
+    {
+      "tag": "appreciation",
+      "patterns": [
+        "good job",
+        "you are smart",
+        "you're genius",
+        "awesome",
+        "great job",
+        "cool",
+        "you're helpful",
+        "nice answer"
+      ],
+      "responses": [
+        "Thank you! 🦊 Your curiosity is what makes learning fun. Let's keep exploring!",
+        "Appreciate the kind words! You're doing fantastic thinking today.",
+        "Thanks! Together we'll master every concept in Questly."
+      ],
+      "suggested_chips": ["What is relative density?", "Why do ships float?", "Quiz me."]
+    },
+    {
+      "tag": "help",
+      "patterns": [
+        "help",
+        "i need help",
+        "can you help me",
+        "what should i do",
+        "how does this work",
+        "guide me",
+        "how to use this"
+      ],
+      "responses": [
+        "I'm here to help! 🦊 You can ask me any question about Density, Mass, Volume, Buoyancy, Ships, Ice, Oil, or ask me to quiz you!",
+        "Sure thing! Try asking questions like 'What is density?', 'Why does wood float?', 'Explain simply', or tap any suggestion chip below."
+      ],
+      "suggested_chips": ["What is density?", "What is the formula?", "Why do ships float?", "Quiz me."]
+    },
+    {
+      "tag": "confusion",
+      "patterns": [
+        "i don't understand",
+        "i'm confused",
+        "this is hard",
+        "i am stuck",
+        "what do you mean",
+        "not clear",
+        "can't understand"
+      ],
+      "responses": [
+        "No worries at all! Let's break it down into simple, bite-sized steps. Would you like me to explain it more simply, or give you a real-life example? 🌟",
+        "It's totally okay to feel confused at first — that's how our brain grows! Let me know if you want the simplest version or a fun real-world example."
+      ],
+      "suggested_chips": ["Explain simply.", "Simplest explanation.", "Give another example.", "Quiz me."]
+    },
+    {
+      "tag": "encouragement",
+      "patterns": [
+        "i am tired",
+        "i want to give up",
+        "i made a mistake",
+        "i got it wrong",
+        "i feel dumb",
+        "can i do this"
+      ],
+      "responses": [
+        "Mistakes are proof that you are trying and learning! 🦊 Take a breath, and remember that every great scientist started by experimenting. You've got this!",
+        "You are doing great! Learning takes practice. Let's tackle one small piece at a time together."
+      ],
+      "suggested_chips": ["Explain simply.", "What is density?", "Quiz me."]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": [
+        "bye",
+        "goodbye",
+        "see you later",
+        "take care",
+        "cya",
+        "see you",
+        "exit",
+        "done for today"
+      ],
+      "responses": [
+        "Goodbye! Keep exploring and being curious! 🦊✨",
+        "See you later! Great job on your learning quest today.",
+        "Take care! Come back anytime you want to explore more science adventures!"
+      ],
+      "suggested_chips": []
+    }
+  ]
+}
