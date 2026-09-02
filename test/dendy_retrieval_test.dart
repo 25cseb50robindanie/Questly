@@ -74,5 +74,35 @@ void main() {
       final res = await retriever.retrieveAnswer(query: 'Is mass the same as weight?');
       expect(res.text.toLowerCase(), contains('gravity'));
     });
+
+    test('11. What is your name?', () async {
+      final res = await retriever.retrieveAnswer(query: 'What is your name?');
+      expect(res.text.toLowerCase(), contains('dendy'));
+    });
+
+    test('12. Tell me a joke', () async {
+      final res = await retriever.retrieveAnswer(query: 'Tell me a joke');
+      expect(res.text.toLowerCase(), contains('why'));
+    });
+
+    test('13. What can you do?', () async {
+      final res = await retriever.retrieveAnswer(query: 'What can you do?');
+      expect(res.text.toLowerCase(), contains('dendy'));
+    });
+
+    test('14. Tell me about coding', () async {
+      final res = await retriever.retrieveAnswer(query: 'Tell me about coding');
+      expect(res.text.toLowerCase(), contains('coding'));
+    });
+
+    test('15. How can I make a budget?', () async {
+      final res = await retriever.retrieveAnswer(query: 'How can I make a budget?');
+      expect(res.text.toLowerCase(), contains('budget'));
+    });
+
+    test('16. Tell me about artificial intelligence', () async {
+      final res = await retriever.retrieveAnswer(query: 'Tell me about artificial intelligence');
+      expect(res.text.toLowerCase(), contains('intelligence'));
+    });
   });
 }

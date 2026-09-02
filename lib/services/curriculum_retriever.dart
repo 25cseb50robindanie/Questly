@@ -330,14 +330,82 @@ class CurriculumRetriever {
     }
 
     // ----------------------------------------------------
-    // STEP 5: Alias-Based Concept Matching
+    // STEP 5: Dendy Conversational & Knowledge Intents
+    // ----------------------------------------------------
+    if (_dendyIntents != null && _dendyIntents!['intents'] is List) {
+      final intents = _dendyIntents!['intents'] as List<dynamic>;
+      final qTokens = cleanQ.split(' ').where((s) => s.isNotEmpty).toSet();
+
+      // Collect all candidate matches and sort by longest matching pattern
+      Map<String, dynamic>? bestIntent;
+      int bestPatternLen = 0;
+
+      for (final rawIntent in intents) {
+        final intent = rawIntent as Map<String, dynamic>;
+        final patterns = (intent['patterns'] as List<dynamic>?)?.map((p) => p.toString().toLowerCase()).toList() ?? [];
+        for (final p in patterns) {
+          final cleanP = _cleanText(p);
+          if (cleanP.isEmpty) continue;
+          final pTokens = cleanP.split(' ').where((s) => s.isNotEmpty).toList();
+
+          bool isMatch = false;
+          if (cleanQ == cleanP) {
+            isMatch = true;
+          } else if (pTokens.length > 1) {
+            if (cleanQ.startsWith('$cleanP ') || cleanQ.endsWith(' $cleanP') || cleanQ.contains(' $cleanP ') || cleanQ.contains(cleanP)) {
+              isMatch = true;
+            }
+          } else if (pTokens.length == 1) {
+            if (qTokens.contains(cleanP)) {
+              isMatch = true;
+            }
+          }
+
+          if (isMatch && cleanP.length > bestPatternLen) {
+            bestPatternLen = cleanP.length;
+            bestIntent = intent;
+          }
+        }
+      }
+
+      if (bestIntent != null) {
+        final responses = (bestIntent['responses'] as List<dynamic>?)?.map((r) => r.toString()).toList() ?? [];
+        final resp = responses.isNotEmpty ? responses.first : "Hello there! 🦊 How can I help with your quest?";
+        final chips = (bestIntent['suggested_chips'] as List<dynamic>?)?.map((c) => c.toString()).toList() ?? ["What is density?", "Why do ships float?", "Quiz me."];
+        return DendyRetrievalResult(
+          text: resp,
+          suggestedChips: chips,
+        );
+      }
+    }
+
+    // ----------------------------------------------------
+    // STEP 6: Alias-Based Concept Matching
     // ----------------------------------------------------
     final aliasDict = _densityKnowledge?['alias_dictionary'] as Map<String, dynamic>? ?? {};
+    final qTokens = cleanQ.split(' ').where((s) => s.isNotEmpty).toSet();
     for (final entry in aliasDict.entries) {
       final conceptKey = entry.key;
       final aliases = (entry.value as List<dynamic>?)?.map((a) => a.toString().toLowerCase()).toList() ?? [];
       for (final alias in aliases) {
-        if (cleanQ.contains(_cleanText(alias)) || lower.contains(alias)) {
+        final cleanAlias = _cleanText(alias);
+        final aliasTokens = cleanAlias.split(' ').where((s) => s.isNotEmpty).toList();
+        bool isAliasMatch = false;
+        if (cleanAlias.isNotEmpty) {
+          if (cleanQ == cleanAlias) {
+            isAliasMatch = true;
+          } else if (aliasTokens.length > 1) {
+            if (cleanQ.contains(' $cleanAlias ') || cleanQ.startsWith('$cleanAlias ') || cleanQ.endsWith(' $cleanAlias') || cleanQ.contains(cleanAlias)) {
+              isAliasMatch = true;
+            }
+          } else if (aliasTokens.length == 1) {
+            if (qTokens.contains(cleanAlias)) {
+              isAliasMatch = true;
+            }
+          }
+        }
+
+        if (isAliasMatch) {
           final c = concepts[conceptKey];
           if (c != null) {
             final styles = c['response_styles'] as Map<String, dynamic>? ?? {};
@@ -347,29 +415,6 @@ class CurriculumRetriever {
               text: answer,
               suggestedChips: chips,
               activeConceptId: conceptKey,
-            );
-          }
-        }
-      }
-    }
-
-    // ----------------------------------------------------
-    // STEP 6: Dendy Educational Intents (Source 2)
-    // ----------------------------------------------------
-    if (_dendyIntents != null && _dendyIntents!['intents'] is List) {
-      final intents = _dendyIntents!['intents'] as List<dynamic>;
-      for (final rawIntent in intents) {
-        final intent = rawIntent as Map<String, dynamic>;
-        final patterns = (intent['patterns'] as List<dynamic>?)?.map((p) => p.toString().toLowerCase()).toList() ?? [];
-        for (final p in patterns) {
-          final cleanP = _cleanText(p);
-          if (cleanQ == cleanP || cleanQ.startsWith('$cleanP ') || cleanQ.endsWith(' $cleanP') || cleanQ.contains(' $cleanP ') || lower == p) {
-            final responses = (intent['responses'] as List<dynamic>?)?.map((r) => r.toString()).toList() ?? [];
-            final resp = responses.isNotEmpty ? responses.first : "Hello there! 🦊 How can I help with your science quest?";
-            final chips = (intent['suggested_chips'] as List<dynamic>?)?.map((c) => c.toString()).toList() ?? ["What is density?", "Why do ships float?", "Quiz me."];
-            return DendyRetrievalResult(
-              text: resp,
-              suggestedChips: chips,
             );
           }
         }
@@ -496,7 +541,19 @@ class CurriculumRetriever {
   }
 
   String _cleanText(String input) {
-    return input.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+    return input
+        .toLowerCase()
+        .replaceAll("what's", "what is")
+        .replaceAll("who's", "who is")
+        .replaceAll("how's", "how is")
+        .replaceAll("that's", "that is")
+        .replaceAll("it's", "it is")
+        .replaceAll("i'm", "i am")
+        .replaceAll("don't", "do not")
+        .replaceAll("you're", "you are")
+        .replaceAll(RegExp(r'[^\w\s]'), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
   }
 }
 

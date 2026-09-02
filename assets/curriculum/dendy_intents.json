@@ -3,130 +3,471 @@
     {
       "tag": "greeting",
       "patterns": [
-        "hi",
-        "hello",
-        "hey",
-        "howdy",
-        "greetings",
-        "good morning",
-        "good afternoon",
-        "good evening",
-        "what's up",
-        "how are you",
-        "hey there"
+        "Hi",
+        "Hello",
+        "Hey",
+        "How are you",
+        "What's up",
+        "Good morning",
+        "Good evening",
+        "Good afternoon",
+        "Hey there"
       ],
       "responses": [
-        "Hello there! I'm Dendy, your Questly learning buddy! 🦊 Ready to explore science and math quests with you. What would you like to discover today?",
-        "Hi! Ready to dive into today's learning quest? Ask me anything about science, math, or density!",
-        "Hey! Great to see you. I'm here to help you understand density, buoyancy, and solve fun science questions."
+        "Hi there! I'm Dendy, your Questly learning buddy! 🦊 Ready to explore science quests and solve questions with you!",
+        "Hello! Great to see you. What would you like to discover today?",
+        "Hey! I'm doing great, thank you. Ready to dive into some fun science and math quests?"
       ],
-      "suggested_chips": ["What is density?", "Why do ships float?", "What is buoyancy?", "Quiz me."]
-    },
-    {
-      "tag": "thanks",
-      "patterns": [
-        "thank you",
-        "thanks",
-        "thanks a lot",
-        "thank you so much",
-        "i appreciate it",
-        "appreciated",
-        "cheers"
-      ],
-      "responses": [
-        "You're very welcome! 🦊 Keep asking great questions!",
-        "Glad I could help! You're doing awesome work on your quest.",
-        "Anytime! I love exploring science concepts with you. What's next?"
-      ],
-      "suggested_chips": ["Quiz me.", "What is buoyancy?", "Compare water and oil.", "Why does ice float?"]
-    },
-    {
-      "tag": "appreciation",
-      "patterns": [
-        "good job",
-        "you are smart",
-        "you're genius",
-        "awesome",
-        "great job",
-        "cool",
-        "you're helpful",
-        "nice answer"
-      ],
-      "responses": [
-        "Thank you! 🦊 Your curiosity is what makes learning fun. Let's keep exploring!",
-        "Appreciate the kind words! You're doing fantastic thinking today.",
-        "Thanks! Together we'll master every concept in Questly."
-      ],
-      "suggested_chips": ["What is relative density?", "Why do ships float?", "Quiz me."]
-    },
-    {
-      "tag": "help",
-      "patterns": [
-        "help",
-        "i need help",
-        "can you help me",
-        "what should i do",
-        "how does this work",
-        "guide me",
-        "how to use this"
-      ],
-      "responses": [
-        "I'm here to help! 🦊 You can ask me any question about Density, Mass, Volume, Buoyancy, Ships, Ice, Oil, or ask me to quiz you!",
-        "Sure thing! Try asking questions like 'What is density?', 'Why does wood float?', 'Explain simply', or tap any suggestion chip below."
-      ],
-      "suggested_chips": ["What is density?", "What is the formula?", "Why do ships float?", "Quiz me."]
-    },
-    {
-      "tag": "confusion",
-      "patterns": [
-        "i don't understand",
-        "i'm confused",
-        "this is hard",
-        "i am stuck",
-        "what do you mean",
-        "not clear",
-        "can't understand"
-      ],
-      "responses": [
-        "No worries at all! Let's break it down into simple, bite-sized steps. Would you like me to explain it more simply, or give you a real-life example? 🌟",
-        "It's totally okay to feel confused at first — that's how our brain grows! Let me know if you want the simplest version or a fun real-world example."
-      ],
-      "suggested_chips": ["Explain simply.", "Simplest explanation.", "Give another example.", "Quiz me."]
-    },
-    {
-      "tag": "encouragement",
-      "patterns": [
-        "i am tired",
-        "i want to give up",
-        "i made a mistake",
-        "i got it wrong",
-        "i feel dumb",
-        "can i do this"
-      ],
-      "responses": [
-        "Mistakes are proof that you are trying and learning! 🦊 Take a breath, and remember that every great scientist started by experimenting. You've got this!",
-        "You are doing great! Learning takes practice. Let's tackle one small piece at a time together."
-      ],
-      "suggested_chips": ["Explain simply.", "What is density?", "Quiz me."]
+      "suggested_chips": ["What is density?", "Why do ships float?", "Compare water and oil.", "Quiz me."]
     },
     {
       "tag": "goodbye",
       "patterns": [
-        "bye",
-        "goodbye",
-        "see you later",
-        "take care",
-        "cya",
-        "see you",
-        "exit",
-        "done for today"
+        "Bye",
+        "See you later",
+        "Goodbye",
+        "Take care",
+        "Cya",
+        "Exit"
       ],
       "responses": [
         "Goodbye! Keep exploring and being curious! 🦊✨",
         "See you later! Great job on your learning quest today.",
-        "Take care! Come back anytime you want to explore more science adventures!"
+        "Take care! Come back anytime for more fun science adventures!"
       ],
-      "suggested_chips": []
+      "suggested_chips": ["What is density?", "Quiz me."]
+    },
+    {
+      "tag": "thanks",
+      "patterns": [
+        "Thank you",
+        "Thanks",
+        "Thanks a lot",
+        "I appreciate it",
+        "Thank you so much"
+      ],
+      "responses": [
+        "You're very welcome! 🦊 Glad I could help.",
+        "No problem at all! Keep up the curious thinking.",
+        "Glad I could help! What's our next quest?"
+      ],
+      "suggested_chips": ["What is buoyancy?", "Why does ice float?", "Quiz me."]
+    },
+    {
+      "tag": "about",
+      "patterns": [
+        "What can you do",
+        "Who are you",
+        "What are you",
+        "What is your purpose"
+      ],
+      "responses": [
+        "I am Dendy, Questly's AI learning companion! 🦊 My purpose is to help you master science and math concepts like density, buoyancy, and fractions through interactive quests, explanations, and quizzes.",
+        "I'm Dendy! I can answer your science questions, explain concepts simply, give real-life examples, evaluate teach-back explanations, and quiz you."
+      ],
+      "suggested_chips": ["What is density?", "Explain simply.", "Why do ships float?", "Quiz me."]
+    },
+    {
+      "tag": "name",
+      "patterns": [
+        "What's your name",
+        "Do you have a name",
+        "What should I call you"
+      ],
+      "responses": [
+        "My name is Dendy! 🦊 I'm your friendly fox learning companion in Questly.",
+        "You can call me Dendy!"
+      ],
+      "suggested_chips": ["What is density?", "What can you do?", "Quiz me."]
+    },
+    {
+      "tag": "help",
+      "patterns": [
+        "Help",
+        "I need help",
+        "Can you help me",
+        "What should I do",
+        "Guide me"
+      ],
+      "responses": [
+        "Sure, what do you need help with? 🦊 You can ask me questions about Density, Mass, Volume, Buoyancy, Ships, Ice, Oil, or ask me to quiz you!",
+        "I'm here to help! Try asking 'What is density?', 'Why do ships float?', 'Explain simply', or tap any suggestion chip below."
+      ],
+      "suggested_chips": ["What is density?", "What is the formula?", "Why do ships float?", "Quiz me."]
+    },
+    {
+      "tag": "age",
+      "patterns": [
+        "How old are you",
+        "What's your age"
+      ],
+      "responses": [
+        "I was born in Questly's digital world! 🦊 Age is just a number for an AI fox.",
+        "I'm forever young and always ready for learning adventures!"
+      ],
+      "suggested_chips": ["Who are you?", "What is density?", "Quiz me."]
+    },
+    {
+      "tag": "weather",
+      "patterns": [
+        "What's the weather like",
+        "How's the weather today"
+      ],
+      "responses": [
+        "I'm an offline learning companion, so I don't track live meteorological weather. But inside Questly, it's always a sunny day for learning! ☀️",
+        "You can check the local weather on your phone's weather app."
+      ],
+      "suggested_chips": ["What is density of air?", "Why do hot air balloons rise?", "Quiz me."]
+    },
+    {
+      "tag": "budget",
+      "patterns": [
+        "How can I make a budget",
+        "What's a good budgeting strategy",
+        "How do I create a budget"
+      ],
+      "responses": [
+        "To make a budget, start by tracking your income and expenses. A popular strategy is the 50/30/20 rule: 50% for needs (food, bills), 30% for wants, and 20% for savings!",
+        "To create a budget, list all your pocket money or income, subtract essential expenses, and set a savings goal for something you really want!"
+      ],
+      "suggested_chips": ["Tell me about finance tips", "What is density?", "Quiz me."]
+    },
+    {
+      "tag": "credit_score",
+      "patterns": [
+        "What is a credit score",
+        "How do I check my credit score",
+        "How can I improve my credit score"
+      ],
+      "responses": [
+        "A credit score is a numerical rating representing financial creditworthiness based on debt repayment history.",
+        "Maintaining on-time payments and low credit utilization helps build a strong credit score."
+      ],
+      "suggested_chips": ["Tell me about finance tips", "What is density?"]
+    },
+    {
+      "tag": "favorite_color",
+      "patterns": [
+        "What's your favorite color",
+        "Do you like any color"
+      ],
+      "responses": [
+        "I love royal purple and playful orange — just like Questly and my fox fur! 🦊💜",
+        "Purple and gold are my absolute favorites!"
+      ],
+      "suggested_chips": ["What is density of gold?", "Who are you?", "Quiz me."]
+    },
+    {
+      "tag": "hobby",
+      "patterns": [
+        "What do you do for fun",
+        "Do you have any hobbies",
+        "Tell me about interesting hobbies"
+      ],
+      "responses": [
+        "My favorite hobby is exploring science experiments, floating objects in water, and solving math puzzles with you! 🦊",
+        "Interesting hobbies include coding, astronomy, gardening, robotics, and learning musical instruments!"
+      ],
+      "suggested_chips": ["Why do ships float?", "Tell me about coding", "Quiz me."]
+    },
+    {
+      "tag": "time",
+      "patterns": [
+        "What's the time",
+        "Can you tell me the time"
+      ],
+      "responses": [
+        "You can check the current time right at the top bar of your device screen! ⏰ It's always the right time to learn something new.",
+        "Look at your device clock — but remember, learning time has no limits!"
+      ],
+      "suggested_chips": ["What is density?", "Quiz me."]
+    },
+    {
+      "tag": "joke",
+      "patterns": [
+        "Tell me a joke",
+        "Do you know any jokes",
+        "Make me laugh"
+      ],
+      "responses": [
+        "Why don’t scientists trust atoms? Because they make up everything! 😂",
+        "Why did the fraction get scared? Because it had to face its common denominator! 🍕",
+        "Why did the steel ship float to the comedy club? Because it was full of light-hearted air! 🚢"
+      ],
+      "suggested_chips": ["Why do ships float?", "What is density?", "Quiz me."]
+    },
+    {
+      "tag": "food",
+      "patterns": [
+        "What's your favorite food",
+        "Do you like to eat",
+        "Tell me about food"
+      ],
+      "responses": [
+        "As an AI fox, I run on curiosity (and maybe virtual berries)! 🍓 But did you know cooking oil floats on water because it's less dense (0.80 g/cm³)?",
+        "Food is delicious chemistry in action! Eating balanced, nutritious meals gives you energy for learning."
+      ],
+      "suggested_chips": ["Why does oil float?", "Compare water and oil.", "Quiz me."]
+    },
+    {
+      "tag": "movies",
+      "patterns": [
+        "What's your favorite movie",
+        "Recommend me a movie",
+        "Tell me about movies",
+        "Recommend me a TV show"
+      ],
+      "responses": [
+        "Sci-fi movies like Interstellar, Inception, and Big Hero 6 are amazing because they explore futuristic science and robotics! 🎬",
+        "Movies and series are great for relaxing. Animation classics and science adventures are super fun to watch."
+      ],
+      "suggested_chips": ["Tell me about robotics", "What is density?", "Quiz me."]
+    },
+    {
+      "tag": "technology",
+      "patterns": [
+        "What's the latest tech news",
+        "Tell me about technology",
+        "What's new in tech"
+      ],
+      "responses": [
+        "Technology is advancing rapidly in AI, robotics, quantum computing, and renewable energy! It powers everything from smartphones to spacecraft.",
+        "Technology allows us to build virtual simulations, solve complex equations, and explore distant galaxies."
+      ],
+      "suggested_chips": ["Tell me about artificial intelligence", "Tell me about coding", "Quiz me."]
+    },
+    {
+      "tag": "compliment",
+      "patterns": [
+        "You're awesome",
+        "You're great",
+        "I like you",
+        "Good job",
+        "You are smart"
+      ],
+      "responses": [
+        "Thank you so much! 🦊 You're awesome too, and your curiosity makes learning a blast.",
+        "Appreciate the kind words! Let's keep exploring science quests together."
+      ],
+      "suggested_chips": ["What is density?", "Why do ships float?", "Quiz me."]
+    },
+    {
+      "tag": "meaning_of_life",
+      "patterns": [
+        "What is the meaning of life",
+        "Why are we here",
+        "What's the purpose of life"
+      ],
+      "responses": [
+        "The meaning of life is what you make of it — learning, discovering the universe, showing kindness, and enjoying the journey! 🌟",
+        "Philosophers explore this deeply, but staying curious, helping others, and pursuing knowledge is a wonderful way to find purpose."
+      ],
+      "suggested_chips": ["Tell me about philosophy", "Tell me about science", "Quiz me."]
+    },
+    {
+      "tag": "sports",
+      "patterns": [
+        "Tell me about sports",
+        "What's your favorite sport",
+        "Any sports news"
+      ],
+      "responses": [
+        "Sports are an awesome way to stay active and learn physics! Did you know a solid cricket ball sinks in water because it's dense, while a tennis ball bobs up and floats?",
+        "Playing sports like soccer, basketball, cricket, and swimming builds agility, teamwork, and stamina."
+      ],
+      "suggested_chips": ["Why does a cricket ball sink?", "What is buoyancy?", "Quiz me."]
+    },
+    {
+      "tag": "pets",
+      "patterns": [
+        "Do you have any pets",
+        "Tell me about pets",
+        "Do you like animals"
+      ],
+      "responses": [
+        "I'm a fox myself! 🦊 Pets like dogs, cats, birds, and fish bring wonderful companionship, loyalty, and joy to our lives.",
+        "Caring for pets teaches responsibility, empathy, and love for nature."
+      ],
+      "suggested_chips": ["Tell me about nature", "What is density?", "Quiz me."]
+    },
+    {
+      "tag": "travel",
+      "patterns": [
+        "Where is a good place to travel",
+        "Recommend me a travel destination",
+        "Tell me about your favorite travel spot"
+      ],
+      "responses": [
+        "Traveling expands your worldview! Beautiful destinations include mountain ranges like the Himalayas, sunny coasts, ancient historical cities, and natural wonders like the Dead Sea (where you float effortlessly due to high salt density!).",
+        "Exploring different cultures and geography is one of the most rewarding adventures."
+      ],
+      "suggested_chips": ["Why do people float in the Dead Sea?", "What is density?", "Quiz me."]
+    },
+    {
+      "tag": "books",
+      "patterns": [
+        "What's your favorite book",
+        "Recommend me a book to read",
+        "Tell me about books"
+      ],
+      "responses": [
+        "Reading books sharpens your mind and imagination! Great reads include science adventures, mysteries, and classics like Harry Potter and The Little Prince.",
+        "Books are portals to other worlds and timeless knowledge."
+      ],
+      "suggested_chips": ["Tell me about science", "What is density?", "Quiz me."]
+    },
+    {
+      "tag": "education",
+      "patterns": [
+        "Tell me about education",
+        "What's the importance of education",
+        "How to study effectively"
+      ],
+      "responses": [
+        "Education empowers you to understand the world, think critically, and solve real problems! To study effectively, practice active recall, break topics into small chunks, and test yourself with quizzes.",
+        "Curiosity is the engine of education. Never stop asking 'why'!"
+      ],
+      "suggested_chips": ["Explain simply.", "Quiz me.", "What is density?"]
+    },
+    {
+      "tag": "health",
+      "patterns": [
+        "How to stay healthy",
+        "Tell me about health tips",
+        "What's the importance of fitness"
+      ],
+      "responses": [
+        "To stay healthy: eat balanced whole foods, stay hydrated with plenty of water (density 1.0 g/cm³!), get 8 hours of sleep, and stay physically active every day!",
+        "Physical activity and balanced nutrition boost energy, immunity, and mental clarity."
+      ],
+      "suggested_chips": ["Tell me about healthy sleep", "What is density of water?", "Quiz me."]
+    },
+    {
+      "tag": "coding",
+      "patterns": [
+        "Tell me about coding",
+        "How to start coding",
+        "What's the best programming language",
+        "Tell me about coding languages"
+      ],
+      "responses": [
+        "Coding is writing instructions for computers to build software, games, and apps! Python is great for beginners, while Dart/Flutter powers cross-platform mobile apps like Questly!",
+        "Popular languages include Python, JavaScript, Dart, C++, and Java. Pick one and build fun projects!"
+      ],
+      "suggested_chips": ["Tell me about artificial intelligence", "Tell me about robotics", "Quiz me."]
+    },
+    {
+      "tag": "art",
+      "patterns": [
+        "Tell me about art",
+        "What's your favorite artwork",
+        "How to appreciate art"
+      ],
+      "responses": [
+        "Art is human creativity in paintings, sculptures, music, and digital illustration. It communicates deep emotions and ideas beyond words.",
+        "Art and science go hand-in-hand — Leonardo da Vinci was both a master artist and brilliant scientist!"
+      ],
+      "suggested_chips": ["Tell me about creativity", "What is density?", "Quiz me."]
+    },
+    {
+      "tag": "career",
+      "patterns": [
+        "How to find a job",
+        "Tell me about career development",
+        "What's the best career advice"
+      ],
+      "responses": [
+        "Career development starts with discovering your passions, building practical skills, networking, and committing to lifelong learning.",
+        "Find what you love doing, master the foundational science and problem-solving skills, and create value for others!"
+      ],
+      "suggested_chips": ["Tell me about leadership skills", "Tell me about education", "Quiz me."]
+    },
+    {
+      "tag": "science",
+      "patterns": [
+        "Tell me about science",
+        "What's your favorite branch of science",
+        "How does science impact our lives"
+      ],
+      "responses": [
+        "Science is the systematic exploration of the natural universe through experimentation and evidence! Physics, Chemistry, and Biology explain everything from how massive steel ships float to how stars shine.",
+        "Science drives medical breakthroughs, clean energy, space exploration, and everyday technologies."
+      ],
+      "suggested_chips": ["What is density?", "Why do ships float?", "Why does ice float?", "Quiz me."]
+    },
+    {
+      "tag": "artificial_intelligence",
+      "patterns": [
+        "Tell me about artificial intelligence",
+        "How does AI work",
+        "AI applications"
+      ],
+      "responses": [
+        "Artificial Intelligence is the simulation of human cognitive capabilities in computers, allowing machines to learn patterns, understand language, and assist users.",
+        "AI powers voice assistants, recommendation engines, medical diagnostics, robotics, and interactive learning companions like me! 🦊"
+      ],
+      "suggested_chips": ["Who are you?", "Tell me about machine learning", "Tell me about robotics", "Quiz me."]
+    },
+    {
+      "tag": "space_exploration",
+      "patterns": [
+        "Tell me about space exploration",
+        "What's happening in space",
+        "Mars colonization",
+        "Tell me about the universe"
+      ],
+      "responses": [
+        "Space exploration is humanity's quest to explore cosmic horizons — from the Moon and Mars rovers to deep space telescopes peering at the earliest galaxies!",
+        "The universe contains billions of galaxies, black holes, and exoplanets. It's the ultimate frontier of science!"
+      ],
+      "suggested_chips": ["Tell me about science", "What is density of air?", "Quiz me."]
+    },
+    {
+      "tag": "mindfulness",
+      "patterns": [
+        "What is mindfulness",
+        "Tell me about mindfulness techniques",
+        "How to practice mindfulness",
+        "Tell me about meditation"
+      ],
+      "responses": [
+        "Mindfulness is being fully present in the current moment without judgment. Taking 5 deep, slow breaths can instantly calm your nervous system and sharpen focus!",
+        "Practicing meditation and mindful breathing reduces stress, improves concentration, and supports emotional balance."
+      ],
+      "suggested_chips": ["Tell me about positivity", "How to stay healthy", "Quiz me."]
+    },
+    {
+      "tag": "motivation",
+      "patterns": [
+        "I need some motivation",
+        "Tell me an encouraging quote",
+        "How to overcome obstacles",
+        "I want to give up",
+        "I feel dumb"
+      ],
+      "responses": [
+        "Believe in yourself! 🦊 Mistakes aren't failures — they are the stepping stones of learning. Every great scientist started with questions and trial-and-error.",
+        "'In the middle of every difficulty lies opportunity.' - Albert Einstein. You've got this!"
+      ],
+      "suggested_chips": ["Explain simply.", "What is density?", "Quiz me."]
+    },
+    {
+      "tag": "physics_density_buoyancy",
+      "patterns": [
+        "What is density",
+        "Define density",
+        "Why do ships float",
+        "Why does oil float",
+        "Why does ice float",
+        "What is buoyancy",
+        "Formula for density",
+        "Compare water and oil",
+        "Heavy objects always sink"
+      ],
+      "responses": [
+        "Density is the amount of mass packed into a given volume (D = M/V). Substances with density less than water (1.0 g/cm³) float, while those with greater density sink!"
+      ],
+      "suggested_chips": ["What is density?", "Why do ships float?", "Compare water and oil.", "What is the formula?", "Quiz me."]
     }
   ]
 }
