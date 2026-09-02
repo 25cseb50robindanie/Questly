@@ -1508,6 +1508,18 @@ class LocalizationService {
     'Welcome back, adventurer.': 'welcome_back_adventurer',
     'Log in to resume your offline learning quests and achievements.': 'login_subtitle',
     'Student Sign In': 'student_sign_in',
+    'Enter your Student ID': 'enter_id_hint',
+    'Enter your password': 'enter_password_hint',
+    'Please enter your Student ID': 'please_enter_id',
+    'Please enter your password': 'please_enter_password',
+    'Welcome back, adventurer! Ready to learn?': 'welcome_adventurer_ready',
+    'Scanning the quest archives...': 'scanning_archives',
+    'Oops! Please check your ID and password.': 'oops_check_credentials',
+    'Invalid Student ID or password. Please try again.': 'invalid_credentials_error',
+    'Passwords do not match': 'passwords_not_match_error',
+    'This Student ID is already registered': 'id_taken_error',
+    'Welcome new explorer! Fill in the details to start your journey.': 'new_explorer_fill_fields',
+    'Setting up your adventurer profile...': 'saving_profile_logs',
     'CONTINUE': 'continue_btn',
     'CREATE NEW ACCOUNT': 'create_new_account_btn',
     'Create Profile': 'create_profile_title',
@@ -1765,6 +1777,10 @@ class LocalizationService {
     'TOTAL SCORE': 'total_score_header',
   };
 
+  static final Map<String, String> _keyToPhrase = {
+    for (var entry in _phraseToKey.entries) entry.value: entry.key,
+  };
+
   static List<String> get allKeys => _localizedValues['en']!.keys.toList();
 
   static void setLanguageCode(String langCode) {
@@ -1796,18 +1812,19 @@ class LocalizationService {
   static String translate(String keyOrText, {String? targetLanguage, Map<String, String>? args}) {
     final lang = targetLanguage ?? _currentLanguage;
     final dict = _localizedValues[lang] ?? _localizedValues['en']!;
+    final trimmed = keyOrText.trim();
 
-    // 1. Direct key match
-    if (dict.containsKey(keyOrText)) {
-      String val = dict[keyOrText]!;
+    // 1. Direct key match in target/current language dictionary
+    if (dict.containsKey(trimmed)) {
+      String val = dict[trimmed]!;
       if (args != null) {
         args.forEach((k, v) => val = val.replaceAll('{$k}', v));
       }
       return val;
     }
 
-    // 2. Direct English phrase match from dictionary
-    final mappedKey = _phraseToKey[keyOrText.trim()];
+    // 2. Direct English phrase match from _phraseToKey
+    final mappedKey = _phraseToKey[trimmed];
     if (mappedKey != null && dict.containsKey(mappedKey)) {
       String val = dict[mappedKey]!;
       if (args != null) {
@@ -1816,10 +1833,38 @@ class LocalizationService {
       return val;
     }
 
-    // 3. Fallback to English dictionary lookup
+    // 3. Reverse key lookup: keyOrText is a snake_case key
+    final mappedPhrase = _keyToPhrase[trimmed];
+    if (mappedPhrase != null) {
+      if (dict.containsKey(mappedPhrase)) {
+        String val = dict[mappedPhrase]!;
+        if (args != null) {
+          args.forEach((k, v) => val = val.replaceAll('{$k}', v));
+        }
+        return val;
+      }
+      if (lang == 'en') {
+        String val = mappedPhrase;
+        if (args != null) {
+          args.forEach((k, v) => val = val.replaceAll('{$k}', v));
+        }
+        return val;
+      }
+    }
+
+    // 4. Fallback to English dictionary lookup by key
     final enDict = _localizedValues['en']!;
-    if (enDict.containsKey(keyOrText)) {
-      String val = enDict[keyOrText]!;
+    if (enDict.containsKey(trimmed)) {
+      String val = enDict[trimmed]!;
+      if (args != null) {
+        args.forEach((k, v) => val = val.replaceAll('{$k}', v));
+      }
+      return val;
+    }
+
+    // 5. Fallback to mapped English phrase if found in reverse lookup
+    if (mappedPhrase != null) {
+      String val = mappedPhrase;
       if (args != null) {
         args.forEach((k, v) => val = val.replaceAll('{$k}', v));
       }
