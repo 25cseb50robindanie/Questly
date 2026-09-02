@@ -1448,7 +1448,7 @@ function bindDirectTitrationEvents() {
     valve.textContent = 'OFF';
 
     const vol = state.expState.buretteVolume;
-    if (vol >= 9.8 && vol <= 10.4) {
+    if (vol >= 9.8 && vol <= 10.2) {
       labSound.playFanfare();
       state.expState.endpointReached = true;
       btnFinish.disabled = false;
@@ -1457,7 +1457,7 @@ function bindDirectTitrationEvents() {
     } else {
       labSound.playError();
       state.stage4Mistakes++;
-      updateExpFeedback(`⚠️ Endpoint deviation (${vol.toFixed(1)} mL). Required reading is 9.8 mL – 10.4 mL.`);
+      updateExpFeedback(`⚠️ Endpoint deviation (${vol.toFixed(1)} mL). Required reading is 9.8 mL – 10.2 mL.`);
     }
     updateHeaderScore();
   });
@@ -1487,12 +1487,12 @@ function dispenseTitrant(amt) {
     ph = 1.0 + (vol / 8.0) * 1.5; // 1.0 -> 2.5
   } else if (vol < 9.7) {
     ph = 2.5 + ((vol - 8.0) / 1.7) * 2.5; // 2.5 -> 5.0
-  } else if (vol <= 10.4) {
-    ph = 7.0 + ((vol - 9.7) / 0.7) * 1.8; // 7.0 -> 8.8 (Pale Pink Endpoint Window)
-  } else if (vol < 11.5) {
-    ph = 9.0 + ((vol - 10.4) / 1.1) * 2.5; // 9.0 -> 11.5
+  } else if (vol <= 10.2) {
+    ph = 7.0 + ((vol - 9.7) / 0.5) * 1.8; // 7.0 -> 8.8 (Pale Pink Endpoint Window 9.8 - 10.2 mL)
+  } else if (vol < 11.2) {
+    ph = 9.0 + ((vol - 10.2) / 1.0) * 2.5; // 9.0 -> 11.5
   } else {
-    ph = 11.5 + Math.min(1.5, (vol - 11.5) * 0.15);
+    ph = 11.5 + Math.min(1.5, (vol - 11.2) * 0.15);
   }
 
   document.getElementById('titrPhVal').textContent = ph.toFixed(1);
@@ -1519,7 +1519,7 @@ function dispenseTitrant(amt) {
     if (seal) seal.style.display = 'none';
 
     // If significantly over-titrated, stop and show misconception advisory popup
-    if (vol >= 11.0 && !state.expState.overTitrated) {
+    if (vol >= 10.8 && !state.expState.overTitrated) {
       state.expState.overTitrated = true;
       stopTitrationDrip();
       const valve = document.getElementById('interactiveStopcock');
@@ -1530,8 +1530,8 @@ function dispenseTitrant(amt) {
       state.stage4Mistakes++;
       openMisconceptionModal(
         '⚠️ Solution Over-Titrated!',
-        `You added ${vol.toFixed(1)} mL of NaOH, surpassing the 10.0 mL equivalence point. The flask is now dark magenta (pH ${ph.toFixed(1)}).`,
-        'In titration, 10.0 mL of 0.100 M HCl requires exactly 10.0 mL of 0.100 M NaOH. When the burette passes 9.0 mL, use SLOW DRIP and stop at the very first faint pale pink!'
+        `You added ${vol.toFixed(1)} mL of NaOH, surpassing the 9.8 - 10.2 mL equivalence window. The flask is now dark magenta (pH ${ph.toFixed(1)}).`,
+        'In titration, 10.0 mL of 0.100 M HCl requires 9.8 - 10.2 mL of 0.100 M NaOH. When the burette passes 9.0 mL, use SLOW DRIP and stop at the very first faint pale pink!'
       );
       updateHeaderScore();
     }
