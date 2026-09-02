@@ -6,6 +6,7 @@ import 'package:questly/screens/fraction_visual_screen.dart';
 import 'package:questly/screens/fraction_practice_screen.dart';
 import 'package:questly/screens/fraction_challenge_screen.dart';
 import 'package:questly/screens/fraction_teach_dendy_screen.dart';
+import 'package:questly/services/progression_service.dart';
 import 'package:questly/services/storage_service.dart';
 import 'package:questly/services/student_repository.dart';
 import 'package:questly/services/auth_service.dart';
@@ -13,7 +14,6 @@ import 'package:questly/services/progress_repository.dart';
 import 'package:questly/services/collection_repository.dart';
 import 'package:questly/services/notification_repository.dart';
 import 'package:questly/services/read_aloud_service.dart';
-import 'package:questly/services/progression_service.dart';
 
 class _FakeStorage extends Fake implements StorageService {
   final Map<String, dynamic> _data = {};
@@ -50,6 +50,17 @@ class _FakeStorage extends Fake implements StorageService {
     _data[key] = value;
   }
 
+  final List<Map<String, dynamic>> _progressList = [];
+
+  @override
+  List<Map<String, dynamic>> getProgressForStudent(String studentId) => _progressList;
+
+  @override
+  Future<void> saveProgress(String studentId, String lessonId, Map<String, dynamic> data) async {
+    _progressList.removeWhere((p) => p['lessonId'] == lessonId);
+    _progressList.add(data);
+  }
+
   @override
   List<String> getUnlockedBadgesRaw(String studentId) => [];
 
@@ -79,7 +90,7 @@ void main() {
   testWidgets('1. FractionConceptScreen renders with zero layout errors', (WidgetTester tester) async {
     await tester.binding.setSurfaceSize(const Size(800, 600));
     await tester.pumpWidget(const MaterialApp(home: FractionConceptScreen()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('The Great Canyon Feast'), findsOneWidget);
     expect(find.text('NEXT PART →'), findsOneWidget);
@@ -88,31 +99,31 @@ void main() {
   testWidgets('2. FractionVisualScreen renders and interacts with zero layout errors', (WidgetTester tester) async {
     await tester.binding.setSurfaceSize(const Size(800, 600));
     await tester.pumpWidget(const MaterialApp(home: FractionVisualScreen()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('LESSON 2: VISUAL UNDERSTANDING'), findsOneWidget);
     expect(find.text('PROCEED TO PRACTICE →'), findsOneWidget);
 
     // Switch to chocolate tab
     await tester.tap(find.text('🍫 Chocolate'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
   });
 
   testWidgets('3. FractionPracticeScreen renders and answers questions with zero layout errors', (WidgetTester tester) async {
     await tester.binding.setSurfaceSize(const Size(800, 600));
     await tester.pumpWidget(const MaterialApp(home: FractionPracticeScreen()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('LESSON 3: GUIDED PRACTICE'), findsOneWidget);
     expect(find.text('CHECK ANSWER'), findsOneWidget);
 
     // Select option 3/4
     await tester.tap(find.text('3/4'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     // Tap Check Answer
     await tester.tap(find.text('CHECK ANSWER'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('NEXT QUESTION →'), findsOneWidget);
   });
@@ -120,27 +131,27 @@ void main() {
   testWidgets('4. FractionChallengeScreen renders all challenge modes with zero layout errors', (WidgetTester tester) async {
     await tester.binding.setSurfaceSize(const Size(800, 600));
     await tester.pumpWidget(const MaterialApp(home: FractionChallengeScreen()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('LESSON 4: CHALLENGE ARENA'), findsOneWidget);
 
     // Switch to Flashcards mode
     await tester.tap(find.text('🗂️ Flashcards'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     // Switch to Speed Quiz mode
     await tester.tap(find.text('⚡ Speed Quiz'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     // Switch to Memory Match mode
     await tester.tap(find.text('🧠 Memory Match'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
   });
 
   testWidgets('5. FractionTeachDendyScreen renders with zero layout errors', (WidgetTester tester) async {
     await tester.binding.setSurfaceSize(const Size(800, 600));
     await tester.pumpWidget(const MaterialApp(home: FractionTeachDendyScreen()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('LESSON 5: TEACH DENDY'), findsOneWidget);
     expect(find.text('HOW WILL YOU TEACH DENDY?'), findsOneWidget);

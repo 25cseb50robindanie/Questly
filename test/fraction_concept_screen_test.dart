@@ -60,10 +60,10 @@ void main() {
         home: FractionConceptScreen(),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     // Verify Header
-    expect(find.text('FRACTIONS • LEVEL 1'), findsOneWidget);
+    expect(find.text('FRACTIONS • QUEST 1'), findsOneWidget);
     expect(find.text('LESSON 1: CONCEPT LEARNING'), findsOneWidget);
 
     // Verify Slide 1 Content
@@ -73,7 +73,7 @@ void main() {
 
     // Tap Next to navigate through slides
     await tester.tap(find.text('NEXT PART →'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Numerator & Denominator'), findsOneWidget);
     expect(find.text('PART 2 OF 4'), findsOneWidget);
@@ -81,14 +81,14 @@ void main() {
 
     // Tap Next again
     await tester.tap(find.text('NEXT PART →'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('The Golden Secret of Denominators'), findsOneWidget);
     expect(find.text('PART 3 OF 4'), findsOneWidget);
 
     // Tap Next to last slide
     await tester.tap(find.text('NEXT PART →'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Fractions in the Real World'), findsOneWidget);
     expect(find.text('PART 4 OF 4'), findsOneWidget);
@@ -114,10 +114,10 @@ void main() {
         home: FractionConceptScreen(activity: ratioActivity),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
 
     // Verify Ratios Header
-    expect(find.text('RATIOS • LEVEL 2'), findsOneWidget);
+    expect(find.text('RATIOS • QUEST 2'), findsOneWidget);
     expect(find.text('The Alchemist\'s Recipe'), findsOneWidget);
   });
 }

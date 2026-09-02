@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
@@ -12,6 +13,7 @@ class RewardRevealDialog extends StatefulWidget {
   final String studentId;
   final List<String> rewardIds;
   final String title;
+  final int? earnedStars;
   final VoidCallback onClaimed;
 
   const RewardRevealDialog({
@@ -19,6 +21,7 @@ class RewardRevealDialog extends StatefulWidget {
     required this.studentId,
     required this.rewardIds,
     this.title = 'REWARD UNLOCKED!',
+    this.earnedStars,
     required this.onClaimed,
   }) : super(key: key);
 
@@ -26,11 +29,15 @@ class RewardRevealDialog extends StatefulWidget {
   _RewardRevealDialogState createState() => _RewardRevealDialogState();
 }
 
-class _RewardRevealDialogState extends State<RewardRevealDialog> with SingleTickerProviderStateMixin {
+class _RewardRevealDialogState extends State<RewardRevealDialog> with TickerProviderStateMixin {
   late AnimationController _animController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _shakeAnimation;
+  late AnimationController _burstController;
+  late Animation<double> _burstAnimation;
+
   bool _isOpened = false;
+  bool _isClaiming = false;
   List<RewardDefinition> _rewardsList = [];
 
   @override
@@ -63,24 +70,50 @@ class _RewardRevealDialogState extends State<RewardRevealDialog> with SingleTick
       ),
     );
 
+    _burstController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _burstAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _burstController, curve: Curves.easeOutBack),
+    );
+
     _animController.forward().then((_) {
-      setState(() {
-        _isOpened = true;
-      });
-      SoundService.playClick(); // Pop open sound effect
+      if (mounted) {
+        setState(() {
+          _isOpened = true;
+        });
+        SoundService.playClick();
+      }
     });
   }
 
   @override
   void dispose() {
     _animController.dispose();
+    _burstController.dispose();
     super.dispose();
   }
 
   Future<void> _claimAll() async {
+    if (_isClaiming) return;
+    setState(() {
+      _isClaiming = true;
+    });
+
+    SoundService.playChestOpen();
+    _burstController.forward();
+
     for (var reward in _rewardsList) {
       await Locator.rewardService.claimReward(widget.studentId, reward.id);
+      if (reward.type == RewardType.coins) {
+        SoundService.playCoinCollect();
+      } else {
+        SoundService.playXpCollect();
+      }
     }
+
+    await Future.delayed(const Duration(milliseconds: 400));
     SoundService.playSwitch();
     widget.onClaimed();
     if (mounted) {
@@ -159,6 +192,61 @@ class _RewardRevealDialogState extends State<RewardRevealDialog> with SingleTick
 
               // Rewards lists transition using Production Assets
               if (_isOpened) ...[
+                // Achievement Stars display (if applicable)
+                if (widget.earnedStars != null && widget.earnedStars! > 0) ...[
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: ColorSystem.gold.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: ColorSystem.gold, width: 1.2),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              for (int s = 1; s <= 3; s++)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 2),
+                                  child: VectorAssetHelper.xpStarIcon(
+                                    size: 16,
+                                    isFilled: s <= widget.earnedStars!,
+                                  ),
+                                ),
+                              const SizedBox(width: 6),
+                              const Flexible(
+                                child: Text(
+                                  'Quest Performance',
+                                  style: TextStyle(
+                                    fontFamily: 'Fredoka',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorSystem.plum,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${widget.earnedStars} / 3 Stars',
+                          style: const TextStyle(
+                            fontFamily: 'Fredoka',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                            color: ColorSystem.gold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
                 Column(
                   children: _rewardsList.map((reward) {
                     Widget iconWidget = VectorAssetHelper.xpStarIcon(size: 18);
@@ -217,9 +305,10 @@ class _RewardRevealDialogState extends State<RewardRevealDialog> with SingleTick
                                   fontWeight: FontWeight.bold,
                                   color: ColorSystem.plum,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 8),
                           Text(
                             details,
                             style: const TextStyle(
@@ -236,7 +325,11 @@ class _RewardRevealDialogState extends State<RewardRevealDialog> with SingleTick
                 ),
                 const SizedBox(height: 16),
                 CustomButton(
+<<<<<<< HEAD
                   text: l('claim_reward_btn_label'),
+=======
+                  text: _isClaiming ? 'COLLECTING...' : 'CLAIM REWARD',
+>>>>>>> cdff187 (Final Fraction Dont Disturb me BYe)
                   backgroundColor: ColorSystem.purple,
                   textColor: Colors.white,
                   height: 38,
@@ -260,4 +353,3 @@ class _RewardRevealDialogState extends State<RewardRevealDialog> with SingleTick
     );
   }
 }
-

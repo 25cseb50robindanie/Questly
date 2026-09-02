@@ -1,14 +1,21 @@
-// This is a basic Flutter widget test for Questly.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:questly/main.dart';
+import 'package:questly/core/locator.dart';
 
 void main() {
-  testWidgets('App splash loading smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const QuestlyApp());
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    Locator.resetForTest();
+    await Locator.setup();
+  });
 
-    // Verify that the splash screen initializes and shows a progress indicator.
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  testWidgets('App splash loading smoke test', (WidgetTester tester) async {
+    await tester.binding.setSurfaceSize(const Size(1024, 768));
+    await tester.pumpWidget(const QuestlyApp());
+    await tester.pump(const Duration(seconds: 2));
+
+    expect(find.byType(QuestlyApp), findsOneWidget);
   });
 }

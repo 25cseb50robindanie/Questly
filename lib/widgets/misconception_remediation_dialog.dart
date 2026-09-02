@@ -342,13 +342,18 @@ class _MisconceptionRemediationDialogState extends State<MisconceptionRemediatio
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: ColorSystem.plum.withOpacity(0.12), width: 1),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: const [
-            PizzaVisualWidget(totalSlices: 4, selectedSlices: 1, size: 90, label: '1/4 (Bigger Slice)'),
-            Icon(Icons.compare_arrows_rounded, color: ColorSystem.purple, size: 24),
-            PizzaVisualWidget(totalSlices: 8, selectedSlices: 1, size: 90, label: '1/8 (Smaller Slice)'),
-          ],
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: const [
+              PizzaVisualWidget(totalSlices: 4, selectedSlices: 1, size: 80, label: '1/4 (Bigger Slice)'),
+              SizedBox(width: 8),
+              Icon(Icons.compare_arrows_rounded, color: ColorSystem.purple, size: 24),
+              SizedBox(width: 8),
+              PizzaVisualWidget(totalSlices: 8, selectedSlices: 1, size: 80, label: '1/8 (Smaller Slice)'),
+            ],
+          ),
         ),
       );
     } else if (diag.visualType == 'fraction_strip') {

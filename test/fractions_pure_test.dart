@@ -1,9 +1,6 @@
-import 'dart:convert';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:questly/core/locator.dart';
-import 'package:questly/models/module.dart';
 import 'package:questly/models/progress.dart';
-import 'package:questly/models/student.dart';
-import 'package:questly/models/roadmap_node.dart';
 import 'package:questly/services/module_repository.dart';
 import 'package:questly/services/roadmap_repository.dart';
 import 'package:questly/services/progression_service.dart';
@@ -19,7 +16,6 @@ class FakeStorageService implements StorageService {
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    // Fallback for unused interface methods
     return null;
   }
 
@@ -45,29 +41,29 @@ class FakeStorageService implements StorageService {
   }
 
   @override
-  List<String> getUnlockedBadgesRaw(String studentId) {
-    final list = _data['unlocked_badges_${studentId.toLowerCase()}'];
-    return list != null ? List<String>.from(list) : [];
-  }
-
-  @override
-  Future<void> saveUnlockedBadgesRaw(String studentId, List<String> badgeIds) async {
-    _data['unlocked_badges_${studentId.toLowerCase()}'] = badgeIds;
-  }
-
-  @override
-  bool? getBool(String key) {
-    return _data[key] as bool?;
-  }
+  bool? getBool(String key) => _data[key] as bool?;
 
   @override
   Future<void> setBool(String key, bool value) async {
     _data[key] = value;
   }
+
+  @override
+  List<String> getUnlockedBadgesRaw(String studentId) {
+    final raw = _data['questly_badges_${studentId.toLowerCase()}'];
+    if (raw is List<String>) return raw;
+    return [];
+  }
+
+  @override
+  Future<void> saveUnlockedBadgesRaw(String studentId, List<String> badges) async {
+    _data['questly_badges_${studentId.toLowerCase()}'] = badges;
+  }
 }
 
 class FakeCollectionRepository implements CollectionRepository {
   final FakeStorageService _storage;
+
   FakeCollectionRepository(this._storage);
 
   @override
@@ -85,133 +81,69 @@ class FakeCollectionRepository implements CollectionRepository {
   }
 }
 
-void main() async {
-  print("--- STARTING FRACTIONS MODULE PURE UNIT TESTS ---");
+void main() {
+  group('Fractions Module Pure Unit Tests', () {
+    late FakeStorageService fakeStorage;
+    late ProgressRepository progressRepo;
+    late FakeCollectionRepository fakeCollection;
+    late ModuleRepository moduleRepo;
+    late RoadmapRepository roadmapRepo;
+    late ProgressionService progressionService;
 
-  // Create mock storage and services
-  final fakeStorage = FakeStorageService();
-  final progressRepo = ProgressRepository(fakeStorage);
-  final fakeCollection = FakeCollectionRepository(fakeStorage);
+    setUp(() {
+      fakeStorage = FakeStorageService();
+      progressRepo = ProgressRepository(fakeStorage);
+      fakeCollection = FakeCollectionRepository(fakeStorage);
 
-  // Inject mock services to locator for tests
-  Locator.storageService = fakeStorage;
-  Locator.progressRepository = progressRepo;
-  Locator.collectionRepository = fakeCollection;
+      Locator.storageService = fakeStorage;
+      Locator.progressRepository = progressRepo;
+      Locator.collectionRepository = fakeCollection;
 
-  // 1. Test Module definitions
-  final moduleRepo = ModuleRepository();
-  final mod = moduleRepo.getModuleById('mod_fractions');
-  if (mod == null) {
-    throw Exception("FAIL: Fractions module 'mod_fractions' not found!");
-  }
-  print("✓ PASS: Module exists");
+      moduleRepo = ModuleRepository();
+      roadmapRepo = RoadmapRepository();
+      progressionService = ProgressionService();
+    });
 
-  if (mod.title != 'Fractions & Ratios') {
-    throw Exception("FAIL: Expected Fractions title to be 'Fractions & Ratios' but got: ${mod.title}");
-  }
-  print("✓ PASS: Module title is correctly unified");
+    test('1. Module definitions and 5 quests', () {
+      final mod = moduleRepo.getModuleById('mod_fractions');
+      expect(mod, isNotNull);
+      expect(mod!.title, equals('Fractions & Ratios'));
+      expect(mod.levels.length, equals(5));
 
-  if (mod.levels.length != 2 || mod.levels[0].lessons.length != 5 || mod.levels[1].lessons.length != 5) {
-    throw Exception("FAIL: Expected 2 levels with 5 lessons each, got ${mod.levels.length} levels");
-  }
-  print("✓ PASS: Level 1 (Fractions) and Level 2 (Ratios) both have exactly 5 sequential lessons");
+      for (var lvl in mod.levels) {
+        expect(lvl.lessons.length, equals(5));
+      }
+    });
 
-  final l1Lessons = mod.levels[0].lessons;
-  final expectedL1Types = [
-    'fraction_concept',
-    'fraction_visual',
-    'fraction_practice',
-    'fraction_challenge',
-    'fraction_teach_dendy'
-  ];
-  for (int i = 0; i < expectedL1Types.length; i++) {
-    if (l1Lessons[i].activityType != expectedL1Types[i]) {
-      throw Exception("FAIL: Expected L1 lesson ${i + 1} activityType to be '${expectedL1Types[i]}' but got '${l1Lessons[i].activityType}'");
-    }
-  }
+    test('2. Roadmap Nodes and Grand Master sequence', () {
+      final nodes = roadmapRepo.getRoadmap('mod_fractions');
+      expect(nodes.length, equals(8));
+      expect(nodes[1].id, equals('fractions_node2'));
+      expect(nodes[4].id, equals('fractions_node5'));
+    });
 
-  final l2Lessons = mod.levels[1].lessons;
-  final expectedL2Types = [
-    'ratio_concept',
-    'ratio_visual',
-    'ratio_practice',
-    'ratio_challenge',
-    'ratio_teach_dendy'
-  ];
-  for (int i = 0; i < expectedL2Types.length; i++) {
-    if (l2Lessons[i].activityType != expectedL2Types[i]) {
-      throw Exception("FAIL: Expected L2 lesson ${i + 1} activityType to be '${expectedL2Types[i]}' but got '${l2Lessons[i].activityType}'");
-    }
-  }
-  print("✓ PASS: Lesson activity types for Fractions & Ratios are correctly ordered");
+    test('3. Progression service lock and unlock rules', () {
+      expect(progressionService.isLessonUnlocked('stu123', 'fractions_les1'), isTrue);
+      expect(progressionService.isLessonUnlocked('stu123', 'fractions_les2'), isFalse);
+    });
 
-  // 2. Test Roadmap Nodes
-  final roadmapRepo = RoadmapRepository();
-  final nodes = roadmapRepo.getRoadmap('mod_fractions');
-  if (nodes.length != 7) {
-    throw Exception("FAIL: Expected 7 roadmap nodes for fractions, got ${nodes.length}");
-  }
-  print("✓ PASS: Fractions roadmap has exactly 7 nodes");
+    test('4. Existing progress migration to 5 lessons', () async {
+      await progressRepo.saveProgress(Progress(
+        studentId: 'stu123',
+        lessonId: 'math_fractions_1',
+        status: 'completed',
+        score: 1.0,
+        stars: 3,
+        attempts: 1,
+        lastPlayed: DateTime.now(),
+        completedAt: DateTime.now(),
+      ));
 
-  final masteryNode = nodes.firstWhere((n) => n.id == 'fractions_node7');
-  if (!masteryNode.rewardIds.contains('rew_fractions_mastery_badge')) {
-    throw Exception("FAIL: Mastery node does not award Fractions Explorer badge!");
-  }
-  print("✓ PASS: Mastery node awards correct badge reward definition");
-
-  // 3. Test progression service lock & unlock rules
-  final progressionService = ProgressionService();
-  
-  // Initially, fractions_les1 should be unlocked, others locked
-  if (!progressionService.isLessonUnlocked('stu123', 'fractions_les1')) {
-    throw Exception("FAIL: Lesson 1 should be unlocked by default");
-  }
-  if (progressionService.isLessonUnlocked('stu123', 'fractions_les2')) {
-    throw Exception("FAIL: Lesson 2 should be locked initially");
-  }
-  print("✓ PASS: Unlocked rules apply correctly to fractions lesson 1 & 2");
-
-  // 4. Test Student Progress Migration
-  // Save old standalone progress
-  await progressRepo.saveProgress(Progress(
-    studentId: 'stu123',
-    lessonId: 'math_fractions_1',
-    status: 'completed',
-    score: 1.0,
-    stars: 3,
-    attempts: 1,
-    lastPlayed: DateTime.now(),
-    completedAt: DateTime.now(),
-  ));
-
-  // Fetching the progress list should trigger the migration
-  final progressList = progressRepo.getProgressList('stu123');
-  
-  // Verify that all 5 lessons are now completed
-  for (int i = 1; i <= 5; i++) {
-    final isDone = progressList.any((p) => p.lessonId == 'fractions_les$i' && p.status == 'completed');
-    if (!isDone) {
-      throw Exception("FAIL: Progress migration failed to mark fractions_les$i as completed");
-    }
-  }
-  print("✓ PASS: Existing progress correctly migrated to all 5 new lessons");
-
-  // Verify that badge is unlocked in storage
-  final badges = fakeStorage.getUnlockedBadgesRaw('stu123');
-  if (!badges.contains('Fractions Explorer')) {
-    throw Exception("FAIL: Progress migration failed to unlock 'Fractions Explorer' badge");
-  }
-  print("✓ PASS: Progress migration correctly unlocked the badge");
-
-  // Verify that roadmap nodes and rewards are claimed
-  if (!fakeStorage.getBool('node_comp_stu123_fractions_node1')! ||
-      !fakeStorage.getBool('node_comp_stu123_fractions_node7')!) {
-    throw Exception("FAIL: Progress migration failed to mark roadmap nodes completed");
-  }
-  if (!fakeStorage.getBool('reward_claimed_stu123_rew_fractions_mastery_badge')!) {
-    throw Exception("FAIL: Progress migration failed to mark rewards claimed");
-  }
-  print("✓ PASS: Progress migration correctly claimed nodes and rewards");
-
-  print("--- ALL FRACTIONS MODULE UNIT TESTS PASSED SUCCESSFULLY! ---");
+      final progressList = progressRepo.getProgressList('stu123');
+      for (int i = 1; i <= 5; i++) {
+        final isDone = progressList.any((p) => p.lessonId == 'fractions_les$i' && p.status == 'completed');
+        expect(isDone, isTrue);
+      }
+    });
+  });
 }

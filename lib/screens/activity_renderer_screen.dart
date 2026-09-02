@@ -128,7 +128,7 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
       return;
     }
 
-    if (_activity!.type == 'fraction_concept' || _activity!.type == 'ratio_concept') {
+    if (_activity!.type.endsWith('_concept') || _activity!.type == 'fraction_concept') {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Navigator.pushReplacementNamed(
           context,
@@ -139,7 +139,7 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
       return;
     }
 
-    if (_activity!.type == 'fraction_visual' || _activity!.type == 'ratio_visual' || _activity!.type == 'fraction_explore') {
+    if (_activity!.type.endsWith('_visual') || _activity!.type == 'fraction_visual' || _activity!.type == 'fraction_explore') {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Navigator.pushReplacementNamed(
           context,
@@ -150,7 +150,7 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
       return;
     }
 
-    if (_activity!.type == 'fraction_practice' || _activity!.type == 'ratio_practice') {
+    if (_activity!.type.endsWith('_practice') || _activity!.type == 'fraction_practice') {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Navigator.pushReplacementNamed(
           context,
@@ -161,7 +161,7 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
       return;
     }
 
-    if (_activity!.type == 'fraction_challenge' || _activity!.type == 'ratio_challenge' || _activity!.type == 'fraction_game') {
+    if (_activity!.type.endsWith('_challenge') || _activity!.type == 'fraction_challenge' || _activity!.type == 'fraction_game') {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Navigator.pushReplacementNamed(
           context,
@@ -172,7 +172,7 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
       return;
     }
 
-    if (_activity!.type == 'fraction_teach_dendy' || _activity!.type == 'ratio_teach_dendy') {
+    if (_activity!.type.endsWith('_teach_dendy') || _activity!.type == 'fraction_teach_dendy') {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Navigator.pushReplacementNamed(
           context,

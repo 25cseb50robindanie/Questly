@@ -90,9 +90,15 @@ class _DendyMascotState extends State<DendyMascot> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    final effectiveSkin = widget.skinId ??
-        Locator.studentRepository.getCurrentStudent()?.equippedDendySkinId ??
-        'dendy_classic';
+    String effectiveSkin = widget.skinId ?? 'dendy_classic';
+    if (widget.skinId == null) {
+      try {
+        final id = Locator.studentRepository.getCurrentStudent()?.equippedDendySkinId;
+        if (id != null && id.isNotEmpty) {
+          effectiveSkin = id;
+        }
+      } catch (_) {}
+    }
 
     return AnimatedBuilder(
       animation: _bobAnimation,

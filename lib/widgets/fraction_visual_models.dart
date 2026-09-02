@@ -626,3 +626,412 @@ class FruitRatioVisualWidget extends StatelessWidget {
     );
   }
 }
+
+/// 7. Proportion Scale / Geometric Scaling Visual Model
+class ProportionScaleWidget extends StatelessWidget {
+  final double baseWidth;
+  final double baseHeight;
+  final double scaleFactor; // e.g. 1.0, 2.0, 3.0
+  final String label;
+
+  const ProportionScaleWidget({
+    Key? key,
+    this.baseWidth = 40,
+    this.baseHeight = 50,
+    required this.scaleFactor,
+    this.label = 'Castle Gate',
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final scaledW = (baseWidth * scaleFactor).clamp(30.0, 140.0);
+    final scaledH = (baseHeight * scaleFactor).clamp(35.0, 120.0);
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: ColorSystem.plum.withOpacity(0.2), width: 1.5),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // Original Shape (Scale 1x)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: baseWidth,
+                height: baseHeight,
+                decoration: BoxDecoration(
+                  color: ColorSystem.lavender.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: ColorSystem.purple, width: 2),
+                ),
+                child: const Center(
+                  child: Icon(Icons.shield_rounded, color: ColorSystem.purple, size: 20),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Original (1x)\n${baseWidth.toInt()}×${baseHeight.toInt()}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.bold, color: ColorSystem.plum),
+              ),
+            ],
+          ),
+
+          Icon(Icons.double_arrow_rounded, color: ColorSystem.purple.withOpacity(0.6), size: 20),
+
+          // Scaled Shape (Scale k)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: scaledW,
+                height: scaledH,
+                decoration: BoxDecoration(
+                  color: ColorSystem.gold.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: ColorSystem.gold, width: 2),
+                ),
+                child: Center(
+                  child: Icon(Icons.shield_rounded, color: ColorSystem.gold, size: (18 * scaleFactor).clamp(18.0, 36.0)),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Scaled (${scaleFactor.toStringAsFixed(1)}x)\n${scaledW.toInt()}×${scaledH.toInt()}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.w900, color: ColorSystem.plum),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 8. Twin Balance Scale Widget for Proportions
+class TwinBalanceWidget extends StatelessWidget {
+  final int leftNum;
+  final int leftDen;
+  final int rightNum;
+  final int rightDen;
+
+  const TwinBalanceWidget({
+    Key? key,
+    required this.leftNum,
+    required this.leftDen,
+    required this.rightNum,
+    required this.rightDen,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final isBalanced = (leftNum * rightDen) == (leftDen * rightNum);
+    final leftVal = leftNum / (leftDen == 0 ? 1 : leftDen);
+    final rightVal = rightNum / (rightDen == 0 ? 1 : rightDen);
+    final angle = isBalanced ? 0.0 : (leftVal > rightVal ? -0.08 : 0.08);
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: ColorSystem.plum.withOpacity(0.2), width: 1.5),
+      ),
+      child: Column(
+        children: [
+          Text(
+            isBalanced ? '⚖️ BALANCED PROPORTION' : '⚖️ UNBALANCED RATIOS',
+            style: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              color: isBalanced ? ColorSystem.green : ColorSystem.pink,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Transform.rotate(
+            angle: angle,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Left Pan
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: ColorSystem.lavender.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: ColorSystem.purple, width: 1.5),
+                  ),
+                  child: Text('$leftNum / $leftDen', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 14, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
+                ),
+                Text(isBalanced ? '==' : '≠', style: TextStyle(fontFamily: 'Fredoka', fontSize: 18, fontWeight: FontWeight.w900, color: isBalanced ? ColorSystem.green : ColorSystem.pink)),
+                // Right Pan
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: ColorSystem.gold.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: ColorSystem.gold, width: 1.5),
+                  ),
+                  child: Text('$rightNum / $rightDen', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 14, fontWeight: FontWeight.w900, color: ColorSystem.plum)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 9. Hundred Grid Percentage Widget (10x10 = 100 Squares)
+class HundredGridWidget extends StatelessWidget {
+  final int percentFilled; // 0 to 100
+  final double size;
+  final bool interactive;
+  final ValueChanged<int>? onPercentChanged;
+
+  const HundredGridWidget({
+    Key? key,
+    required this.percentFilled,
+    this.size = 140,
+    this.interactive = false,
+    this.onPercentChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final safePercent = percentFilled.clamp(0, 100);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: interactive && onPercentChanged != null
+              ? () {
+                  final next = (safePercent + 10) % 110;
+                  onPercentChanged!(next);
+                }
+              : null,
+          child: Container(
+            width: size,
+            height: size,
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: ColorSystem.plum, width: 2),
+            ),
+            child: GridView.builder(
+              padding: EdgeInsets.zero,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 10,
+                crossAxisSpacing: 1,
+                mainAxisSpacing: 1,
+              ),
+              itemCount: 100,
+              itemBuilder: (context, index) {
+                final isShaded = index < safePercent;
+                return Container(
+                  decoration: BoxDecoration(
+                    color: isShaded ? ColorSystem.purple : ColorSystem.lavender.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(1),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '$safePercent% ($safePercent / 100)',
+          style: const TextStyle(
+            fontFamily: 'Fredoka',
+            fontSize: 11,
+            fontWeight: FontWeight.w900,
+            color: ColorSystem.plum,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// 10. Discount Tag Widget for Percentages
+class DiscountTagWidget extends StatelessWidget {
+  final double originalPrice;
+  final int discountPercent;
+
+  const DiscountTagWidget({
+    Key? key,
+    required this.originalPrice,
+    required this.discountPercent,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final discountAmount = originalPrice * (discountPercent / 100.0);
+    final finalPrice = originalPrice - discountAmount;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: ColorSystem.pink, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: ColorSystem.pink.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('ITEM PRICE:', style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.bold, color: ColorSystem.plum)),
+              Text('\$${originalPrice.toStringAsFixed(0)}', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey, decoration: TextDecoration.lineThrough)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('SALE DISCOUNT ($discountPercent% OFF):', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.bold, color: ColorSystem.pink)),
+              Text('-\$${discountAmount.toStringAsFixed(0)}', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.w900, color: ColorSystem.pink)),
+            ],
+          ),
+          const Divider(height: 12, thickness: 1),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('YOU PAY:', style: TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.w900, color: ColorSystem.green)),
+              Text('\$${finalPrice.toStringAsFixed(0)}', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 15, fontWeight: FontWeight.w900, color: ColorSystem.green)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 11. Blueprint Scale Map Widget for Real-World Applications
+class BlueprintMapWidget extends StatelessWidget {
+  final int mapCm;
+  final int kmPerCm;
+
+  const BlueprintMapWidget({
+    Key? key,
+    required this.mapCm,
+    this.kmPerCm = 5,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final actualKm = mapCm * kmPerCm;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A237E),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1.5),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text('🗺️ KINGDOM SCALE BLUEPRINT', style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: Colors.white)),
+              Text('Scale: 1 cm = 5 km', style: TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.bold, color: ColorSystem.gold)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              const Icon(Icons.castle_rounded, color: Colors.white, size: 24),
+              Expanded(
+                child: Container(
+                  height: 3,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  color: ColorSystem.gold,
+                ),
+              ),
+              const Icon(Icons.fort_rounded, color: ColorSystem.gold, size: 24),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Map Distance: $mapCm cm  ==>  Real Distance: $actualKm km',
+            style: const TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 12. Recipe Mixer Cauldron Widget for Real-World Applications
+class RecipeMixerWidget extends StatelessWidget {
+  final int servings;
+  final int flourCupsPerServing;
+  final int sugarCupsPerServing;
+
+  const RecipeMixerWidget({
+    Key? key,
+    required this.servings,
+    this.flourCupsPerServing = 2,
+    this.sugarCupsPerServing = 1,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final totalFlour = servings * flourCupsPerServing;
+    final totalSugar = servings * sugarCupsPerServing;
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: ColorSystem.plum.withOpacity(0.2), width: 1.5),
+      ),
+      child: Column(
+        children: [
+          Text('🥘 FEAST CAULDRON: $servings SERVINGS', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10.5, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  const Icon(Icons.grain_rounded, color: Color(0xFF8D6E63), size: 20),
+                  Text('$totalFlour Cups Flour', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.bold, color: ColorSystem.plum)),
+                ],
+              ),
+              Column(
+                children: [
+                  const Icon(Icons.cake_rounded, color: ColorSystem.pink, size: 20),
+                  Text('$totalSugar Cups Sugar', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.bold, color: ColorSystem.plum)),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+

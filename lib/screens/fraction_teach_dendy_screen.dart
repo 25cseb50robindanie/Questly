@@ -33,7 +33,7 @@ enum _TeachStage {
 class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
   Student? _student;
   Activity? _activeActivity;
-  bool _isRatios = false;
+  String _topic = 'fractions'; // 'fractions', 'ratios', 'proportions', 'percentages', 'applications'
 
   _TeachStage _stage = _TeachStage.dendyDoubt;
   int? _selectedChipIndex;
@@ -58,6 +58,17 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
     }
   }
 
+  String _detectTopic(Activity? act) {
+    if (act == null) return 'fractions';
+    final id = act.id.toLowerCase();
+    final type = act.type.toLowerCase();
+    if (type.contains('ratio') || id.contains('ratio')) return 'ratios';
+    if (type.contains('proportion') || id.contains('proportion')) return 'proportions';
+    if (type.contains('percentage') || id.contains('percentage') || type.contains('percent') || id.contains('percent')) return 'percentages';
+    if (type.contains('application') || id.contains('application')) return 'applications';
+    return 'fractions';
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -67,8 +78,7 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
     } else if (widget.activity != null) {
       _activeActivity = widget.activity;
     }
-    _isRatios = _activeActivity?.type == 'ratio_teach_dendy' ||
-        _activeActivity?.id.contains('ratio') == true;
+    _topic = _detectTopic(_activeActivity);
   }
 
   @override
@@ -98,9 +108,17 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
     setState(() {
       _isListening = !_isListening;
       if (_isListening) {
-        _customExplanationController.text = _isRatios
-            ? 'Order matters in ratios because the first item corresponds to the first number!'
-            : 'More slices means each slice is smaller, so 1/4 is bigger than 1/8!';
+        if (_topic == 'ratios') {
+          _customExplanationController.text = 'Order matters in ratios because the first item corresponds to the first number!';
+        } else if (_topic == 'proportions') {
+          _customExplanationController.text = 'Proportions must scale by multiplying both terms by the same factor k!';
+        } else if (_topic == 'percentages') {
+          _customExplanationController.text = 'Percent means out of 100, so we multiply by original price to get discount!';
+        } else if (_topic == 'applications') {
+          _customExplanationController.text = 'Solve the problem step by step: scale ingredients first, then compute total cost!';
+        } else {
+          _customExplanationController.text = 'More slices means each slice is smaller, so 1/4 is bigger than 1/8!';
+        }
       }
     });
   }
@@ -112,7 +130,7 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
     final student = _student;
     if (student != null) {
       final sId = student.questlyId.toLowerCase();
-      final lessonId = _isRatios ? 'ratios_les5' : 'fractions_les5';
+      final lessonId = '${_topic}_les5';
       final xp = _activeActivity?.xpReward ?? 100;
       final gold = _activeActivity?.goldReward ?? 20;
 
@@ -128,10 +146,29 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
           completedAt: DateTime.now(),
         ));
 
-        final nodeId = _isRatios ? 'fractions_node3' : 'fractions_node1';
+        // Mark Node completed on roadmap
+        final nodeId = _topic == 'fractions'
+            ? 'fractions_node1'
+            : (_topic == 'ratios'
+                ? 'fractions_node2'
+                : (_topic == 'proportions'
+                    ? 'fractions_node3'
+                    : (_topic == 'percentages'
+                        ? 'fractions_node4'
+                        : 'fractions_node5')));
+
         await Locator.progressionService.markNodeCompleted(sId, nodeId, stars: 3);
 
-        final badgeName = _isRatios ? 'Ratio Alchemist' : 'Fractions Explorer';
+        final badgeName = _topic == 'fractions'
+            ? 'Fractions Explorer'
+            : (_topic == 'ratios'
+                ? 'Ratio Alchemist'
+                : (_topic == 'proportions'
+                    ? 'Proportions Architect'
+                    : (_topic == 'percentages'
+                        ? 'Percentage Merchant'
+                        : 'Grand Master of Mathematics')));
+
         await Locator.collectionRepository.unlockBadge(sId, badgeName);
 
         final updated = student.copyWith(
@@ -149,8 +186,8 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
         xpReward: _activeActivity?.xpReward ?? 100,
         goldReward: _activeActivity?.goldReward ?? 20,
         earnedStars: 3,
-        title: _isRatios ? 'RATIOS QUEST MASTERED! 🏆' : 'FRACTIONS QUEST MASTERED! 🏆',
-        message: 'You successfully taught Dendy and conquered this entire Quest! You earned the Mastery Badge!',
+        title: '${_getQuestTitle()} MASTERED! 🏆',
+        message: 'You taught Dendy with mastery and conquered this entire Quest! You unlocked the Next Quest and earned the Mastery Badge!',
         onContinue: () {
           Navigator.pushReplacementNamed(
             context,
@@ -159,6 +196,22 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
           );
         },
       );
+    }
+  }
+
+  String _getQuestTitle() {
+    switch (_topic) {
+      case 'ratios':
+        return 'RATIOS • QUEST 2';
+      case 'proportions':
+        return 'PROPORTIONS • QUEST 3';
+      case 'percentages':
+        return 'PERCENTAGES • QUEST 4';
+      case 'applications':
+        return 'APPLICATIONS • QUEST 5';
+      case 'fractions':
+      default:
+        return 'FRACTIONS • QUEST 1';
     }
   }
 
@@ -227,17 +280,62 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
   }
 
   Widget _buildDoubtAndExplanationStage(bool isShort, bool isLandscape) {
-    final chips = !_isRatios
-        ? [
-            'Because cutting into 8 slices makes each slice smaller than cutting into 4 slices!',
-            'Denominator is the number of pieces. More pieces = Smaller slice!',
-            '1/4 is two 1/8 slices combined (2/8), so 1/4 is bigger!',
-          ]
-        : [
-            'Order matters! The first word (Apples) must match the first number!',
-            '3:5 means 3 apples for every 5 bananas. 5:3 would mean 5 apples!',
-            'In ratios, reversing the numbers changes who has more!',
-          ];
+    final List<String> chips;
+    final String doubtText;
+    final Widget doubtVisual;
+
+    switch (_topic) {
+      case 'ratios':
+        doubtText = '"Teacher! If there are 3 apples and 5 bananas, why can\'t I just write the ratio as 5 : 3?"';
+        chips = [
+          'Order matters! The first word (Apples) must match the first number!',
+          '3:5 means 3 apples for every 5 bananas. 5:3 would mean 5 apples!',
+          'In ratios, reversing numbers flips who has more items!',
+        ];
+        doubtVisual = const FruitRatioVisualWidget(countA: 3, countB: 5, labelA: 'Apples', labelB: 'Bananas');
+        break;
+
+      case 'proportions':
+        doubtText = '"Teacher! To double the size of our 2×3 gate, why can\'t I just add 2 to make it 4×5?"';
+        chips = [
+          'Proportions scale by MULTIPLYING by scale factor k (2×2=4 and 3×2=6)!',
+          'Adding numbers distorts the shape into an unequal ratio!',
+          'Both numerator and denominator must be multiplied by the exact same number!',
+        ];
+        doubtVisual = const ProportionScaleWidget(scaleFactor: 2.0);
+        break;
+
+      case 'percentages':
+        doubtText = '"Teacher! If a potion costs \$50 and is 20% off, doesn\'t that mean it costs \$50 - \$20 = \$30?"';
+        chips = [
+          'No! 20% means 20% OF \$50 (which is \$10), so the final price is \$40!',
+          'Always calculate the discount amount first: (Percent/100) × Original Price!',
+          'Percentages are fractions of the total, not flat dollar subtractions!',
+        ];
+        doubtVisual = const DiscountTagWidget(originalPrice: 50, discountPercent: 20);
+        break;
+
+      case 'applications':
+        doubtText = '"Teacher! When scaling feast recipes for 50 builders, how do I avoid mixing up ingredients and budget?"';
+        chips = [
+          'Follow the 3-step blueprint: 1. Scale ingredients 2. Compute unit prices 3. Sum total!',
+          'Solve one step at a time and verify each intermediate answer!',
+          'Fractions and proportions give exact quantities before applying shop discounts!',
+        ];
+        doubtVisual = const BlueprintMapWidget(mapCm: 4);
+        break;
+
+      case 'fractions':
+      default:
+        doubtText = '"Teacher! I thought 1/8 is bigger than 1/4 because 8 is bigger than 4! Why is that wrong?"';
+        chips = [
+          'Because cutting into 8 slices makes each slice smaller than cutting into 4 slices!',
+          'Denominator is the number of pieces. More pieces = Smaller slice!',
+          '1/4 is two 1/8 slices combined (2/8), so 1/4 is bigger!',
+        ];
+        doubtVisual = const PizzaVisualWidget(totalSlices: 8, selectedSlices: 1, size: 95, label: '1/8 Slice');
+        break;
+    }
 
     if (!isLandscape) {
       return SingleChildScrollView(
@@ -255,17 +353,11 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              !_isRatios
-                  ? '"Teacher! I thought 1/8 is bigger than 1/4 because 8 is bigger than 4! Why is that wrong?"'
-                  : '"Teacher! If there are 3 apples and 5 bananas, why can\'t I just write the ratio as 5 : 3?"',
+              doubtText,
               style: const TextStyle(fontFamily: 'Fredoka', fontSize: 14, fontWeight: FontWeight.w900, color: ColorSystem.plum, height: 1.3),
             ),
             const SizedBox(height: 10),
-            Center(
-              child: !_isRatios
-                  ? const PizzaVisualWidget(totalSlices: 8, selectedSlices: 1, size: 90, label: '1/8 Slice')
-                  : const FruitRatioVisualWidget(countA: 3, countB: 5, labelA: 'Apples', labelB: 'Bananas'),
-            ),
+            Center(child: doubtVisual),
             const SizedBox(height: 12),
             const Text('HOW WILL YOU TEACH DENDY?', style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
             const SizedBox(height: 6),
@@ -315,9 +407,7 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    !_isRatios
-                        ? '"Teacher! I thought 1/8 is bigger than 1/4 because 8 is bigger than 4! Why is that wrong?"'
-                        : '"Teacher! If there are 3 apples and 5 bananas, why can\'t I just write the ratio as 5 : 3?"',
+                    doubtText,
                     style: TextStyle(
                       fontFamily: 'Fredoka',
                       fontSize: isShort ? 13 : 15,
@@ -328,11 +418,7 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
                   ),
                 ],
               ),
-              Center(
-                child: !_isRatios
-                    ? const PizzaVisualWidget(totalSlices: 8, selectedSlices: 1, size: 95, label: '1/8 Slice')
-                    : const FruitRatioVisualWidget(countA: 3, countB: 5, labelA: 'Apples', labelB: 'Bananas'),
-              ),
+              Center(child: doubtVisual),
               const Center(child: DendyMascot(size: 50, mood: DendyMood.confused)),
             ],
           ),
@@ -432,6 +518,26 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
 
   // Stage 3: Dendy's Aha Moment
   Widget _buildDendyAhaStage(bool isShort) {
+    final String ahaText;
+    switch (_topic) {
+      case 'ratios':
+        ahaText = '"Aha! Order matters in ratios because Apples came first (3) and Bananas second (5), so it must be 3 : 5! Thank you teacher!"';
+        break;
+      case 'proportions':
+        ahaText = '"Aha! Proportions scale by multiplying by k, so doubling 2×3 gives 4×6! Thank you teacher!"';
+        break;
+      case 'percentages':
+        ahaText = '"Aha! Percent is out of 100, so 20% of \$50 is \$10 discount, leaving \$40! Thank you teacher!"';
+        break;
+      case 'applications':
+        ahaText = '"Aha! Scaling the blueprint first gives the true distance, then dividing by speed gives travel time! Thank you teacher!"';
+        break;
+      case 'fractions':
+      default:
+        ahaText = '"Aha! Now I get it! The denominator is how many cuts we made. More cuts means smaller slices, so 1/4 is bigger than 1/8! Thank you teacher!"';
+        break;
+    }
+
     return Center(
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -455,9 +561,7 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    !_isRatios
-                        ? '"Aha! Now I get it! The denominator is how many cuts we made. More cuts means smaller slices, so 1/4 is bigger than 1/8! Thank you teacher!"'
-                        : '"Aha! Now I get it! Order matters in ratios because Apples came first (3) and Bananas second (5), so it must be 3 : 5! Thank you teacher!"',
+                    ahaText,
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontFamily: 'Fredoka', fontSize: 12.5, fontWeight: FontWeight.bold, color: ColorSystem.plum, height: 1.35),
                   ),
@@ -485,9 +589,32 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
 
   // Stage 4: Co-solving Final Graduation Puzzle
   Widget _buildCoSolveStage(bool isShort) {
-    final options = !_isRatios
-        ? ['3/4 is bigger than 3/8', '3/8 is bigger than 3/4', 'Both are equal']
-        : ['2 : 4 simplifies to 1 : 2', '2 : 4 simplifies to 2 : 2', '2 : 4 cannot be simplified'];
+    final List<String> options;
+    final String promptText;
+
+    switch (_topic) {
+      case 'ratios':
+        promptText = 'FINAL TEAM CHALLENGE: Simplify 4 : 6 with Dendy!';
+        options = ['4 : 6 simplifies to 2 : 3', '4 : 6 simplifies to 2 : 4', '4 : 6 cannot be simplified'];
+        break;
+      case 'proportions':
+        promptText = 'FINAL TEAM CHALLENGE: Find x if 3/4 = x/12!';
+        options = ['x = 9 (3 × 3 = 9)', 'x = 11 (3 + 8)', 'x = 6'];
+        break;
+      case 'percentages':
+        promptText = 'FINAL TEAM CHALLENGE: What is 25% of \$200?';
+        options = ['\$50 (1/4 of \$200)', '\$25', '\$75'];
+        break;
+      case 'applications':
+        promptText = 'FINAL TEAM CHALLENGE: Build the King\'s Great Bridge!';
+        options = ['All 4 Mathematical Pillars Verified ✓', 'Missing Proportion Check', 'Uncalibrated Percent'];
+        break;
+      case 'fractions':
+      default:
+        promptText = 'FINAL TEAM CHALLENGE: Compare 3/4 and 3/8 with Dendy!';
+        options = ['3/4 is bigger than 3/8', '3/8 is bigger than 3/4', 'Both are equal'];
+        break;
+    }
 
     return Center(
       child: SingleChildScrollView(
@@ -496,9 +623,7 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              !_isRatios
-                  ? 'FINAL TEAM CHALLENGE: Compare 3/4 and 3/8 with Dendy!'
-                  : 'FINAL TEAM CHALLENGE: Simplify 2 : 4 with Dendy!',
+              promptText,
               textAlign: TextAlign.center,
               style: TextStyle(fontFamily: 'Fredoka', fontSize: isShort ? 13 : 15, fontWeight: FontWeight.w900, color: ColorSystem.purple),
             ),
@@ -556,7 +681,7 @@ class _FractionTeachDendyScreenState extends State<FractionTeachDendyScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isRatios ? 'RATIOS • LEVEL 2' : 'FRACTIONS • LEVEL 1',
+                  _getQuestTitle(),
                   style: TextStyle(fontFamily: 'Fredoka', fontSize: isShort ? 10 : 12, fontWeight: FontWeight.w900, color: ColorSystem.purple),
                 ),
                 Text(

@@ -319,15 +319,20 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
     Color bg = Colors.white;
     Color border = ColorSystem.plum;
 
+    final bool isRewardOrMilestone = node.type == RoadmapNodeType.milestone ||
+        node.type == RoadmapNodeType.mystery ||
+        node.type == RoadmapNodeType.reward ||
+        node.title.toLowerCase().contains('reward');
+
     if (isCompleted) {
       bg = ColorSystem.green.withOpacity(0.2);
       border = ColorSystem.green;
-    } else if (isCurrent) {
-      bg = ColorSystem.purple.withOpacity(0.15);
-      border = ColorSystem.purple;
-    } else if (isClaimable) {
-      bg = ColorSystem.gold.withOpacity(0.2);
+    } else if (isCurrent || isClaimable) {
+      bg = ColorSystem.gold.withOpacity(0.25);
       border = ColorSystem.gold;
+    } else if (isRewardOrMilestone) {
+      bg = ColorSystem.lavender.withOpacity(0.35);
+      border = ColorSystem.plum;
     } else if (status == RoadmapNodeStatus.available) {
       bg = ColorSystem.lavender.withOpacity(0.3);
       border = ColorSystem.plum;
@@ -345,12 +350,12 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
     Widget nodeAssetWidget;
     final rewards = Locator.roadmapRepository.getRewardsForNode(node);
 
-    if (isLocked) {
+    if (isRewardOrMilestone) {
+      nodeAssetWidget = VectorAssetHelper.chestIcon(size: size * 0.55, isOpen: isCompleted);
+    } else if (isLocked) {
       nodeAssetWidget = VectorAssetHelper.lockIcon(size: size * 0.45, isLocked: true);
     } else if (node.type == RoadmapNodeType.mastery) {
       nodeAssetWidget = VectorAssetHelper.chestIcon(size: size * 0.55, isEpic: true);
-    } else if (node.type == RoadmapNodeType.mystery) {
-      nodeAssetWidget = VectorAssetHelper.chestIcon(size: size * 0.5, isOpen: isCompleted);
     } else if (rewards.any((r) => r.type == RewardType.collectible)) {
       final collReward = rewards.firstWhere((r) => r.type == RewardType.collectible);
       nodeAssetWidget = VectorAssetHelper.collectibleIcon(
@@ -367,7 +372,12 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
     void handleTap() {
       SoundService.playClick();
 
-      if (isClaimable && (node.type == RoadmapNodeType.mystery || node.type == RoadmapNodeType.reward || node.type == RoadmapNodeType.mastery)) {
+      if (isClaimable &&
+          (node.type == RoadmapNodeType.mystery ||
+              node.type == RoadmapNodeType.reward ||
+              node.type == RoadmapNodeType.milestone ||
+              node.type == RoadmapNodeType.mastery)) {
+        final stars = _student != null ? Locator.progressionService.getNodeStars(_student!.questlyId, node) : 3;
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -375,12 +385,22 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
             studentId: _student!.questlyId,
             rewardIds: node.rewardIds,
             title: node.title,
+            earnedStars: stars > 0 ? stars : 3,
             onClaimed: () {
               Locator.progressionService.markNodeCompleted(_student!.questlyId, node.id);
               _loadState();
             },
           ),
         );
+        return;
+      }
+
+      if (isCompleted &&
+          (node.type == RoadmapNodeType.mystery ||
+              node.type == RoadmapNodeType.reward ||
+              node.type == RoadmapNodeType.milestone ||
+              node.type == RoadmapNodeType.mastery)) {
+        _showNodeDetailSheet(node, status, allNodes);
         return;
       }
 
@@ -409,8 +429,32 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
                   break;
                 }
               }
-            } else if (node.levelId == 'fractions_lvl2') {
+            } else if (node.levelId == 'ratios_lvl1' || node.levelId == 'fractions_lvl2') {
               final lessons = ['ratios_les1', 'ratios_les2', 'ratios_les3', 'ratios_les4', 'ratios_les5'];
+              for (final lid in lessons) {
+                if (!Locator.progressionService.isLessonCompleted(_student!.questlyId, lid)) {
+                  targetLessonId = lid;
+                  break;
+                }
+              }
+            } else if (node.levelId == 'proportions_lvl1') {
+              final lessons = ['proportions_les1', 'proportions_les2', 'proportions_les3', 'proportions_les4', 'proportions_les5'];
+              for (final lid in lessons) {
+                if (!Locator.progressionService.isLessonCompleted(_student!.questlyId, lid)) {
+                  targetLessonId = lid;
+                  break;
+                }
+              }
+            } else if (node.levelId == 'percentages_lvl1') {
+              final lessons = ['percentages_les1', 'percentages_les2', 'percentages_les3', 'percentages_les4', 'percentages_les5'];
+              for (final lid in lessons) {
+                if (!Locator.progressionService.isLessonCompleted(_student!.questlyId, lid)) {
+                  targetLessonId = lid;
+                  break;
+                }
+              }
+            } else if (node.levelId == 'applications_lvl1') {
+              final lessons = ['applications_les1', 'applications_les2', 'applications_les3', 'applications_les4', 'applications_les5'];
               for (final lid in lessons) {
                 if (!Locator.progressionService.isLessonCompleted(_student!.questlyId, lid)) {
                   targetLessonId = lid;
@@ -514,6 +558,29 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
           },
         ),
 
+        // "Claim Reward" badge under milestone nodes
+        if (isRewardOrMilestone && !isCompleted)
+          Positioned(
+            bottom: -14,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: ColorSystem.plum,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: ColorSystem.gold, width: 0.8),
+              ),
+              child: const Text(
+                '🎁 Claim Reward',
+                style: TextStyle(
+                  fontFamily: 'Fredoka',
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+
         // 3-Star Rating compact badge display under completed nodes
         if (isCompleted)
           Positioned(
@@ -544,9 +611,12 @@ class _RoadmapScreenState extends State<RoadmapScreen> with SingleTickerProvider
       ],
     );
 
+    final rewardsSummary = rewards.map((r) => r.type == RewardType.xp ? '+${r.amount} XP' : (r.type == RewardType.coins ? '+${r.amount} Quest Coins' : r.name)).join(' • ');
+    final tooltipMsg = rewardsSummary.isNotEmpty ? '${node.title}\n${node.description}\n$rewardsSummary' : '${node.title}\n${node.description}';
+
     // Wrap in Desktop Tooltip preview card
     return Tooltip(
-      message: '${node.title}\n~8 Mins • 3 Activities\n+75 XP • +10 Quest Coins',
+      message: tooltipMsg,
       textStyle: const TextStyle(
         fontFamily: 'Fredoka',
         fontSize: 10,

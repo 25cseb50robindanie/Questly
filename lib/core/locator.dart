@@ -21,40 +21,43 @@ import '../services/daily_reward_service.dart';
 import '../services/mission_service.dart';
 import '../services/read_aloud_service.dart';
 import '../services/whisper_voice_service.dart';
-
 import '../services/learner_analytics_service.dart';
 
 class Locator {
-  static late final StorageService storageService;
-  static late final StudentRepository studentRepository;
-  static late final ModuleRepository moduleRepository;
-  static late final ProgressRepository progressRepository;
-  static late final CollectionRepository collectionRepository;
-  static late final ShopRepository shopRepository;
-  static late final NotificationRepository notificationRepository;
-  static late final AuthService authService;
+  static late StorageService storageService;
+  static late StudentRepository studentRepository;
+  static late ModuleRepository moduleRepository;
+  static late ProgressRepository progressRepository;
+  static late CollectionRepository collectionRepository;
+  static late ShopRepository shopRepository;
+  static late NotificationRepository notificationRepository;
+  static late AuthService authService;
   
   // V0.3 progression interfaces
-  static late final RoadmapRepository roadmapRepository;
-  static late final ProgressionService progressionService;
-  static late final RewardService rewardService;
-  static late final PendingRewardService pendingRewardService;
+  static late RoadmapRepository roadmapRepository;
+  static late ProgressionService progressionService;
+  static late RewardService rewardService;
+  static late PendingRewardService pendingRewardService;
 
   // V0.4 AI Tutor interfaces
-  static late final KnowledgeRepository knowledgeRepository;
-  static late final DoubtRepository doubtRepository;
-  static late final SpeechToTextProvider speechToTextProvider;
-  static late final TextToSpeechProvider textToSpeechProvider;
-  static late final AITutorService aiTutorService;
+  static late KnowledgeRepository knowledgeRepository;
+  static late DoubtRepository doubtRepository;
+  static late SpeechToTextProvider speechToTextProvider;
+  static late TextToSpeechProvider textToSpeechProvider;
+  static late AITutorService aiTutorService;
 
   // New Game App Services
-  static late final DailyRewardService dailyRewardService;
-  static late final MissionService missionService;
-  static late final ReadAloudService readAloudService;
-  static late final WhisperVoiceService whisperVoiceService;
-  static late final LearnerAnalyticsService learnerAnalyticsService;
+  static late DailyRewardService dailyRewardService;
+  static late MissionService missionService;
+  static late ReadAloudService readAloudService;
+  static late WhisperVoiceService whisperVoiceService;
+  static late LearnerAnalyticsService learnerAnalyticsService;
 
   static bool _initialized = false;
+
+  static void resetForTest() {
+    _initialized = false;
+  }
 
   static Future<void> setup() async {
     if (_initialized) return;

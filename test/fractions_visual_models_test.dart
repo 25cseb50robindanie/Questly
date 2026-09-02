@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:questly/core/locator.dart';
+import 'package:questly/services/read_aloud_service.dart';
 import 'package:questly/widgets/fraction_visual_models.dart';
 import 'package:questly/widgets/flashcard_widget.dart';
 import 'package:questly/widgets/misconception_remediation_dialog.dart';
 import 'package:questly/services/misconception_engine.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    Locator.resetForTest();
+    Locator.readAloudService = ReadAloudService();
+  });
+
   testWidgets('PizzaVisualWidget renders pizza custom painter and label', (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
@@ -102,12 +111,14 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: FlashcardWidget(
-            card: card,
-            onMastered: () {
-              mastered = true;
-            },
-            onReviewAgain: () {},
+          body: Center(
+            child: FlashcardWidget(
+              card: card,
+              onMastered: () {
+                mastered = true;
+              },
+              onReviewAgain: () {},
+            ),
           ),
         ),
       ),
@@ -116,7 +127,7 @@ void main() {
     expect(find.text('What is a Numerator?'), findsOneWidget);
     expect(find.text('TAP TO FLIP'), findsOneWidget);
 
-    // Tap to flip
+    // Tap to flip card
     await tester.tap(find.text('TAP TO FLIP'));
     await tester.pumpAndSettle();
 
@@ -142,28 +153,43 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(
-          body: MisconceptionRemediationDialog(
-            diagnosis: diag,
-            onResolved: () {
-              resolved = true;
-            },
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  MisconceptionRemediationDialog.show(
+                    context: context,
+                    diagnosis: diag,
+                    onResolved: () {
+                      resolved = true;
+                    },
+                  );
+                },
+                child: const Text('OPEN DIALOG'),
+              ),
+            ),
           ),
         ),
       ),
     );
 
+    await tester.tap(find.text('OPEN DIALOG'));
+    await tester.pump(const Duration(milliseconds: 100));
+
     expect(find.text('AHA! LET\'S CLEAR THIS UP'), findsOneWidget);
     expect(find.text(diag.title.toUpperCase()), findsOneWidget);
     expect(find.text('🎯 QUICK CHECK – TEST YOUR UNDERSTANDING'), findsOneWidget);
 
-    // Choose correct retry option
+    // Ensure option is visible and choose correct retry option
+    await tester.ensureVisible(find.text('1/2 is bigger'));
     await tester.tap(find.text('1/2 is bigger'));
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
-    // Tap continue
+    // Ensure continue button is visible and tap continue
+    await tester.ensureVisible(find.text('CONTINUE LEARNING ✓'));
     await tester.tap(find.text('CONTINUE LEARNING ✓'));
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
     expect(resolved, isTrue);
   });
 }

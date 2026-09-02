@@ -5,7 +5,7 @@ class MisconceptionDiagnosis {
   final String studentThinking;
   final String correctConcept;
   final String visualExplanation;
-  final String visualType; // 'pizza_comparison', 'fraction_strip', 'number_line', 'ratio_beaker'
+  final String visualType; // 'pizza_comparison', 'fraction_strip', 'number_line', 'ratio_beaker', 'scale_comparison', 'hundred_grid'
   final Map<String, dynamic> visualData;
   final String scaffoldedHint;
   final ScaffoldedRetryProblem retryProblem;
@@ -40,7 +40,10 @@ class ScaffoldedRetryProblem {
 
 class MisconceptionEngine {
   final Map<String, MisconceptionDiagnosis> _diagnoses = {
-    'larger_denominator_fallacy': MisconceptionDiagnosis(
+    // -------------------------------------------------------------
+    // Quest 1: Fractions Diagnoses
+    // -------------------------------------------------------------
+    'larger_denominator_fallacy': const MisconceptionDiagnosis(
       id: 'larger_denominator_fallacy',
       title: 'Larger Denominator Misconception',
       summary: 'More pieces means smaller slices!',
@@ -60,7 +63,7 @@ class MisconceptionEngine {
         feedback: 'Superb! 1/2 is half the whole pizza, which is much bigger than 1/10!',
       ),
     ),
-    'denominator_confusion': MisconceptionDiagnosis(
+    'denominator_confusion': const MisconceptionDiagnosis(
       id: 'denominator_confusion',
       title: 'Denominator Counting Error',
       summary: 'Denominator is the TOTAL number of parts in the whole.',
@@ -83,7 +86,7 @@ class MisconceptionEngine {
         feedback: 'Correct! 2 + 3 = 5 total pieces, so the denominator is 5!',
       ),
     ),
-    'numerator_confusion': MisconceptionDiagnosis(
+    'numerator_confusion': const MisconceptionDiagnosis(
       id: 'numerator_confusion',
       title: 'Numerator Inversion Error',
       summary: 'Numerator is the top number (parts being selected).',
@@ -103,7 +106,7 @@ class MisconceptionEngine {
         feedback: 'Spot on! You ate 1 slice, so 1 is the numerator on top (1/6)!',
       ),
     ),
-    'equivalent_additive_fallacy': MisconceptionDiagnosis(
+    'equivalent_additive_fallacy': const MisconceptionDiagnosis(
       id: 'equivalent_additive_fallacy',
       title: 'Equivalent Fraction Scaling Error',
       summary: 'Multiply or divide top and bottom by the SAME number.',
@@ -124,7 +127,11 @@ class MisconceptionEngine {
         feedback: 'Brilliant! 1×2 = 2 and 3×2 = 6, giving 2/6 which equals 1/3!',
       ),
     ),
-    'ratio_order_inversion': MisconceptionDiagnosis(
+
+    // -------------------------------------------------------------
+    // Quest 2: Ratios Diagnoses
+    // -------------------------------------------------------------
+    'ratio_order_inversion': const MisconceptionDiagnosis(
       id: 'ratio_order_inversion',
       title: 'Ratio Order Reversal',
       summary: 'Order matters in ratios!',
@@ -138,39 +145,154 @@ class MisconceptionEngine {
         'correctRatio': '3 : 5',
         'wrongRatio': '5 : 3',
       },
-      scaffoldedHint: 'Match each word in the question to its number in the exact same order.',
+      scaffoldedHint: 'Match the first word in the sentence to the first number in the ratio.',
       retryProblem: ScaffoldedRetryProblem(
-        question: 'There are 3 blue balls and 7 yellow balls. What is the ratio of BLUE balls to YELLOW balls?',
-        options: ['3 : 7', '7 : 3', '3 : 10'],
+        question: 'There are 2 cats and 7 dogs. What is the ratio of CATS to DOGS?',
+        options: ['2 : 7', '7 : 2', '2 : 9'],
         correctIndex: 0,
-        feedback: 'Perfect! Blue comes first (3) and Yellow comes second (7), so 3 : 7!',
+        feedback: 'Exact! Cats came first (2), Dogs second (7), so it is 2 : 7.',
       ),
     ),
-    'ratio_simplification_subtraction': MisconceptionDiagnosis(
+    'ratio_simplification_subtraction': const MisconceptionDiagnosis(
       id: 'ratio_simplification_subtraction',
-      title: 'Ratio Simplification Error',
-      summary: 'Simplify ratios by dividing by the Greatest Common Divisor (GCD).',
-      studentThinking: 'You subtracted numbers instead of dividing by a common factor.',
-      correctConcept: 'To simplify a ratio like 6 : 8, divide both numbers by their common factor (2) to get 3 : 4.',
-      visualExplanation: '6 : 8 = (6÷2) : (8÷2) = 3 : 4. Both represent the exact same proportion!',
+      title: 'Ratio Subtraction Simplification Fallacy',
+      summary: 'Simplify ratios by DIVIDING by greatest common factor.',
+      studentThinking: 'You tried to simplify a ratio by subtracting numbers instead of dividing.',
+      correctConcept: 'To simplify a ratio like 4 : 6, you must DIVIDE both numbers by their common factor (2) to get 2 : 3. Never subtract!',
+      visualExplanation: 'Dividing preserves the proportional relationship. Subtraction changes the taste, color, or speed ratio!',
       visualType: 'ratio_beaker',
       visualData: {
-        'original': '6 : 8',
-        'divisor': '2',
-        'simplified': '3 : 4',
+        'original': '4 : 6',
+        'dividedByTwo': '2 : 3 (Correct)',
+        'subtractedTwo': '2 : 4 (Wrong)',
       },
-      scaffoldedHint: 'Divide both sides by the biggest number that goes into both evenly.',
+      scaffoldedHint: 'Divide BOTH numbers by their common divisor (e.g. ÷2, ÷3).',
       retryProblem: ScaffoldedRetryProblem(
-        question: 'Simplify the ratio 4 : 8 by dividing both sides by 4:',
-        options: ['1 : 2', '2 : 4', '0 : 4'],
+        question: 'Simplify the ratio 6 : 9 by dividing both by 3:',
+        options: ['2 : 3', '3 : 6', '4 : 7'],
         correctIndex: 0,
-        feedback: 'Awesome! 4÷4 = 1 and 8÷4 = 2, so the simplest form is 1 : 2!',
+        feedback: 'Perfect! 6÷3 = 2 and 9÷3 = 3, so 6:9 simplifies to 2:3!',
+      ),
+    ),
+
+    // -------------------------------------------------------------
+    // Quest 3: Proportions Diagnoses
+    // -------------------------------------------------------------
+    'additive_scaling_fallacy': const MisconceptionDiagnosis(
+      id: 'additive_scaling_fallacy',
+      title: 'Additive Scaling Fallacy',
+      summary: 'Proportions scale by MULTIPLICATION, not addition!',
+      studentThinking: 'You added a number to both terms instead of multiplying by the scale factor.',
+      correctConcept: 'If 2 cups juice mixes with 3 cups water (2:3), doubling the juice means multiplying by 2 (2×2=4), so water must also be multiplied by 2 (3×2=6). Adding 2 gives 4:5, which ruins the proportion!',
+      visualExplanation: 'Scaling a picture or recipe means multiplying all dimensions by the same scale factor k.',
+      visualType: 'scale_comparison',
+      visualData: {
+        'original': '2 : 3',
+        'scaleFactor': '×2 = 4 : 6',
+        'additiveWrong': '+2 = 4 : 5',
+      },
+      scaffoldedHint: 'Find what number you MULTIPLIED by, then multiply the other term by that exact same number.',
+      retryProblem: ScaffoldedRetryProblem(
+        question: 'If 1 potion requires 3 crystals (1 : 3), how many crystals are needed for 4 potions?',
+        options: ['12 crystals (4 × 3)', '7 crystals (4 + 3)', '8 crystals'],
+        correctIndex: 0,
+        feedback: 'Outstanding! 4 potions × 3 crystals each = 12 crystals!',
+      ),
+    ),
+    'cross_multiplication_inversion': const MisconceptionDiagnosis(
+      id: 'cross_multiplication_inversion',
+      title: 'Cross-Multiplication Inversion',
+      summary: 'Multiply diagonally across the equals sign: a × d = b × c.',
+      studentThinking: 'You multiplied across the top and bottom instead of cross-multiplying diagonally.',
+      correctConcept: 'For the proportion a/b = c/d, the cross-products are equal: a × d = b × c.',
+      visualExplanation: 'Draw an "X" connecting numerator of one side to denominator of the other side.',
+      visualType: 'scale_comparison',
+      visualData: {
+        'rule': 'a/b = c/d ==> a*d = b*c',
+      },
+      scaffoldedHint: 'Multiply top-left with bottom-right, and bottom-left with top-right.',
+      retryProblem: ScaffoldedRetryProblem(
+        question: 'In the proportion 2/5 = x/10, cross-multiply: 2 × 10 = 5 × x. What is x?',
+        options: ['x = 4 (20 ÷ 5)', 'x = 8', 'x = 15'],
+        correctIndex: 0,
+        feedback: 'Correct! 2 × 10 = 20, and 20 ÷ 5 = 4!',
+      ),
+    ),
+
+    // -------------------------------------------------------------
+    // Quest 4: Percentages Diagnoses
+    // -------------------------------------------------------------
+    'base_100_misinterpretation': const MisconceptionDiagnosis(
+      id: 'base_100_misinterpretation',
+      title: 'Percentage Base-100 Misinterpretation',
+      summary: 'Percent means "per hundred" (parts out of 100).',
+      studentThinking: 'You treated a fraction directly as a percentage without scaling to 100 (e.g. thinking 3/5 = 3%).',
+      correctConcept: 'Percent means per hundred (out of 100). To find the percent for 3/5, scale the denominator to 100: 3/5 = 60/100 = 60%!',
+      visualExplanation: 'On a 100-square grid, 3 out of 5 columns is 60 individual squares filled, which is 60%.',
+      visualType: 'hundred_grid',
+      visualData: {
+        'fraction': '3/5',
+        'scaledTo100': '60/100',
+        'percentage': '60%',
+      },
+      scaffoldedHint: 'Multiply numerator and denominator to make the bottom equal 100.',
+      retryProblem: ScaffoldedRetryProblem(
+        question: 'What is 1/2 as a percentage (scale 1/2 to have denominator 100)?',
+        options: ['50% (50/100)', '12%', '2%'],
+        correctIndex: 0,
+        feedback: 'Brilliant! 1/2 = 50/100 = 50%!',
+      ),
+    ),
+    'discount_subtraction_fallacy': const MisconceptionDiagnosis(
+      id: 'discount_subtraction_fallacy',
+      title: 'Discount Percent vs Dollar Fallacy',
+      summary: 'Calculate the percentage of the original price first!',
+      studentThinking: 'You subtracted the percentage number directly from the dollar price (e.g. \$50 with 20% off = \$30).',
+      correctConcept: 'A 20% discount on \$50 means subtracting 20% OF \$50 (which is \$10), giving a final price of \$50 - \$10 = \$40!',
+      visualExplanation: '20% of \$50 = 0.20 × 50 = \$10 discount. New price = \$50 - \$10 = \$40.',
+      visualType: 'hundred_grid',
+      visualData: {
+        'originalPrice': 50,
+        'discountPercent': 20,
+        'discountAmount': 10,
+        'finalPrice': 40,
+      },
+      scaffoldedHint: 'Find the discount amount first: (Discount % / 100) × Original Price.',
+      retryProblem: ScaffoldedRetryProblem(
+        question: 'A sword costs 100 gold coins. It is on sale for 25% off. How much is the discount in coins?',
+        options: ['25 gold coins (25% of 100)', '75 gold coins', '4 gold coins'],
+        correctIndex: 0,
+        feedback: 'Exactly right! 25% of 100 is 25 gold coins!',
+      ),
+    ),
+
+    // -------------------------------------------------------------
+    // Quest 5: Real-World Applications Diagnoses
+    // -------------------------------------------------------------
+    'multi_step_order_confusion': const MisconceptionDiagnosis(
+      id: 'multi_step_order_confusion',
+      title: 'Multi-Step Application Order Error',
+      summary: 'Break real-world problems into clear sequential steps.',
+      studentThinking: 'You skipped an intermediate calculation or applied steps out of order.',
+      correctConcept: 'In multi-step problems (e.g. scaling a recipe and then calculating cost), always compute the scaled quantities first before multiplying by unit cost.',
+      visualExplanation: 'Step 1: Scale the ingredient. Step 2: Multiply by cost per unit. Step 3: Sum total budget.',
+      visualType: 'scale_comparison',
+      visualData: {
+        'step1': 'Find total ingredients',
+        'step2': 'Calculate cost',
+      },
+      scaffoldedHint: 'Solve Step 1 first, verify the answer, then proceed to Step 2.',
+      retryProblem: ScaffoldedRetryProblem(
+        question: 'To build 1 bridge section needs 4 wood planks costing 2 gold each. What is the cost for 3 bridge sections?',
+        options: ['24 gold (12 planks × 2 gold)', '14 gold', '8 gold'],
+        correctIndex: 0,
+        feedback: 'Masterful! 3 sections × 4 planks = 12 planks. 12 planks × 2 gold = 24 gold!',
       ),
     ),
   };
 
   MisconceptionDiagnosis? diagnose({
-    required String? explicitTrigger,
+    String? explicitTrigger,
     required String topic,
     required String selectedOption,
     required String correctOption,
@@ -179,43 +301,18 @@ class MisconceptionEngine {
       return _diagnoses[explicitTrigger];
     }
 
-    // Heuristic pattern analysis if no explicit trigger tag
+    // Heuristic Fallback based on topic
     if (topic == 'fractions') {
-      if (selectedOption.contains('/') && correctOption.contains('/')) {
-        final selParts = selectedOption.split('/');
-        final corParts = correctOption.split('/');
-        if (selParts.length == 2 && corParts.length == 2) {
-          final selNum = int.tryParse(selParts[0].trim());
-          final selDen = int.tryParse(selParts[1].trim());
-          final corNum = int.tryParse(corParts[0].trim());
-          final corDen = int.tryParse(corParts[1].trim());
-
-          if (selNum != null && selDen != null && corNum != null && corDen != null) {
-            // Check if student picked bigger denominator thinking it's bigger
-            if (selNum == corNum && selDen > corDen) {
-              return _diagnoses['larger_denominator_fallacy'];
-            }
-            // Check if inverted numerator/denominator
-            if (selNum == corDen && selDen == corNum) {
-              return _diagnoses['numerator_confusion'];
-            }
-          }
-        }
-      }
+      return _diagnoses['larger_denominator_fallacy'];
     } else if (topic == 'ratios') {
-      if (selectedOption.contains(':') && correctOption.contains(':')) {
-        final selParts = selectedOption.split(':');
-        final corParts = correctOption.split(':');
-        if (selParts.length == 2 && corParts.length == 2) {
-          if (selParts[0].trim() == corParts[1].trim() && selParts[1].trim() == corParts[0].trim()) {
-            return _diagnoses['ratio_order_inversion'];
-          }
-        }
-      }
+      return _diagnoses['ratio_order_inversion'];
+    } else if (topic == 'proportions') {
+      return _diagnoses['additive_scaling_fallacy'];
+    } else if (topic == 'percentages') {
+      return _diagnoses['base_100_misinterpretation'];
+    } else if (topic == 'applications') {
+      return _diagnoses['multi_step_order_confusion'];
     }
-
     return null;
   }
-
-  List<MisconceptionDiagnosis> getAllDiagnoses() => _diagnoses.values.toList();
 }

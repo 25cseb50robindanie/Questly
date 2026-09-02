@@ -25,16 +25,29 @@ class FractionVisualScreen extends StatefulWidget {
 class _FractionVisualScreenState extends State<FractionVisualScreen> {
   Student? _student;
   Activity? _activeActivity;
-  bool _isRatios = false;
-  int _selectedModelTab = 0; // 0: Pizza, 1: Chocolate, 2: Strips, 3: Number Line (or Beaker / Fruits for ratios)
+  String _topic = 'fractions'; // 'fractions', 'ratios', 'proportions', 'percentages', 'applications'
+  int _selectedModelTab = 0;
 
-  // Interactive Model Controls
+  // Fractions Controls
   int _numerator = 3;
   int _denominator = 4;
 
   // Ratio Controls
   int _ratioPartA = 2;
   int _ratioPartB = 3;
+
+  // Proportions Controls
+  double _scaleFactor = 2.0;
+  int _propRightNum = 4;
+  int _propRightDen = 6;
+
+  // Percentages Controls
+  int _percentFilled = 50;
+  int _discountPercent = 25;
+
+  // Applications Controls
+  int _mapDistanceCm = 4;
+  int _feastServings = 4;
 
   bool _isCompleted = false;
 
@@ -53,6 +66,17 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
     }
   }
 
+  String _detectTopic(Activity? act) {
+    if (act == null) return 'fractions';
+    final id = act.id.toLowerCase();
+    final type = act.type.toLowerCase();
+    if (type.contains('ratio') || id.contains('ratio')) return 'ratios';
+    if (type.contains('proportion') || id.contains('proportion')) return 'proportions';
+    if (type.contains('percentage') || id.contains('percentage') || type.contains('percent') || id.contains('percent')) return 'percentages';
+    if (type.contains('application') || id.contains('application')) return 'applications';
+    return 'fractions';
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -62,8 +86,7 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
     } else if (widget.activity != null) {
       _activeActivity = widget.activity;
     }
-    _isRatios = _activeActivity?.type == 'ratio_visual' ||
-        _activeActivity?.id.contains('ratio') == true;
+    _topic = _detectTopic(_activeActivity);
   }
 
   void _handleReturn() {
@@ -82,7 +105,7 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
     final student = _student;
     if (student != null) {
       final sId = student.questlyId.toLowerCase();
-      final lessonId = _isRatios ? 'ratios_les2' : 'fractions_les2';
+      final lessonId = '${_topic}_les2';
       final xp = _activeActivity?.xpReward ?? 60;
       final gold = _activeActivity?.goldReward ?? 10;
 
@@ -101,7 +124,7 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
         final updated = student.copyWith(
           xp: student.xp + xp,
           gold: student.gold + gold,
-          currentLessonId: _isRatios ? 'ratios_les3' : 'fractions_les3',
+          currentLessonId: '${_topic}_les3',
         );
         await Locator.studentRepository.updateStudentProfile(updated);
       } catch (_) {}
@@ -124,6 +147,22 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
           );
         },
       );
+    }
+  }
+
+  String _getQuestTitle() {
+    switch (_topic) {
+      case 'ratios':
+        return 'RATIOS • QUEST 2';
+      case 'proportions':
+        return 'PROPORTIONS • QUEST 3';
+      case 'percentages':
+        return 'PERCENTAGES • QUEST 4';
+      case 'applications':
+        return 'APPLICATIONS • QUEST 5';
+      case 'fractions':
+      default:
+        return 'FRACTIONS • QUEST 1';
     }
   }
 
@@ -195,7 +234,7 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
                 child: Center(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    child: _isRatios ? _buildRatioModel() : _buildFractionModel(),
+                    child: _buildVisualModel(),
                   ),
                 ),
               ),
@@ -231,74 +270,13 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
                             ),
                           ),
                           DendySpeakButton(
-                            textToSpeak: _isRatios
-                                ? 'Adjust the parts to see how the ratio and mixture change!'
-                                : 'Move the sliders to change numerator and denominator and watch the model update!',
+                            textToSpeak: 'Adjust the controls and watch the mathematical visual model update live!',
                             size: 22,
                           ),
                         ],
                       ),
                       const SizedBox(height: 10),
-                      if (!_isRatios) ...[
-                        _buildSliderRow(
-                          label: 'Numerator (Top)',
-                          value: _numerator,
-                          min: 1,
-                          max: _denominator,
-                          color: ColorSystem.purple,
-                          onChanged: (val) {
-                            setState(() {
-                              _numerator = val;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        _buildSliderRow(
-                          label: 'Denominator (Bottom)',
-                          value: _denominator,
-                          min: 2,
-                          max: 8,
-                          color: ColorSystem.gold,
-                          onChanged: (val) {
-                            setState(() {
-                              _denominator = val;
-                              if (_numerator > _denominator) {
-                                _numerator = _denominator;
-                              }
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        _buildFractionLiveBadge(),
-                      ] else ...[
-                        _buildSliderRow(
-                          label: 'Part A (Juice / Apples)',
-                          value: _ratioPartA,
-                          min: 1,
-                          max: 8,
-                          color: const Color(0xFFFF9800),
-                          onChanged: (val) {
-                            setState(() {
-                              _ratioPartA = val;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        _buildSliderRow(
-                          label: 'Part B (Water / Bananas)',
-                          value: _ratioPartB,
-                          min: 1,
-                          max: 8,
-                          color: const Color(0xFF29B6F6),
-                          onChanged: (val) {
-                            setState(() {
-                              _ratioPartB = val;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        _buildRatioLiveBadge(),
-                      ],
+                      _buildInteractiveControls(),
                     ],
                   ),
                 ),
@@ -327,69 +305,10 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
           _buildModelTabs(),
           const SizedBox(height: 12),
           Center(
-            child: _isRatios ? _buildRatioModel() : _buildFractionModel(),
+            child: _buildVisualModel(),
           ),
           const SizedBox(height: 14),
-          if (!_isRatios) ...[
-            _buildSliderRow(
-              label: 'Numerator (Top)',
-              value: _numerator,
-              min: 1,
-              max: _denominator,
-              color: ColorSystem.purple,
-              onChanged: (val) {
-                setState(() {
-                  _numerator = val;
-                });
-              },
-            ),
-            const SizedBox(height: 8),
-            _buildSliderRow(
-              label: 'Denominator (Bottom)',
-              value: _denominator,
-              min: 2,
-              max: 8,
-              color: ColorSystem.gold,
-              onChanged: (val) {
-                setState(() {
-                  _denominator = val;
-                  if (_numerator > _denominator) {
-                    _numerator = _denominator;
-                  }
-                });
-              },
-            ),
-            const SizedBox(height: 10),
-            _buildFractionLiveBadge(),
-          ] else ...[
-            _buildSliderRow(
-              label: 'Part A (Juice / Apples)',
-              value: _ratioPartA,
-              min: 1,
-              max: 8,
-              color: const Color(0xFFFF9800),
-              onChanged: (val) {
-                setState(() {
-                  _ratioPartA = val;
-                });
-              },
-            ),
-            const SizedBox(height: 8),
-            _buildSliderRow(
-              label: 'Part B (Water / Bananas)',
-              value: _ratioPartB,
-              min: 1,
-              max: 8,
-              color: const Color(0xFF29B6F6),
-              onChanged: (val) {
-                setState(() {
-                  _ratioPartB = val;
-                });
-              },
-            ),
-            const SizedBox(height: 10),
-            _buildRatioLiveBadge(),
-          ],
+          _buildInteractiveControls(),
           const SizedBox(height: 16),
           CustomButton(
             text: 'PROCEED TO PRACTICE →',
@@ -404,9 +323,25 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
   }
 
   Widget _buildModelTabs() {
-    final tabs = _isRatios
-        ? ['🧪 Juice Mixer', '🍎 Fruit Sorter']
-        : ['🍕 Pizza', '🍫 Chocolate', '📏 Strips', '📈 Number Line'];
+    final List<String> tabs;
+    switch (_topic) {
+      case 'ratios':
+        tabs = ['🧪 Juice Mixer', '🍎 Fruit Sorter'];
+        break;
+      case 'proportions':
+        tabs = ['🏰 Castle Scale', '⚖️ Twin Balance'];
+        break;
+      case 'percentages':
+        tabs = ['🔟 100-Grid', '🏷️ Discount Tag'];
+        break;
+      case 'applications':
+        tabs = ['🗺️ Blueprint Map', '🥘 Feast Cauldron'];
+        break;
+      case 'fractions':
+      default:
+        tabs = ['🍕 Pizza', '🍫 Chocolate', '📏 Strips', '📈 Number Line'];
+        break;
+    }
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -443,54 +378,184 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
     );
   }
 
-  Widget _buildFractionModel() {
-    switch (_selectedModelTab) {
-      case 0:
-        return PizzaVisualWidget(
-          totalSlices: _denominator,
-          selectedSlices: _numerator,
-          size: 140,
-          label: '$_numerator / $_denominator of Pizza',
-        );
-      case 1:
-        return ChocolateBarVisualWidget(
-          totalRows: 2,
-          totalCols: _denominator ~/ 2 > 0 ? _denominator ~/ 2 : 2,
-          selectedPieces: _numerator,
-          width: 180,
-          height: 90,
-        );
-      case 2:
-        return FractionStripsVisualWidget(
-          activeDenominator: _denominator,
-          activeNumerator: _numerator,
-        );
-      case 3:
+  Widget _buildVisualModel() {
+    switch (_topic) {
+      case 'ratios':
+        return _selectedModelTab == 0
+            ? RatioBeakerVisualWidget(partA: _ratioPartA, partB: _ratioPartB, height: 130, width: 100)
+            : FruitRatioVisualWidget(countA: _ratioPartA, countB: _ratioPartB, labelA: 'Apples', labelB: 'Bananas');
+
+      case 'proportions':
+        return _selectedModelTab == 0
+            ? ProportionScaleWidget(scaleFactor: _scaleFactor)
+            : TwinBalanceWidget(leftNum: 2, leftDen: 3, rightNum: _propRightNum, rightDen: _propRightDen);
+
+      case 'percentages':
+        return _selectedModelTab == 0
+            ? HundredGridWidget(percentFilled: _percentFilled, size: 130)
+            : DiscountTagWidget(originalPrice: 100, discountPercent: _discountPercent);
+
+      case 'applications':
+        return _selectedModelTab == 0
+            ? BlueprintMapWidget(mapCm: _mapDistanceCm, kmPerCm: 5)
+            : RecipeMixerWidget(servings: _feastServings);
+
+      case 'fractions':
       default:
-        return NumberLineVisualWidget(
-          denominator: _denominator,
-          numerator: _numerator,
-          width: 260,
-        );
+        switch (_selectedModelTab) {
+          case 0:
+            return PizzaVisualWidget(totalSlices: _denominator, selectedSlices: _numerator, size: 135, label: '$_numerator / $_denominator of Pizza');
+          case 1:
+            return ChocolateBarVisualWidget(totalRows: 2, totalCols: _denominator ~/ 2 > 0 ? _denominator ~/ 2 : 2, selectedPieces: _numerator, width: 170, height: 85);
+          case 2:
+            return FractionStripsVisualWidget(activeDenominator: _denominator, activeNumerator: _numerator);
+          case 3:
+          default:
+            return NumberLineVisualWidget(denominator: _denominator, numerator: _numerator, width: 250);
+        }
     }
   }
 
-  Widget _buildRatioModel() {
-    switch (_selectedModelTab) {
-      case 0:
-        return RatioBeakerVisualWidget(
-          partA: _ratioPartA,
-          partB: _ratioPartB,
-          height: 140,
-          width: 110,
+  Widget _buildInteractiveControls() {
+    switch (_topic) {
+      case 'ratios':
+        return Column(
+          children: [
+            _buildSliderRow(
+              label: 'Part A (Juice / Apples)',
+              value: _ratioPartA,
+              min: 1,
+              max: 8,
+              color: const Color(0xFFFF9800),
+              onChanged: (val) => setState(() => _ratioPartA = val),
+            ),
+            const SizedBox(height: 8),
+            _buildSliderRow(
+              label: 'Part B (Water / Bananas)',
+              value: _ratioPartB,
+              min: 1,
+              max: 8,
+              color: const Color(0xFF29B6F6),
+              onChanged: (val) => setState(() => _ratioPartB = val),
+            ),
+            const SizedBox(height: 10),
+            _buildRatioLiveBadge(),
+          ],
         );
-      case 1:
+
+      case 'proportions':
+        return Column(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Scale Factor (k)', style: TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.bold, color: ColorSystem.plum)),
+                    Text('${_scaleFactor.toStringAsFixed(1)}x', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 12, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
+                  ],
+                ),
+                SliderTheme(
+                  data: SliderThemeData(activeTrackColor: ColorSystem.purple, thumbColor: ColorSystem.purple, trackHeight: 4),
+                  child: Slider(
+                    value: _scaleFactor,
+                    min: 1.0,
+                    max: 3.0,
+                    divisions: 4,
+                    onChanged: (val) => setState(() => _scaleFactor = val),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            _buildSliderRow(
+              label: 'Right Denominator (Target = 6 for 2/3)',
+              value: _propRightDen,
+              min: 3,
+              max: 9,
+              color: ColorSystem.gold,
+              onChanged: (val) => setState(() {
+                _propRightDen = val;
+                _propRightNum = (val * 2) ~/ 3;
+              }),
+            ),
+          ],
+        );
+
+      case 'percentages':
+        return Column(
+          children: [
+            _buildSliderRow(
+              label: 'Grid Percentage Fill',
+              value: _percentFilled,
+              min: 0,
+              max: 100,
+              color: ColorSystem.purple,
+              onChanged: (val) => setState(() => _percentFilled = val),
+            ),
+            const SizedBox(height: 8),
+            _buildSliderRow(
+              label: 'Discount Percentage (%)',
+              value: _discountPercent,
+              min: 5,
+              max: 50,
+              color: ColorSystem.pink,
+              onChanged: (val) => setState(() => _discountPercent = val),
+            ),
+          ],
+        );
+
+      case 'applications':
+        return Column(
+          children: [
+            _buildSliderRow(
+              label: 'Blueprint Map Distance (cm)',
+              value: _mapDistanceCm,
+              min: 1,
+              max: 10,
+              color: const Color(0xFF1A237E),
+              onChanged: (val) => setState(() => _mapDistanceCm = val),
+            ),
+            const SizedBox(height: 8),
+            _buildSliderRow(
+              label: 'Feast Servings Count',
+              value: _feastServings,
+              min: 1,
+              max: 12,
+              color: ColorSystem.gold,
+              onChanged: (val) => setState(() => _feastServings = val),
+            ),
+          ],
+        );
+
+      case 'fractions':
       default:
-        return FruitRatioVisualWidget(
-          countA: _ratioPartA,
-          countB: _ratioPartB,
-          labelA: 'Apples',
-          labelB: 'Bananas',
+        return Column(
+          children: [
+            _buildSliderRow(
+              label: 'Numerator (Top)',
+              value: _numerator,
+              min: 1,
+              max: _denominator,
+              color: ColorSystem.purple,
+              onChanged: (val) => setState(() => _numerator = val),
+            ),
+            const SizedBox(height: 8),
+            _buildSliderRow(
+              label: 'Denominator (Bottom)',
+              value: _denominator,
+              min: 2,
+              max: 8,
+              color: ColorSystem.gold,
+              onChanged: (val) => setState(() {
+                _denominator = val;
+                if (_numerator > _denominator) _numerator = _denominator;
+              }),
+            ),
+            const SizedBox(height: 10),
+            _buildFractionLiveBadge(),
+          ],
         );
     }
   }
@@ -521,13 +586,11 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
             trackHeight: 4,
           ),
           child: Slider(
-            value: value.toDouble(),
+            value: value.toDouble().clamp(min.toDouble(), max.toDouble()),
             min: min.toDouble(),
             max: max.toDouble(),
             divisions: max - min > 0 ? max - min : 1,
-            onChanged: (val) {
-              onChanged(val.round());
-            },
+            onChanged: (val) => onChanged(val.round()),
           ),
         ),
       ],
@@ -591,7 +654,7 @@ class _FractionVisualScreenState extends State<FractionVisualScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isRatios ? 'RATIOS • LEVEL 2' : 'FRACTIONS • LEVEL 1',
+                  _getQuestTitle(),
                   style: TextStyle(fontFamily: 'Fredoka', fontSize: isShort ? 10 : 12, fontWeight: FontWeight.w900, color: ColorSystem.purple),
                 ),
                 Text(

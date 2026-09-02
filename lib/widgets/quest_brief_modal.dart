@@ -191,7 +191,13 @@ class QuestBriefModal extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                        ] else if (node.levelId == 'fractions_lvl1') ...[
+                        ] else if (node.levelId != null &&
+                            (node.levelId == 'fractions_lvl1' ||
+                             node.levelId == 'ratios_lvl1' ||
+                             node.levelId == 'fractions_lvl2' ||
+                             node.levelId == 'proportions_lvl1' ||
+                             node.levelId == 'percentages_lvl1' ||
+                             node.levelId == 'applications_lvl1')) ...[
                           const Text(
                             'LESSONS IN THIS LEVEL',
                             style: TextStyle(
@@ -210,52 +216,31 @@ class QuestBriefModal extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: ColorSystem.plum.withOpacity(0.12), width: 1),
                             ),
-                            child: Column(
-                              children: [
-                                _buildLessonRow(context, studentId, 'fractions_les1', '1. Concept Learning', isFirst: true),
-                                const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'fractions_les2', '2. Visual Understanding'),
-                                const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'fractions_les3', '3. Guided Practice'),
-                                const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'fractions_les4', '4. Challenge'),
-                                const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'fractions_les5', '5. Teach Dendy'),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                        ] else if (node.levelId == 'fractions_lvl2') ...[
-                          const Text(
-                            'LESSONS IN THIS LEVEL',
-                            style: TextStyle(
-                              fontFamily: 'Fredoka',
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
-                              color: ColorSystem.purple,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: ColorSystem.plum.withOpacity(0.12), width: 1),
-                            ),
-                            child: Column(
-                              children: [
-                                _buildLessonRow(context, studentId, 'ratios_les1', '1. Concept Learning', isFirst: true),
-                                const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'ratios_les2', '2. Visual Understanding'),
-                                const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'ratios_les3', '3. Guided Practice'),
-                                const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'ratios_les4', '4. Challenge'),
-                                const SizedBox(height: 3),
-                                _buildLessonRow(context, studentId, 'ratios_les5', '5. Teach Dendy'),
-                              ],
+                            child: Builder(
+                              builder: (context) {
+                                final prefix = node.levelId == 'fractions_lvl1'
+                                    ? 'fractions'
+                                    : (node.levelId == 'ratios_lvl1' || node.levelId == 'fractions_lvl2'
+                                        ? 'ratios'
+                                        : (node.levelId == 'proportions_lvl1'
+                                            ? 'proportions'
+                                            : (node.levelId == 'percentages_lvl1'
+                                                ? 'percentages'
+                                                : 'applications')));
+                                return Column(
+                                  children: [
+                                    _buildLessonRow(context, studentId, '${prefix}_les1', '1. Concept Learning', isFirst: true),
+                                    const SizedBox(height: 3),
+                                    _buildLessonRow(context, studentId, '${prefix}_les2', '2. Visual Understanding'),
+                                    const SizedBox(height: 3),
+                                    _buildLessonRow(context, studentId, '${prefix}_les3', '3. Guided Practice'),
+                                    const SizedBox(height: 3),
+                                    _buildLessonRow(context, studentId, '${prefix}_les4', '4. Challenge'),
+                                    const SizedBox(height: 3),
+                                    _buildLessonRow(context, studentId, '${prefix}_les5', '5. Teach Dendy'),
+                                  ],
+                                );
+                              },
                             ),
                           ),
                           const SizedBox(height: 8),

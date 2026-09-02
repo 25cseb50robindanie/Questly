@@ -5,6 +5,7 @@ import '../core/theme/color_system.dart';
 import '../models/activity.dart';
 import '../models/progress.dart';
 import '../models/student.dart';
+import '../services/adaptive_learning_engine.dart';
 import '../services/sound_service.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/dendy_mascot.dart';
@@ -23,7 +24,7 @@ class FractionChallengeScreen extends StatefulWidget {
 }
 
 enum _ChallengeMode {
-  bridgeBuilder,
+  miniGame,
   flashcards,
   speedQuiz,
   memoryMatrix,
@@ -32,19 +33,21 @@ enum _ChallengeMode {
 class _FractionChallengeScreenState extends State<FractionChallengeScreen> with TickerProviderStateMixin {
   Student? _student;
   Activity? _activeActivity;
-  bool _isRatios = false;
+  String _topic = 'fractions'; // 'fractions', 'ratios', 'proportions', 'percentages', 'applications'
 
-  _ChallengeMode _activeMode = _ChallengeMode.bridgeBuilder;
+  final AdaptiveLearningEngine _adaptiveEngine = AdaptiveLearningEngine();
+
+  _ChallengeMode _activeMode = _ChallengeMode.miniGame;
   int _score = 0;
   int _earnedCoins = 0;
   int _earnedXp = 0;
   bool _isCompleted = false;
 
-  // 1. Bridge Builder Mini-Game State
+  // 1. Mini-Game State
   final int _bridgeTargetDenominator = 4;
   final int _bridgeTargetNumerator = 3;
   int? _selectedPlankIndex;
-  bool _bridgeConstructed = false;
+  bool _miniGameSolved = false;
 
   // 2. Flashcards State
   int _currentFlashcardIndex = 0;
@@ -54,7 +57,7 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
   int _comboCount = 0;
 
   // 4. Memory Matrix State
-  final List<String> _memoryCards = ['1/2', '2/4', '3/4', '6/8', '1/3', '2/6'];
+  List<String> _memoryCards = [];
   final List<int> _flippedCardIndices = [];
   final Set<int> _matchedCardIndices = {};
 
@@ -62,7 +65,7 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
   void initState() {
     super.initState();
     _loadStudent();
-    _initFlashcards();
+    _initChallengeData();
   }
 
   void _loadStudent() {
@@ -74,6 +77,17 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
     }
   }
 
+  String _detectTopic(Activity? act) {
+    if (act == null) return 'fractions';
+    final id = act.id.toLowerCase();
+    final type = act.type.toLowerCase();
+    if (type.contains('ratio') || id.contains('ratio')) return 'ratios';
+    if (type.contains('proportion') || id.contains('proportion')) return 'proportions';
+    if (type.contains('percentage') || id.contains('percentage') || type.contains('percent') || id.contains('percent')) return 'percentages';
+    if (type.contains('application') || id.contains('application')) return 'applications';
+    return 'fractions';
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -83,72 +97,151 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
     } else if (widget.activity != null) {
       _activeActivity = widget.activity;
     }
-    
-    final wasRatios = _isRatios;
-    _isRatios = _activeActivity?.type == 'ratio_challenge' ||
-        _activeActivity?.id.contains('ratio') == true;
-        
-    if (_flashcards.isEmpty || wasRatios != _isRatios) {
-      _initFlashcards();
+
+    final newTopic = _detectTopic(_activeActivity);
+    if (_flashcards.isEmpty || newTopic != _topic) {
+      _topic = newTopic;
+      _initChallengeData();
     }
   }
 
-  void _initFlashcards() {
-    if (!_isRatios) {
-      _flashcards = [
-        const FlashcardData(
-          id: 'fc1',
-          category: 'Definitions',
-          question: 'What is the top number of a fraction called?',
-          answer: 'NUMERATOR',
-          rule: 'The numerator shows how many equal parts you have.',
-        ),
-        const FlashcardData(
-          id: 'fc2',
-          category: 'Definitions',
-          question: 'What is the bottom number of a fraction called?',
-          answer: 'DENOMINATOR',
-          rule: 'The denominator represents total parts that make the whole.',
-        ),
-        const FlashcardData(
-          id: 'fc3',
-          category: 'Equivalent',
-          question: 'Is 2/4 equal to 1/2?',
-          answer: 'YES! (2/4 = 1/2)',
-          rule: 'Dividing top and bottom of 2/4 by 2 gives 1/2.',
-        ),
-        const FlashcardData(
-          id: 'fc4',
-          category: 'Comparison',
-          question: 'Which is bigger: 1/3 or 1/6?',
-          answer: '1/3 IS BIGGER',
-          rule: 'Cutting into 3 pieces gives much larger slices than 6 pieces.',
-        ),
-      ];
-    } else {
-      _flashcards = [
-        const FlashcardData(
-          id: 'rc1',
-          category: 'Ratio Notation',
-          question: 'Name three ways to write the ratio of 3 to 4:',
-          answer: '3 : 4  •  3 to 4  •  3/4',
-          rule: 'All three forms express the exact same relationship.',
-        ),
-        const FlashcardData(
-          id: 'rc2',
-          category: 'Simplification',
-          question: 'What is the simplest form of 6 : 9?',
-          answer: '2 : 3',
-          rule: 'Divide both 6 and 9 by their GCD (3): 6÷3 = 2, 9÷3 = 3.',
-        ),
-        const FlashcardData(
-          id: 'rc3',
-          category: 'Proportions',
-          question: 'If 1 cup syrup mixes with 4 cups soda, how much syrup for 8 cups soda?',
-          answer: '2 CUPS SYRUP',
-          rule: 'Soda doubled (4 × 2 = 8), so syrup doubles (1 × 2 = 2).',
-        ),
-      ];
+  void _initChallengeData() {
+    switch (_topic) {
+      case 'ratios':
+        _flashcards = [
+          const FlashcardData(
+            id: 'rc1',
+            category: 'Ratio Notation',
+            question: 'Name three ways to write the ratio of 3 to 4:',
+            answer: '3 : 4  •  3 to 4  •  3/4',
+            rule: 'All three forms express the exact same relationship.',
+          ),
+          const FlashcardData(
+            id: 'rc2',
+            category: 'Simplification',
+            question: 'What is the simplest form of 6 : 9?',
+            answer: '2 : 3',
+            rule: 'Divide both 6 and 9 by their GCD (3): 6÷3 = 2, 9÷3 = 3.',
+          ),
+          const FlashcardData(
+            id: 'rc3',
+            category: 'Proportions',
+            question: 'If 1 cup syrup mixes with 4 cups soda, how much syrup for 8 cups soda?',
+            answer: '2 CUPS SYRUP',
+            rule: 'Soda doubled (4 × 2 = 8), so syrup doubles (1 × 2 = 2).',
+          ),
+        ];
+        _memoryCards = ['2:3', '4:6', '1:2', '3:6', '3:4', '6:8'];
+        break;
+
+      case 'proportions':
+        _flashcards = [
+          const FlashcardData(
+            id: 'pc1',
+            category: 'Proportion Rule',
+            question: 'What is the Cross-Product Property for a/b = c/d?',
+            answer: 'a × d = b × c',
+            rule: 'The cross-products of a true proportion are always equal.',
+          ),
+          const FlashcardData(
+            id: 'pc2',
+            category: 'Scaling',
+            question: 'If a 2×3 rectangle is enlarged with scale factor k = 4, what is the new size?',
+            answer: '8 × 12',
+            rule: 'Multiply BOTH dimensions by 4 (2×4=8 and 3×4=12).',
+          ),
+          const FlashcardData(
+            id: 'pc3',
+            category: 'Unit Rate',
+            question: 'If 3 shields cost 15 gold, what is the cost of 1 shield (Unit Rate)?',
+            answer: '5 GOLD EACH',
+            rule: 'Divide 15 by 3 = 5 gold per shield.',
+          ),
+        ];
+        _memoryCards = ['2/5=4/10', '1/3=3/9', '3/4=6/8', '20=20', '9=9', '24=24'];
+        break;
+
+      case 'percentages':
+        _flashcards = [
+          const FlashcardData(
+            id: 'pct1',
+            category: 'Definitions',
+            question: 'What does "percent" mean literally?',
+            answer: 'PARTS PER HUNDRED (/100)',
+            rule: '50% = 50/100 = 0.50.',
+          ),
+          const FlashcardData(
+            id: 'pct2',
+            category: 'Benchmark',
+            question: 'What is 3/4 as a percentage?',
+            answer: '75%',
+            rule: '3/4 = (3×25)/(4×25) = 75/100 = 75%.',
+          ),
+          const FlashcardData(
+            id: 'pct3',
+            category: 'Discount',
+            question: 'What is 10% off a \$50 item?',
+            answer: '\$5 DISCOUNT (PAY \$45)',
+            rule: '10% of 50 = 0.10 × 50 = \$5 discount.',
+          ),
+        ];
+        _memoryCards = ['1/2', '50%', '1/4', '25%', '3/4', '75%'];
+        break;
+
+      case 'applications':
+        _flashcards = [
+          const FlashcardData(
+            id: 'app1',
+            category: 'Blueprint Scale',
+            question: 'On a 1 cm = 5 km map, how far is 4 cm?',
+            answer: '20 KILOMETERS',
+            rule: 'Multiply map distance by scale factor (4 × 5 = 20 km).',
+          ),
+          const FlashcardData(
+            id: 'app2',
+            category: 'Multi-Batch',
+            question: 'If 1 feast serving takes 2 eggs, how many for 25 knights?',
+            answer: '50 EGGS',
+            rule: 'Multiply 25 × 2 = 50 eggs.',
+          ),
+        ];
+        _memoryCards = ['1cm=5km', '4cm=20km', '25% off 100', 'Pay 75', '2 cups flour', '4 knights'];
+        break;
+
+      case 'fractions':
+      default:
+        _flashcards = [
+          const FlashcardData(
+            id: 'fc1',
+            category: 'Definitions',
+            question: 'What is the top number of a fraction called?',
+            answer: 'NUMERATOR',
+            rule: 'The numerator shows how many equal parts you have.',
+          ),
+          const FlashcardData(
+            id: 'fc2',
+            category: 'Definitions',
+            question: 'What is the bottom number of a fraction called?',
+            answer: 'DENOMINATOR',
+            rule: 'The denominator represents total parts that make the whole.',
+          ),
+          const FlashcardData(
+            id: 'fc3',
+            category: 'Equivalent',
+            question: 'Is 2/4 equal to 1/2?',
+            answer: 'YES! (2/4 = 1/2)',
+            rule: 'Dividing top and bottom of 2/4 by 2 gives 1/2.',
+          ),
+          const FlashcardData(
+            id: 'fc4',
+            category: 'Comparison',
+            question: 'Which is bigger: 1/3 or 1/6?',
+            answer: '1/3 IS BIGGER',
+            rule: 'Cutting into 3 pieces gives much larger slices than 6 pieces.',
+          ),
+        ];
+        _memoryCards = ['1/2', '2/4', '3/4', '6/8', '1/3', '2/6'];
+        break;
     }
   }
 
@@ -161,14 +254,60 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
     }
   }
 
+  void _handleChallengeFailure() {
+    SoundService.playSwitch();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: const [
+            Icon(Icons.replay_rounded, color: ColorSystem.pink, size: 24),
+            SizedBox(width: 8),
+            Text('CHALLENGE FAILED', style: TextStyle(fontFamily: 'Fredoka', fontSize: 16, fontWeight: FontWeight.w900, color: ColorSystem.pink)),
+          ],
+        ),
+        content: const Text(
+          'You need more preparation to defeat this arena! Returning to Guided Practice to reinforce your skills before retrying.',
+          style: TextStyle(fontFamily: 'Fredoka', fontSize: 13, color: ColorSystem.plum),
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorSystem.purple,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              Navigator.pushReplacementNamed(
+                context,
+                '/fraction_practice',
+                arguments: _activeActivity,
+              );
+            },
+            child: const Text('BACK TO GUIDED PRACTICE →', style: TextStyle(fontFamily: 'Fredoka', fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _completeChallengeLesson() async {
+    // If student didn't solve the mini-game, trigger failure flow
+    if (!_miniGameSolved && _score < 50) {
+      _handleChallengeFailure();
+      return;
+    }
+
     if (_isCompleted) return;
     _isCompleted = true;
 
     final student = _student;
     if (student != null) {
       final sId = student.questlyId.toLowerCase();
-      final lessonId = _isRatios ? 'ratios_les4' : 'fractions_les4';
+      final lessonId = '${_topic}_les4';
       final xp = _activeActivity?.xpReward ?? 80;
       final gold = _activeActivity?.goldReward ?? 15;
 
@@ -187,7 +326,7 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
         final updated = student.copyWith(
           xp: student.xp + xp + _earnedXp,
           gold: student.gold + gold + _earnedCoins,
-          currentLessonId: _isRatios ? 'ratios_les5' : 'fractions_les5',
+          currentLessonId: '${_topic}_les5',
         );
         await Locator.studentRepository.updateStudentProfile(updated);
       } catch (_) {}
@@ -210,6 +349,22 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
           );
         },
       );
+    }
+  }
+
+  String _getQuestTitle() {
+    switch (_topic) {
+      case 'ratios':
+        return 'RATIOS • QUEST 2';
+      case 'proportions':
+        return 'PROPORTIONS • QUEST 3';
+      case 'percentages':
+        return 'PERCENTAGES • QUEST 4';
+      case 'applications':
+        return 'APPLICATIONS • QUEST 5';
+      case 'fractions':
+      default:
+        return 'FRACTIONS • QUEST 1';
     }
   }
 
@@ -267,7 +422,7 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
 
   Widget _buildModeTabs() {
     final modes = [
-      {'mode': _ChallengeMode.bridgeBuilder, 'label': '🌉 Bridge Builder', 'icon': Icons.construction_rounded},
+      {'mode': _ChallengeMode.miniGame, 'label': '🎮 Quest Arena', 'icon': Icons.sports_esports_rounded},
       {'mode': _ChallengeMode.flashcards, 'label': '🗂️ Flashcards', 'icon': Icons.flip_rounded},
       {'mode': _ChallengeMode.speedQuiz, 'label': '⚡ Speed Quiz', 'icon': Icons.timer_rounded},
       {'mode': _ChallengeMode.memoryMatrix, 'label': '🧠 Memory Match', 'icon': Icons.grid_view_rounded},
@@ -310,8 +465,8 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
 
   Widget _buildActiveChallengeMode(bool isShort, bool isLandscape) {
     switch (_activeMode) {
-      case _ChallengeMode.bridgeBuilder:
-        return _buildBridgeBuilderMode(isShort, isLandscape);
+      case _ChallengeMode.miniGame:
+        return _buildMiniGameMode(isShort, isLandscape);
       case _ChallengeMode.flashcards:
         return _buildFlashcardsMode(isShort);
       case _ChallengeMode.speedQuiz:
@@ -322,9 +477,15 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
     }
   }
 
-  // 1. Canyon Bridge Builder Mini-Game
-  Widget _buildBridgeBuilderMode(bool isShort, bool isLandscape) {
-    final plankOptions = ['6/8', '2/4', '4/8', '3/6']; // 6/8 is equivalent to 3/4!
+  // 1. Topic Specific Mini-Game Mode
+  Widget _buildMiniGameMode(bool isShort, bool isLandscape) {
+    final plankOptions = _topic == 'ratios'
+        ? ['2 : 3', '3 : 5', '4 : 7', '1 : 2']
+        : (_topic == 'proportions'
+            ? ['x = 6', 'x = 8', 'x = 4', 'x = 10']
+            : (_topic == 'percentages'
+                ? ['\$75', '\$80', '\$60', '\$85']
+                : ['6/8', '2/4', '4/8', '3/6']));
 
     if (!isLandscape) {
       return SingleChildScrollView(
@@ -333,14 +494,14 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'BUILD THE BRIDGE SPAN: $_bridgeTargetNumerator/$_bridgeTargetDenominator',
+              'CONQUER THE QUEST ARENA',
               textAlign: TextAlign.center,
               style: const TextStyle(fontFamily: 'Fredoka', fontSize: 13, fontWeight: FontWeight.w900, color: ColorSystem.purple),
             ),
             const SizedBox(height: 10),
-            _buildCanyonVisual(),
+            _buildVisualArena(),
             const SizedBox(height: 12),
-            const Text('AVAILABLE PLANKS', style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
+            const Text('CHOOSE MATCHING PIECE', style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
             const SizedBox(height: 6),
             ...List.generate(plankOptions.length, (i) {
               return _buildPlankOptionTile(plankOptions[i], i);
@@ -360,30 +521,30 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
 
     return Row(
       children: [
-        // Left: Canyon Visualization
+        // Left: Arena Visualization
         Expanded(
           flex: 12,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'BUILD THE BRIDGE SPAN: $_bridgeTargetNumerator/$_bridgeTargetDenominator',
+                'QUEST ARENA: SPAN THE SPAN',
                 style: TextStyle(fontFamily: 'Fredoka', fontSize: isShort ? 12 : 14, fontWeight: FontWeight.w900, color: ColorSystem.purple),
               ),
               Expanded(
                 child: Center(
-                  child: _buildCanyonVisual(),
+                  child: _buildVisualArena(),
                 ),
               ),
               Text(
-                _bridgeConstructed
-                    ? '🎉 Bridge Crossed Successfully! (+25 XP)'
-                    : 'Select an equivalent plank to span the canyon safely!',
+                _miniGameSolved
+                    ? '🎉 Target Achieved Successfully! (+25 XP)'
+                    : 'Select the matching equivalent solution to conquer the arena!',
                 style: TextStyle(
                   fontFamily: 'Fredoka',
                   fontSize: 11,
                   fontWeight: FontWeight.w900,
-                  color: _bridgeConstructed ? ColorSystem.green : ColorSystem.plum,
+                  color: _miniGameSolved ? ColorSystem.green : ColorSystem.plum,
                 ),
               ),
             ],
@@ -392,7 +553,7 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
 
         const VerticalDivider(width: 24, thickness: 1.5, color: ColorSystem.cream),
 
-        // Right: Available Planks Selection & Finish
+        // Right: Available Options
         Expanded(
           flex: 10,
           child: Column(
@@ -404,7 +565,7 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text('AVAILABLE PLANKS', style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
+                      const Text('CHOOSE MATCHING PIECE', style: TextStyle(fontFamily: 'Fredoka', fontSize: 10, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
                       const SizedBox(height: 8),
                       ...List.generate(plankOptions.length, (i) {
                         return _buildPlankOptionTile(plankOptions[i], i);
@@ -428,7 +589,7 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
     );
   }
 
-  Widget _buildCanyonVisual() {
+  Widget _buildVisualArena() {
     return Container(
       height: 110,
       width: double.infinity,
@@ -454,26 +615,26 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
             width: 45,
             child: Container(color: const Color(0xFF795548)),
           ),
-          if (_bridgeConstructed)
+          if (_miniGameSolved)
             Container(
-              height: 20,
+              height: 22,
               width: 170,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFB300),
+                color: ColorSystem.green,
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(color: ColorSystem.plum, width: 2),
               ),
               child: const Center(
-                child: Text('6/8 PLANK MATCH ✓', style: TextStyle(fontFamily: 'Fredoka', fontSize: 9, fontWeight: FontWeight.w900, color: Colors.white)),
+                child: Text('TARGET MATCH ✓', style: TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.w900, color: Colors.white)),
               ),
             )
           else
-            Text(
-              'GAP REQUIRES EQUIVALENT PLANK: $_bridgeTargetNumerator/$_bridgeTargetDenominator',
-              style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.grey),
+            const Text(
+              'TARGET SPAN: SELECT CORRECT EQUIVALENT',
+              style: TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.grey),
             ),
           Positioned(
-            left: _bridgeConstructed ? 180 : 10,
+            left: _miniGameSolved ? 180 : 10,
             bottom: 35,
             child: const DendyMascot(size: 32, mood: DendyMood.happy),
           ),
@@ -484,18 +645,20 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
 
   Widget _buildPlankOptionTile(String plank, int i) {
     final isSelected = _selectedPlankIndex == i;
+    final isWinningOption = i == 0; // First option configured as match
+
     return GestureDetector(
       onTap: () {
         SoundService.playClick();
         setState(() {
           _selectedPlankIndex = i;
-          if (plank == '6/8') {
-            _bridgeConstructed = true;
+          if (isWinningOption) {
+            _miniGameSolved = true;
             _earnedXp += 25;
             _earnedCoins += 5;
             SoundService.playSuccess();
           } else {
-            _bridgeConstructed = false;
+            _miniGameSolved = false;
             SoundService.playSwitch();
           }
         });
@@ -504,15 +667,15 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
         decoration: BoxDecoration(
-          color: isSelected ? (_bridgeConstructed ? ColorSystem.green.withOpacity(0.15) : ColorSystem.pink.withOpacity(0.15)) : Colors.white,
+          color: isSelected ? (_miniGameSolved ? ColorSystem.green.withOpacity(0.15) : ColorSystem.pink.withOpacity(0.15)) : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? (_bridgeConstructed ? ColorSystem.green : ColorSystem.pink) : ColorSystem.plum.withOpacity(0.2),
+            color: isSelected ? (_miniGameSolved ? ColorSystem.green : ColorSystem.pink) : ColorSystem.plum.withOpacity(0.2),
             width: 1.5,
           ),
         ),
         child: Text(
-          'Plank $plank',
+          plank,
           textAlign: TextAlign.center,
           style: const TextStyle(fontFamily: 'Fredoka', fontSize: 12.5, fontWeight: FontWeight.w900, color: ColorSystem.plum),
         ),
@@ -559,6 +722,18 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
 
   // 3. Speed Quiz Mode
   Widget _buildSpeedQuizMode(bool isShort) {
+    final qText = _topic == 'ratios'
+        ? 'What is 3 : 5 in simplest terms?'
+        : (_topic == 'proportions'
+            ? 'If 2/3 = x/6, what is x?'
+            : (_topic == 'percentages'
+                ? 'What is 50% of 60?'
+                : 'What is 2/3 of 12?'));
+
+    final opt1 = _topic == 'percentages' ? '30' : (_topic == 'proportions' ? '4' : (_topic == 'ratios' ? '3 : 5' : '8'));
+    final opt2 = _topic == 'percentages' ? '25' : '6';
+    final opt3 = _topic == 'percentages' ? '15' : '10';
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
@@ -581,17 +756,18 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
             ),
             child: Column(
               children: [
-                const Text(
-                  'Speed Question: What is 2/3 of 12?',
-                  style: TextStyle(fontFamily: 'Fredoka', fontSize: 14, fontWeight: FontWeight.w900, color: ColorSystem.plum),
+                Text(
+                  'Speed Blitz: $qText',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontFamily: 'Fredoka', fontSize: 14, fontWeight: FontWeight.w900, color: ColorSystem.plum),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildSpeedQuizOption('8', true),
-                    _buildSpeedQuizOption('6', false),
-                    _buildSpeedQuizOption('4', false),
+                    _buildSpeedQuizOption(opt1, true),
+                    _buildSpeedQuizOption(opt2, false),
+                    _buildSpeedQuizOption(opt3, false),
                   ],
                 ),
               ],
@@ -630,7 +806,7 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
     );
   }
 
-  // 4. Memory Matrix Card Matching Mode
+  // 4. Memory Matrix Mode
   Widget _buildMemoryMatrixMode(bool isShort) {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -638,7 +814,7 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
-            'MATCH EQUIVALENT PAIRS (e.g. 1/2 == 2/4)',
+            'MATCH EQUIVALENT PAIRS',
             style: TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.w900, color: ColorSystem.purple),
           ),
           const SizedBox(height: 10),
@@ -664,12 +840,12 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
                             final idx2 = _flippedCardIndices[1];
                             final card1 = _memoryCards[idx1];
                             final card2 = _memoryCards[idx2];
-                            bool matched = (card1 == '1/2' && card2 == '2/4') ||
+                            bool matched = (idx1 % 2 == 0 && idx2 == idx1 + 1) ||
+                                (idx2 % 2 == 0 && idx1 == idx2 + 1) ||
+                                (card1 == '1/2' && card2 == '2/4') ||
                                 (card1 == '2/4' && card2 == '1/2') ||
                                 (card1 == '3/4' && card2 == '6/8') ||
-                                (card1 == '6/8' && card2 == '3/4') ||
-                                (card1 == '1/3' && card2 == '2/6') ||
-                                (card1 == '2/6' && card2 == '1/3');
+                                (card1 == '6/8' && card2 == '3/4');
 
                             if (matched) {
                               SoundService.playSuccess();
@@ -705,13 +881,19 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
                   ),
                   child: Center(
                     child: isFlipped
-                        ? Text(
-                            _memoryCards[i],
-                            style: TextStyle(
-                              fontFamily: 'Fredoka',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w900,
-                              color: isMatched ? ColorSystem.green : ColorSystem.purple,
+                        ? FittedBox(
+                            child: Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: Text(
+                                _memoryCards[i],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'Fredoka',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  color: isMatched ? ColorSystem.green : ColorSystem.purple,
+                                ),
+                              ),
                             ),
                           )
                         : const Icon(Icons.help_outline_rounded, color: Colors.white, size: 24),
@@ -740,7 +922,7 @@ class _FractionChallengeScreenState extends State<FractionChallengeScreen> with 
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isRatios ? 'RATIOS • LEVEL 2' : 'FRACTIONS • LEVEL 1',
+                  _getQuestTitle(),
                   style: TextStyle(fontFamily: 'Fredoka', fontSize: isShort ? 10 : 12, fontWeight: FontWeight.w900, color: ColorSystem.purple),
                 ),
                 Text(
