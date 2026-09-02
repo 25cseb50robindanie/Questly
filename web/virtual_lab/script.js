@@ -1,16 +1,19 @@
 /**
- * QUESTLY VIRTUAL LAB - MOBILE 5-LEVEL GAME CONTROLLER
+ * QUESTLY VIRTUAL LAB - MOBILE 5-LEVEL GAME CONTROLLER WITH EXPERIMENT SELECTOR
  */
 
+let selectedExperiment = 'titration';
 let currentLevel = 1;
 let unlockedLevel = 1;
 let conceptSlide = 0; // 0..3
 let isQuizCorrect = false;
 
-// Apparatus
+// Apparatus Set (6 items)
 const assembledApparatus = new Set();
 
 // Reagents
+let selectedAcid = null;
+let selectedIndicator = null;
 let acidPipetted = false;
 let indicatorAdded = false;
 
@@ -85,9 +88,7 @@ class SimpleSound {
 }
 const sound = new SimpleSound();
 
-// Text to Speech
-function speakFoxyText() {
-  const text = document.getElementById('foxySpeech').innerText;
+function speakText(text) {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text.replace(/"/g, ''));
@@ -97,8 +98,45 @@ function speakFoxyText() {
   }
 }
 
+function speakFoxyText() {
+  const text = document.getElementById('foxySpeech').innerText;
+  speakText(text);
+}
+
 function setFoxySpeech(text) {
   document.getElementById('foxySpeech').innerText = text;
+}
+
+// ---------------------------------------------------------------------------
+// 0. EXPERIMENT SELECTION FLOW
+// ---------------------------------------------------------------------------
+function startExperiment(expId) {
+  sound.playClick();
+  selectedExperiment = expId;
+  document.getElementById('screenExpSelect').classList.remove('active');
+  document.getElementById('screenActiveLab').classList.add('active');
+
+  currentLevel = 1;
+  unlockedLevel = 1;
+  conceptSlide = 0;
+  isQuizCorrect = false;
+  assembledApparatus.clear();
+  selectedAcid = null;
+  selectedIndicator = null;
+  acidPipetted = false;
+  indicatorAdded = false;
+  buretteVolume = 0.0;
+  isContinuous = false;
+
+  updateSlideView();
+  goToLevel(1);
+}
+
+function exitToExperimentSelect() {
+  sound.playClick();
+  if (isContinuous) toggleContinuous();
+  document.getElementById('screenActiveLab').classList.remove('active');
+  document.getElementById('screenExpSelect').classList.add('active');
 }
 
 // ---------------------------------------------------------------------------
@@ -184,7 +222,7 @@ function goToLevel(lvl) {
   currentLevel = lvl;
   if (lvl > unlockedLevel) unlockedLevel = lvl;
 
-  // Update Stepper Pills
+  // Stepper Pills
   for (let i = 1; i <= 5; i++) {
     const pill = document.getElementById(`pill${i}`);
     pill.classList.remove('active', 'passed', 'locked');
@@ -200,25 +238,22 @@ function goToLevel(lvl) {
     }
   }
 
-  // Update Header
   document.getElementById('headerSubtitle').innerText = `LEVEL ${currentLevel} OF 5 • ACID–BASE TITRATION`;
 
-  // Show Active Level Section
   for (let i = 1; i <= 5; i++) {
     const card = document.getElementById(`level${i}Card`);
     if (card) card.classList.toggle('active', i === currentLevel);
   }
 
-  // Teacher Message
   switch (currentLevel) {
     case 2:
-      setFoxySpeech('"Level 2: Tap each apparatus card to assemble all 4 essential pieces onto your lab table!"');
+      setFoxySpeech('"Level 2: Select the 4 required glassware apparatus for titration from the 6 lab tools below!"');
       break;
     case 3:
-      setFoxySpeech('"Level 3: Pipette 20.0 mL of HCl acid into the flask, then add 3 drops of indicator!"');
+      setFoxySpeech('"Level 3: Select and pipette 20.0 mL of 0.1M HCl into the flask, then add 3 drops of Phenolphthalein!"');
       break;
     case 4:
-      setFoxySpeech('"Level 4: Add drops slowly and swirl. Stop right when a faint persistent pink endpoint appears!"');
+      setFoxySpeech('"Level 4: Turn the stopcock to add drops of NaOH. Swirl regularly. Stop right when a faint persistent pink endpoint appears!"');
       renderCanvas();
       break;
     case 5:
@@ -228,7 +263,7 @@ function goToLevel(lvl) {
 }
 
 // ---------------------------------------------------------------------------
-// LEVEL 2: APPARATUS
+// LEVEL 2: 6 APPARATUS (4 REQUIRED)
 // ---------------------------------------------------------------------------
 function toggleApparatus(id) {
   sound.playPop();
@@ -245,58 +280,72 @@ function toggleApparatus(id) {
     mark.innerText = '✅';
   }
 
-  document.getElementById('apparatusCount').innerText = `${assembledApparatus.size} / 4 Placed`;
+  document.getElementById('apparatusCount').innerText = `${assembledApparatus.size} Selected`;
   const btn = document.getElementById('btnFinishLevel2');
 
-  if (assembledApparatus.size === 4) {
+  const required = ['stand', 'burette', 'flask', 'pipette'];
+  const allRequired = required.every(r => assembledApparatus.has(r));
+
+  if (allRequired) {
     sound.playSuccess();
     btn.classList.remove('disabled');
     btn.innerText = 'START REAGENTS PREPARATION ➜';
   } else {
     btn.classList.add('disabled');
-    btn.innerText = 'Assemble all 4 items to proceed';
+    btn.innerText = 'Select Stand, Burette, Flask & Pipette';
   }
 }
 
 function finishLevel2() {
-  if (assembledApparatus.size === 4) {
+  const required = ['stand', 'burette', 'flask', 'pipette'];
+  if (required.every(r => assembledApparatus.has(r))) {
     sound.playSuccess();
     goToLevel(3);
   }
 }
 
 // ---------------------------------------------------------------------------
-// LEVEL 3: REAGENTS
+// LEVEL 3: 6 REAGENTS BOTTLES (HCl + PHENOLPHTHALEIN REQUIRED)
 // ---------------------------------------------------------------------------
-function pipetteAcid() {
+function selectReagent(id, type) {
   sound.playPop();
-  acidPipetted = true;
-  const box = document.getElementById('acidBox');
-  box.classList.add('done');
-  document.getElementById('btnPipetteAcid').innerText = '✓ Pipetted 20 mL';
-  document.getElementById('btnPipetteAcid').classList.add('btn-green-solid');
-  checkReagentsLevel();
-}
 
-function addIndicator() {
-  sound.playPop();
-  indicatorAdded = true;
-  const box = document.getElementById('indicatorBox');
-  box.classList.add('done');
-  document.getElementById('btnAddIndicator').innerText = '✓ 3 Drops Added';
-  document.getElementById('btnAddIndicator').classList.add('btn-green-solid');
-  checkReagentsLevel();
-}
+  if (type === 'acid') {
+    selectedAcid = id;
+    acidPipetted = (id === 'hcl');
+  } else if (type === 'indicator') {
+    selectedIndicator = id;
+    indicatorAdded = (id === 'phenolphthalein');
+  }
 
-function checkReagentsLevel() {
-  const count = (acidPipetted ? 1 : 0) + (indicatorAdded ? 1 : 0);
-  document.getElementById('reagentsCount').innerText = `${count} / 2 Steps`;
+  // Update checkmarks on bottles
+  const reagents = ['hcl', 'phenolphthalein', 'naoh', 'ch3cooh', 'methyl_orange', 'h2o'];
+  reagents.forEach(r => {
+    const card = document.getElementById(`bot_${r}`);
+    const chk = document.getElementById(`chk_${r}`);
+    if (r === selectedAcid || r === selectedIndicator) {
+      card.classList.add('selected');
+      chk.innerText = '✅';
+    } else {
+      card.classList.remove('selected');
+      chk.innerText = '⭕';
+    }
+  });
 
   const btn = document.getElementById('btnFinishLevel3');
+  const counter = document.getElementById('reagentsCount');
+
   if (acidPipetted && indicatorAdded) {
     sound.playSuccess();
+    counter.innerText = '✓ Ready';
+    counter.style.color = '#06D6A0';
     btn.classList.remove('disabled');
     btn.innerText = 'START TITRATION SIMULATOR ➜';
+  } else {
+    counter.innerText = 'Select Acid & Indicator';
+    counter.style.color = '#FF6B6B';
+    btn.classList.add('disabled');
+    btn.innerText = 'Select 0.1M HCl and Phenolphthalein';
   }
 }
 
@@ -392,7 +441,7 @@ function verifyEndpoint() {
     goToLevel(5);
   } else if (buretteVolume < targetEndpoint) {
     sound.playPop();
-    alert(`Keep going! Volume is ${buretteVolume.toFixed(2)} mL (Target: 20.00 mL). Add drops until pink color persists!`);
+    alert(`Keep going! Volume is ${buretteVolume.toFixed(2)} mL (Target: 20.00 mL). Add drops until faint pink color persists!`);
   } else {
     sound.playPop();
     alert(`Over-titrated (${buretteVolume.toFixed(2)} mL). Dark pink indicates excess base. Let's see calculations in the report!`);
@@ -405,7 +454,6 @@ function updateHud() {
   document.getElementById('hudPH').innerText = calculatePH().toFixed(2);
 }
 
-// Canvas Painter
 function renderCanvas() {
   const canvas = document.getElementById('titrationCanvas');
   if (!canvas) return;
@@ -417,7 +465,7 @@ function renderCanvas() {
   const cx = w * 0.55;
   const standX = w * 0.22;
 
-  // Retort Stand
+  // Stand Base & Rod
   ctx.fillStyle = '#1E293B';
   ctx.fillRect(standX - 25, h * 0.92, 50, 8);
   ctx.strokeStyle = '#334155';
@@ -427,37 +475,34 @@ function renderCanvas() {
   ctx.lineTo(standX, h * 0.06);
   ctx.stroke();
 
-  // Clamp
+  // Stand Clamp
   ctx.lineWidth = 2.5;
   ctx.beginPath();
   ctx.moveTo(standX, h * 0.25);
   ctx.lineTo(cx, h * 0.25);
   ctx.stroke();
 
-  // Burette Tube
+  // Glass Burette
   const bTop = h * 0.08;
   const bBottom = h * 0.54;
   const bWidth = 11;
 
-  // Liquid
   const frac = Math.max(0, Math.min(1, 1 - (buretteVolume / 50.0)));
   const liqTop = bTop + (bBottom - bTop) * (1 - frac);
   ctx.fillStyle = 'rgba(186, 230, 253, 0.5)';
   ctx.fillRect(cx - bWidth / 2 + 1, liqTop, bWidth - 2, bBottom - liqTop);
 
-  // Outline
   ctx.strokeStyle = '#475569';
   ctx.lineWidth = 1.2;
   ctx.strokeRect(cx - bWidth / 2, bTop, bWidth, bBottom - bTop);
 
-  // Stopcock
+  // Red Stopcock Valve
   const valveY = bBottom + 6;
   ctx.fillStyle = '#EF4444';
   ctx.beginPath();
   ctx.arc(cx, valveY, 3, 0, Math.PI * 2);
   ctx.fill();
 
-  // Tip
   ctx.beginPath();
   ctx.moveTo(cx, valveY);
   ctx.lineTo(cx, valveY + 10);
@@ -484,16 +529,14 @@ function renderCanvas() {
   ctx.lineTo(cx - 7, fTop + 8);
   ctx.closePath();
 
-  // Liquid Color calculation
   const ph = calculatePH();
   let liqColor = 'rgba(186, 230, 253, 0.35)';
   if (ph >= 8.2 && ph <= 9.0) {
-    liqColor = 'rgba(244, 114, 182, 0.65)'; // Pale pink
+    liqColor = 'rgba(244, 114, 182, 0.65)';
   } else if (ph > 9.0) {
-    liqColor = 'rgba(219, 39, 119, 0.85)'; // Dark magenta
+    liqColor = 'rgba(219, 39, 119, 0.85)';
   }
 
-  // Fill Flask Liquid
   const liqY = fBottom - 18;
   ctx.fillStyle = liqColor;
   ctx.beginPath();
@@ -508,7 +551,6 @@ function renderCanvas() {
   ctx.closePath();
   ctx.fill();
 
-  // Flask outline
   ctx.strokeStyle = '#334155';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
@@ -523,21 +565,14 @@ function renderCanvas() {
 }
 
 // ---------------------------------------------------------------------------
-// LEVEL 5: REPORT
+// LEVEL 5: REPORT & FINISH
 // ---------------------------------------------------------------------------
 function claimLabTrophy() {
   sound.playSuccess();
   alert('🏆 CONGRATULATIONS!\nYou completed all 5 Virtual Lab levels and earned +60 XP & +15 Coins!');
+  exitToExperimentSelect();
 }
 
-function handleGoBack() {
-  if (confirm('Return to previous screen?')) {
-    window.history.back();
-  }
-}
-
-// Init
 window.addEventListener('DOMContentLoaded', () => {
-  updateSlideView();
-  renderCanvas();
+  // Ready
 });
