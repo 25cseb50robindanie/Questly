@@ -959,18 +959,43 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (_conceptSlide > 0)
-                CustomButton(text: '⮜ Previous', backgroundColor: ColorSystem.lavender, textColor: Colors.white, onPressed: _prevSlide)
+                SizedBox(
+                  width: 120,
+                  child: CustomButton(
+                    width: 120,
+                    height: 38,
+                    text: '⮜ Previous',
+                    backgroundColor: ColorSystem.lavender,
+                    textColor: Colors.white,
+                    onPressed: _prevSlide,
+                  ),
+                )
               else
-                const SizedBox(width: 90),
+                const SizedBox(width: 120),
               Text('Lesson ${_conceptSlide + 1} of 4', style: const TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.w900, color: ColorSystem.purple)),
               if (_conceptSlide < 3)
-                CustomButton(text: 'Next Concept ➜', backgroundColor: ColorSystem.castlePurple, textColor: Colors.white, onPressed: _nextSlide)
+                SizedBox(
+                  width: 150,
+                  child: CustomButton(
+                    width: 150,
+                    height: 38,
+                    text: 'Next Concept ➜',
+                    backgroundColor: ColorSystem.castlePurple,
+                    textColor: Colors.white,
+                    onPressed: _nextSlide,
+                  ),
+                )
               else
-                CustomButton(
-                  text: _quizCorrect ? 'ENTER APPARATUS LAB ➜' : 'Select Correct Option',
-                  backgroundColor: _quizCorrect ? ColorSystem.green : Colors.grey.shade400,
-                  textColor: Colors.white,
-                  onPressed: _quizCorrect ? _advanceToLevel2 : () {},
+                SizedBox(
+                  width: 210,
+                  child: CustomButton(
+                    width: 210,
+                    height: 38,
+                    text: _quizCorrect ? 'ENTER APPARATUS LAB ➜' : 'Select Correct Option',
+                    backgroundColor: _quizCorrect ? ColorSystem.green : Colors.grey.shade400,
+                    textColor: Colors.white,
+                    onPressed: _quizCorrect ? _advanceToLevel2 : () {},
+                  ),
                 ),
             ],
           ),
@@ -981,7 +1006,8 @@ class _VirtualLabScreenState extends State<VirtualLabScreen>
 
   Widget _buildConceptBox(String formula, String desc) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const SizedBox(height: 10),
         Container(
