@@ -1,0 +1,385 @@
+{
+  "module_id": "fractions_ratios_master",
+  "title": "Fractions & Ratios Master Knowledge Base",
+  "grade": 8,
+  "subject": "Mathematics",
+  "alias_dictionary": {
+    "fraction": ["fraction", "part", "piece", "portion", "share", "what is a fraction", "parts of a whole", "equal parts"],
+    "numerator": ["numerator", "top number", "number on top", "your pieces", "selected parts", "how many parts"],
+    "denominator": ["denominator", "bottom number", "number at bottom", "all the pieces", "total equal parts", "can denominator be zero"],
+    "proper_fraction": ["proper fraction", "proper", "less than one whole", "numerator smaller than denominator"],
+    "improper_fraction": ["improper fraction", "improper", "more than one whole", "numerator greater than denominator", "5/4 allowed", "is 5/4 possible"],
+    "mixed_fraction": ["mixed fraction", "mixed number", "whole number and fraction", "convert mixed", "convert improper"],
+    "equivalent_fraction": ["equivalent fraction", "equivalent", "same value", "how to make equivalent fraction", "equal fractions"],
+    "simplify_fraction": ["simplify", "simplifying", "reduce", "lowest form", "simplest form", "simplify fractions", "reduce fraction"],
+    "compare_fractions": ["compare fractions", "which is bigger", "which is larger", "greater than", "comparing fractions", "bigger numerator", "smaller denominator"],
+    "add_fractions": ["add fractions", "adding fractions", "addition of fractions", "sum of fractions", "plus fractions", "how do i add fractions"],
+    "subtract_fractions": ["subtract fractions", "subtracting fractions", "subtraction of fractions", "minus fractions", "how do i subtract fractions"],
+    "multiply_fractions": ["multiply fractions", "multiplying fractions", "multiplication of fractions", "times fractions", "how do i multiply fractions"],
+    "divide_fractions": ["divide fractions", "dividing fractions", "division of fractions", "keep change flip", "how do i divide fractions"],
+    "number_line": ["number line", "fractions on number line", "where is 1/2", "where is 3/4", "fraction placement"],
+    "ratio": ["ratio", "comparison", "compare two quantities", "what is a ratio", "boys to girls", "3:2"],
+    "simplify_ratio": ["simplify ratio", "simplifying ratios", "lowest form ratio", "reduce ratio"],
+    "equivalent_ratio": ["equivalent ratio", "equivalent ratios", "same ratio", "equal ratios"],
+    "ratio_vs_fraction": ["ratio vs fraction", "difference between ratio and fraction", "are fractions and ratios the same", "ratio or fraction"],
+    "proportion": ["proportion", "cross multiplication", "are ratios equal", "solve proportion"],
+    "unit_rate": ["unit rate", "cost per item", "price per unit", "speed", "per kilogram", "unit price"],
+    "decimal_connection": ["fraction to decimal", "decimal to fraction", "convert 0.5", "convert 0.25", "convert 0.75", "point number"],
+    "percentage_connection": ["fraction to percentage", "percentage connection", "percent", "convert 50%", "convert 25%", "fraction to percent"],
+    "word_problems": ["word problem", "pizza slices", "chocolate problem", "rope problem", "ratio problem"]
+  },
+  "concepts": {
+    "fraction": {
+      "id": "fraction",
+      "name": "What is a Fraction?",
+      "definition": "A fraction represents a part of a whole. It tells us how many equal parts are taken out of the total equal parts.",
+      "response_styles": {
+        "standard": "A fraction represents a part of a whole. It has two numbers separated by a fraction line: the top number (numerator) shows the selected parts, and the bottom number (denominator) shows the total equal parts.",
+        "simple": "Imagine cutting a pizza into 8 equal slices. If you eat 3 slices, you have eaten 3/8 of the pizza!",
+        "simplest": "A fraction is simply some pieces out of all the pieces.",
+        "real_life": "Think of pizza slices, chocolate bar pieces, cake slices, or a water bottle that is half full (1/2).",
+        "exam": "A fraction is a numerical quantity representing a rational number in the form a/b where b != 0, denoting 'a' equal parts of a whole divided into 'b' equal parts."
+      },
+      "suggested_chips": ["What is the numerator?", "What is the denominator?", "Explain simply.", "Quiz me."]
+    },
+    "numerator": {
+      "id": "numerator",
+      "name": "Numerator",
+      "definition": "The numerator is the number above the fraction line.",
+      "response_styles": {
+        "standard": "The numerator is the number above the fraction line. It indicates how many equal parts of the whole are being counted or selected.",
+        "simple": "The numerator counts the specific pieces you have. In 3/5, the numerator is 3.",
+        "simplest": "Top number = your pieces.",
+        "real_life": "If you take 3 slices from an 8-slice pizza, 3 is the numerator.",
+        "exam": "The numerator is the dividend in a fraction a/b, representing the number of fractional units considered."
+      },
+      "suggested_chips": ["What is the denominator?", "What is a proper fraction?", "Explain simply.", "Quiz me."]
+    },
+    "denominator": {
+      "id": "denominator",
+      "name": "Denominator",
+      "definition": "The denominator is the number below the fraction line.",
+      "response_styles": {
+        "standard": "The denominator is the number below the fraction line. It indicates the total number of equal parts into which the whole is divided. A denominator can never be zero.",
+        "simple": "The denominator tells you how many total pieces exist altogether. In 3/5, the denominator is 5.",
+        "simplest": "Bottom number = all the pieces in total.",
+        "real_life": "If a whole pizza is sliced into 8 equal pieces, 8 is the denominator.",
+        "exam": "The denominator is the divisor in a fraction a/b (b != 0), specifying the total number of equal subdivisions constituting one whole."
+      },
+      "suggested_chips": ["Can denominator be zero?", "What is the numerator?", "Explain simply.", "Quiz me."]
+    },
+    "proper_fraction": {
+      "id": "proper_fraction",
+      "name": "Proper Fractions",
+      "definition": "A proper fraction has a numerator smaller than its denominator, representing a value strictly less than one whole.",
+      "response_styles": {
+        "standard": "A proper fraction has a numerator strictly smaller than its denominator (such as 1/2, 3/5, or 7/10). Its numerical value is always less than 1.",
+        "simple": "In a proper fraction, the top number is smaller than the bottom number. You have less than one whole object.",
+        "simplest": "Top number smaller than bottom number (less than 1).",
+        "real_life": "Eating 3 slices out of an 8-slice pizza (3/8) is a proper fraction because you did not finish the whole pizza.",
+        "exam": "A proper fraction is any fraction a/b where 0 <= a < b, having a value strictly less than 1."
+      },
+      "suggested_chips": ["What is an improper fraction?", "What is a mixed fraction?", "Explain simply.", "Quiz me."]
+    },
+    "improper_fraction": {
+      "id": "improper_fraction",
+      "name": "Improper Fractions",
+      "definition": "An improper fraction has a numerator greater than or equal to its denominator, representing a value of one whole or more.",
+      "response_styles": {
+        "standard": "An improper fraction has a numerator greater than or equal to its denominator (such as 5/4, 8/5, or 9/9). Its value is equal to or greater than 1.",
+        "simple": "In an improper fraction, the top number is equal to or bigger than the bottom number, meaning you have at least one complete whole object or more!",
+        "simplest": "Top number bigger than or equal to bottom number (1 or more).",
+        "real_life": "Having 5 quarter-slices of pizza (5/4) means you have one entire pizza plus one extra slice.",
+        "exam": "An improper fraction is a fraction a/b where a >= b > 0, representing a value greater than or equal to 1."
+      },
+      "suggested_chips": ["Convert to mixed fraction.", "What is a proper fraction?", "Explain simply.", "Quiz me."]
+    },
+    "mixed_fraction": {
+      "id": "mixed_fraction",
+      "name": "Mixed Fractions (Mixed Numbers)",
+      "definition": "A mixed fraction combines a whole number with a proper fraction.",
+      "response_styles": {
+        "standard": "A mixed fraction (mixed number) combines an integer with a proper fraction, such as 2 1/3 (two wholes and one third).",
+        "simple": "A mixed fraction shows whole items and leftover pieces together, like 2 full pizzas and 1/3 of another pizza.",
+        "simplest": "Whole number plus a fraction.",
+        "real_life": "Baking with 2 1/2 cups of flour means 2 full cups plus half of another cup.",
+        "exam": "A mixed number is expressed as c a/b, representing the sum of integer c and proper fraction a/b (equivalent to (c*b + a)/b)."
+      },
+      "conversion_rules": {
+        "improper_to_mixed": "Divide numerator by denominator. The quotient is the whole number, the remainder is the new numerator, and the denominator stays the same (e.g. 7/3 = 2 1/3).",
+        "mixed_to_improper": "Multiply whole number by denominator, add the numerator, and keep the same denominator (e.g. 2 1/3 = (2*3 + 1)/3 = 7/3)."
+      },
+      "suggested_chips": ["How to convert 7/3?", "How to convert 2 1/3?", "What is an improper fraction?", "Quiz me."]
+    },
+    "equivalent_fraction": {
+      "id": "equivalent_fraction",
+      "name": "Equivalent Fractions",
+      "definition": "Equivalent fractions have different numerators and denominators but represent the exact same value.",
+      "response_styles": {
+        "standard": "Equivalent fractions represent the same portion of a whole. You generate equivalent fractions by multiplying or dividing both the numerator and the denominator by the same non-zero number.",
+        "simple": "Half a pizza (1/2) and two quarters of a pizza (2/4) give you the exact same amount of food!",
+        "simplest": "Different numbers, exact same value.",
+        "real_life": "1/2 of a chocolate bar is identical in size to 2/4 or 4/8 of that same bar.",
+        "exam": "Two fractions a/b and c/d are equivalent if and only if their cross-products are equal (a*d = b*c)."
+      },
+      "suggested_chips": ["How to simplify fractions?", "What is 1/2 equivalent to?", "Explain simply.", "Quiz me."]
+    },
+    "simplify_fraction": {
+      "id": "simplify_fraction",
+      "name": "Simplifying Fractions",
+      "definition": "Simplifying (reducing) a fraction means dividing both numerator and denominator by their greatest common factor until they have no common factors other than 1.",
+      "response_styles": {
+        "standard": "To simplify a fraction to its lowest terms, find the greatest common factor (GCF) of the numerator and denominator and divide both numbers by it. For example, 12/16 divided by 4 gives 3/4.",
+        "simple": "Divide the top and bottom by the biggest number that goes evenly into both.",
+        "simplest": "Divide top and bottom by the same number to reach lowest terms.",
+        "real_life": "Saying 3/4 of a class passed is much clearer than saying 12/16 passed, even though both mean the exact same thing.",
+        "exam": "A fraction a/b is in irreducible lowest terms when gcd(a, b) = 1."
+      },
+      "suggested_chips": ["Simplify 12/16.", "What are equivalent fractions?", "Explain simply.", "Quiz me."]
+    },
+    "compare_fractions": {
+      "id": "compare_fractions",
+      "name": "Comparing Fractions",
+      "definition": "Comparing fractions determines which fraction has a greater value by using common denominators or cross-multiplication.",
+      "response_styles": {
+        "standard": "To compare fractions with different denominators, convert them to equivalent fractions with a common denominator (LCM) or cross-multiply. For 1/3 and 1/2, convert to 2/6 and 3/6, so 1/2 is greater.",
+        "simple": "If bottom numbers are the same, the bigger top number wins (3/7 > 2/7). If top numbers are the same, the smaller bottom number wins because the pieces are bigger (1/2 > 1/4)!",
+        "simplest": "Same bottom: bigger top wins. Same top: smaller bottom wins.",
+        "real_life": "Getting 1/2 of a cake gives you much more cake than getting 1/8 of that cake.",
+        "exam": "To compare a/b and c/d, evaluate the sign of (a*d - b*c). If a*d > b*c, then a/b > c/d."
+      },
+      "suggested_chips": ["Which is bigger, 1/2 or 1/3?", "Is 3/4 greater than 2/3?", "Explain simply.", "Quiz me."]
+    },
+    "add_fractions": {
+      "id": "add_fractions",
+      "name": "Adding Fractions",
+      "definition": "Adding fractions combines parts of a whole. If denominators are equal, add numerators; if different, find a common denominator first.",
+      "response_styles": {
+        "standard": "To add fractions with the same denominator, add the numerators and keep the denominator (2/7 + 3/7 = 5/7). With different denominators, find the LCM, convert both fractions, and then add numerators (1/2 + 1/3 = 3/6 + 2/6 = 5/6).",
+        "simple": "Make the bottom numbers match first, then add only the top numbers together. Never add the bottom numbers!",
+        "simplest": "Match bottom numbers, then add top numbers.",
+        "real_life": "If you have 1/4 cup of sugar and add 2/4 cup of sugar, you have 3/4 cup of sugar total.",
+        "exam": "Formula: a/b + c/d = (a*d + b*c) / (b*d), followed by reduction to lowest terms."
+      },
+      "suggested_chips": ["How do I subtract fractions?", "Why can't I add denominators?", "Add 1/2 and 1/3.", "Quiz me."]
+    },
+    "subtract_fractions": {
+      "id": "subtract_fractions",
+      "name": "Subtracting Fractions",
+      "definition": "Subtracting fractions finds the difference between parts of a whole using a common denominator.",
+      "response_styles": {
+        "standard": "To subtract fractions with the same denominator, subtract the numerators and keep the denominator (5/8 - 2/8 = 3/8). With different denominators, find the LCM, convert both, and subtract (3/4 - 1/2 = 3/4 - 2/4 = 1/4).",
+        "simple": "Make bottom numbers match, then subtract only the top numbers.",
+        "simplest": "Match bottom numbers, then subtract top numbers.",
+        "real_life": "If you have 5/8 of a pizza and eat 2/8, you have 3/8 of the pizza remaining.",
+        "exam": "Formula: a/b - c/d = (a*d - b*c) / (b*d), followed by reduction to lowest terms."
+      },
+      "suggested_chips": ["How do I add fractions?", "Subtract 3/4 - 1/2.", "Explain simply.", "Quiz me."]
+    },
+    "multiply_fractions": {
+      "id": "multiply_fractions",
+      "name": "Multiplying Fractions",
+      "definition": "Multiplying fractions calculates a fraction of another fraction by multiplying numerators together and denominators together.",
+      "response_styles": {
+        "standard": "To multiply fractions, multiply the numerators together and multiply the denominators together: (a/b) * (c/d) = (a*c)/(b*d). For example, 2/3 * 4/5 = 8/15.",
+        "simple": "Multiply top times top, and bottom times bottom! No need for common denominators.",
+        "simplest": "Top times top, bottom times bottom.",
+        "real_life": "Taking half of a quarter pizza (1/2 * 1/4) gives you 1/8 of the whole pizza.",
+        "exam": "Product rule: (a/b) * (c/d) = (ac)/(bd). Common factors can be cross-cancelled prior to multiplication."
+      },
+      "suggested_chips": ["How do I divide fractions?", "Multiply 2/3 and 4/5.", "Explain simply.", "Quiz me."]
+    },
+    "divide_fractions": {
+      "id": "divide_fractions",
+      "name": "Dividing Fractions",
+      "definition": "Dividing fractions is accomplished by multiplying the first fraction by the reciprocal (flipped version) of the second fraction.",
+      "response_styles": {
+        "standard": "To divide fractions, apply the Keep-Change-Flip rule: Keep the first fraction, Change division to multiplication, and Flip the second fraction into its reciprocal. For example, 1/2 ÷ 1/4 = 1/2 * 4/1 = 4/2 = 2.",
+        "simple": "Keep the first fraction, change the sign to multiply, and flip the second fraction upside down (Keep, Change, Flip).",
+        "simplest": "Keep, Change, Flip.",
+        "real_life": "How many quarter-pizzas (1/4) fit inside half a pizza (1/2)? Exactly 2 pieces!",
+        "exam": "Division rule: (a/b) ÷ (c/d) = (a/b) * (d/c) = (ad)/(bc) for c != 0."
+      },
+      "suggested_chips": ["What is Keep Change Flip?", "Divide 1/2 by 1/4.", "Explain simply.", "Quiz me."]
+    },
+    "ratio": {
+      "id": "ratio",
+      "name": "What is a Ratio?",
+      "definition": "A ratio is an ordered comparison of two quantities of the same kind by division, written as a:b or a/b.",
+      "response_styles": {
+        "standard": "A ratio compares two quantities, written as a:b (read as 'a to b'). For example, a classroom with 3 boys and 2 girls has a boy-to-girl ratio of 3:2.",
+        "simple": "A ratio shows how much of one thing there is compared to another thing.",
+        "simplest": "A comparison between two amounts (written with a colon : ).",
+        "real_life": "Comparing 4 red marbles to 5 blue marbles (4:5), or mixing 1 cup of concentrate with 3 cups of water (1:3).",
+        "exam": "A ratio is a quantitative relation between two amounts showing the number of times one value contains or is contained within the other."
+      },
+      "suggested_chips": ["How to simplify ratios?", "Ratio vs fraction.", "Explain simply.", "Quiz me."]
+    },
+    "simplify_ratio": {
+      "id": "simplify_ratio",
+      "name": "Simplifying Ratios",
+      "definition": "Simplifying a ratio means dividing all terms by their greatest common divisor until they are in lowest whole numbers.",
+      "response_styles": {
+        "standard": "To simplify a ratio, divide both sides by their greatest common factor (GCF). For example, in 12:18, dividing both numbers by 6 gives the simplified ratio 2:3.",
+        "simple": "Divide both numbers by the biggest number that divides evenly into both.",
+        "simplest": "Divide both numbers by their common factor.",
+        "real_life": "A recipe with 12 spoons of sugar and 18 spoons of flour simplifies to 2 parts sugar for every 3 parts flour (2:3).",
+        "exam": "A ratio a:b is in simplest form when gcd(a, b) = 1 in integer terms."
+      },
+      "suggested_chips": ["Simplify 12:18.", "What are equivalent ratios?", "Explain simply.", "Quiz me."]
+    },
+    "ratio_vs_fraction": {
+      "id": "ratio_vs_fraction",
+      "name": "Ratio vs Fraction",
+      "definition": "A fraction represents part of a single whole, whereas a ratio compares two distinct quantities or parts to each other.",
+      "response_styles": {
+        "standard": "Fractions and ratios are not the same! A fraction (like 1/2) represents a part of one whole. A ratio (like 1:2) compares two separate quantities (1 boy for every 2 girls, where the total group is 3).",
+        "simple": "A fraction divides a whole item. A ratio compares two separate groups.",
+        "simplest": "Fraction = part of whole. Ratio = comparison of amounts.",
+        "real_life": "In a group of 1 boy and 2 girls: the ratio of boys to girls is 1:2, but the fraction of boys in the whole group is 1/3.",
+        "exam": "Fraction denotes part-to-whole relationship (a / (a+b)); ratio denotes part-to-part relationship (a:b)."
+      },
+      "suggested_chips": ["What is a proportion?", "What is a unit rate?", "Explain simply.", "Quiz me."]
+    },
+    "proportion": {
+      "id": "proportion",
+      "name": "Proportions",
+      "definition": "A proportion is an equation stating that two ratios or fractions are equal.",
+      "response_styles": {
+        "standard": "A proportion states that two ratios are equal: a:b = c:d (or a/b = c/d). You can solve unknown values using cross-multiplication (a*d = b*c).",
+        "simple": "If 2 pens cost 10 rupees, then 4 pens cost 20 rupees. The two ratios are proportional (2/10 = 4/20).",
+        "simplest": "Two equal ratios connected together.",
+        "real_life": "Scaling a recipe: if 2 cups of milk feed 4 people, you need 4 cups of milk to feed 8 people.",
+        "exam": "In proportion a/b = c/d, the product of the extremes equals the product of the means (ad = bc)."
+      },
+      "suggested_chips": ["What is a unit rate?", "Solve 2/3 = x/12.", "Explain simply.", "Quiz me."]
+    },
+    "unit_rate": {
+      "id": "unit_rate",
+      "name": "Unit Rate",
+      "definition": "A unit rate compares a quantity to exactly one unit of another quantity.",
+      "response_styles": {
+        "standard": "A unit rate is a ratio where the second term is 1. For example, if 3 notebooks cost 60 rupees, the unit rate is 20 rupees per notebook (60 / 3 = 20).",
+        "simple": "A unit rate tells you how much for just one single item.",
+        "simplest": "The price or amount for exactly one unit.",
+        "real_life": "Speed in km per hour (60 km/h), price per kilogram (50 rupees/kg), or cost per single pen.",
+        "exam": "A unit rate expresses a rate as a quantity of one, computed by dividing numerator by denominator (Quantity / Units)."
+      },
+      "suggested_chips": ["What is a proportion?", "Give a unit rate example.", "Explain simply.", "Quiz me."]
+    },
+    "decimal_connection": {
+      "id": "decimal_connection",
+      "name": "Fractions to Decimals",
+      "definition": "Every fraction can be converted into an equivalent decimal by dividing the numerator by the denominator.",
+      "response_styles": {
+        "standard": "To convert a fraction to a decimal, divide the numerator by the denominator: 1/2 = 0.5, 1/4 = 0.25, 3/4 = 0.75, and 1/5 = 0.2.",
+        "simple": "Divide the top number by the bottom number using long division to get the decimal point number.",
+        "simplest": "Divide top by bottom (1/2 = 0.5).",
+        "real_life": "Half a dollar is 0.50 dollars (50 cents); a quarter dollar is 0.25 dollars (25 cents).",
+        "exam": "Rational fraction a/b converts to decimal via standard division, yielding either terminating or recurring decimals."
+      },
+      "suggested_chips": ["Convert 0.5 to fraction.", "Convert 3/4 to decimal.", "Fraction to percentage.", "Quiz me."]
+    },
+    "percentage_connection": {
+      "id": "percentage_connection",
+      "name": "Fractions to Percentages",
+      "definition": "A percentage is a fraction with a denominator of 100. Multiply any fraction by 100% to convert it to a percentage.",
+      "response_styles": {
+        "standard": "To convert a fraction to a percentage, multiply by 100%: 1/2 = 50%, 1/4 = 25%, 3/4 = 75%, 1/5 = 20%, and 1/10 = 10%.",
+        "simple": "Percent means out of 100. Multiply your fraction by 100 to find the percentage.",
+        "simplest": "Multiply fraction by 100 to get percent.",
+        "real_life": "Scoring 18 out of 20 on a test is 18/20 = 90%.",
+        "exam": "Percentage = (Numerator / Denominator) * 100%."
+      },
+      "suggested_chips": ["Convert 1/4 to percent.", "Convert 50% to fraction.", "Explain simply.", "Quiz me."]
+    }
+  },
+  "misconceptions": [
+    {
+      "id": "bigger_denominator_bigger_fraction",
+      "student_phrase": "1/8 is bigger than 1/4 because 8 is bigger.",
+      "trigger_patterns": ["1/8 is bigger than 1/4", "bigger denominator means bigger", "8 is bigger so 1/8 is bigger", "1/8 is larger than 1/4"],
+      "correction": "When the numerator is the same, a bigger denominator means the whole is cut into more pieces, making each individual piece smaller! Having 1 slice out of 4 (1/4) gives you twice as much pizza as 1 slice out of 8 (1/8).",
+      "suggested_chips": ["Compare 1/2 and 1/4.", "What is a denominator?", "Explain simply.", "Quiz me."]
+    },
+    {
+      "id": "add_denominators",
+      "student_phrase": "Add denominators too (1/2 + 1/3 = 2/5).",
+      "trigger_patterns": ["add denominators", "add top and bottom", "1/2 + 1/3 = 2/5", "why can't i add denominators", "why cant i add denominators"],
+      "correction": "You must never add denominators! Denominators only tell you the size of the pieces. First find a common denominator (LCM) to make piece sizes equal, then add only the numerators: 1/2 + 1/3 = 3/6 + 2/6 = 5/6.",
+      "suggested_chips": ["How do I add fractions?", "Add 1/2 and 1/3.", "Explain simply.", "Quiz me."]
+    },
+    {
+      "id": "ratios_and_fractions_identical",
+      "student_phrase": "Ratios and fractions are identical.",
+      "trigger_patterns": ["ratios and fractions are identical", "ratio is same as fraction", "ratio and fraction are the same"],
+      "correction": "Ratios and fractions are not identical! A fraction represents part of a single whole (part-to-whole), while a ratio compares two separate quantities or groups (part-to-part).",
+      "suggested_chips": ["Ratio vs fraction.", "What is a ratio?", "Explain simply.", "Quiz me."]
+    },
+    {
+      "id": "improper_fractions_impossible",
+      "student_phrase": "5/4 is impossible.",
+      "trigger_patterns": ["5/4 is impossible", "improper fractions are impossible", "numerator cannot be bigger", "5/4 cannot exist"],
+      "correction": "Improper fractions like 5/4 are completely valid! They simply represent an amount greater than one whole (5/4 = 1 whole plus 1/4 extra).",
+      "suggested_chips": ["What is an improper fraction?", "Convert 5/4 to mixed.", "Explain simply.", "Quiz me."]
+    }
+  ],
+  "quiz_bank": [
+    {
+      "id": "frac_quiz_1",
+      "type": "true_false",
+      "question": "1/2 is greater than 1/4.",
+      "options": ["True", "False"],
+      "answer": "True",
+      "explanation": "When numerators are equal, smaller denominators represent larger pieces, so 1/2 is twice as large as 1/4."
+    },
+    {
+      "id": "frac_quiz_2",
+      "type": "true_false",
+      "question": "5/4 is an improper fraction.",
+      "options": ["True", "False"],
+      "answer": "True",
+      "explanation": "Because the numerator 5 is greater than the denominator 4, 5/4 is an improper fraction equal to 1 1/4."
+    },
+    {
+      "id": "frac_quiz_3",
+      "type": "mcq",
+      "question": "Which fraction is larger?",
+      "options": ["1/3", "1/2"],
+      "answer": "1/2",
+      "explanation": "1/2 (0.50) is greater than 1/3 (0.33) because dividing a whole into 2 pieces creates larger pieces than dividing into 3 pieces."
+    },
+    {
+      "id": "frac_quiz_4",
+      "type": "mcq",
+      "question": "Which fraction is equivalent to 2/5?",
+      "options": ["4/10", "3/10", "2/10", "5/2"],
+      "answer": "4/10",
+      "explanation": "Multiplying both numerator and denominator of 2/5 by 2 yields 4/10."
+    },
+    {
+      "id": "frac_quiz_5",
+      "type": "one_word",
+      "question": "What is the name of the top number in a fraction?",
+      "options": ["Numerator", "Denominator", "Quotient", "Divisor"],
+      "answer": "Numerator",
+      "explanation": "The top number is the numerator, which tells how many equal parts are selected."
+    },
+    {
+      "id": "frac_quiz_6",
+      "type": "scenario",
+      "question": "An 8-slice pizza has 3 slices eaten. What fraction of the pizza was eaten?",
+      "options": ["3/8", "5/8", "8/3", "3/5"],
+      "answer": "3/8",
+      "explanation": "3 eaten slices out of 8 total slices represents 3/8 of the pizza."
+    },
+    {
+      "id": "frac_quiz_7",
+      "type": "scenario",
+      "question": "In a class of 20 students, the ratio of boys to girls is 3:2. If there are 12 boys, how many girls are there?",
+      "options": ["8", "10", "6", "14"],
+      "answer": "8",
+      "explanation": "With a ratio of 3:2, 12 boys represents 3 parts (4 per part). Therefore 2 parts for girls equals 2 * 4 = 8 girls."
+    }
+  ]
+}
