@@ -29,6 +29,38 @@ class DendyChatPanel extends StatefulWidget {
     required this.onClose,
   }) : super(key: key);
 
+  /// Global launcher to open the exact same right-side sliding chat panel from anywhere in the app
+  static void open(BuildContext context) {
+    SoundService.playClick();
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Ask Dendy',
+      barrierColor: Colors.black.withOpacity(0.35),
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (ctx, anim1, anim2) {
+        return Align(
+          alignment: Alignment.centerRight,
+          child: Material(
+            color: Colors.transparent,
+            child: DendyChatPanel(
+              onClose: () => Navigator.of(ctx).pop(),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1, 0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(parent: anim1, curve: Curves.easeOutCubic)),
+          child: child,
+        );
+      },
+    );
+  }
+
   @override
   _DendyChatPanelState createState() => _DendyChatPanelState();
 }
@@ -36,7 +68,8 @@ class DendyChatPanel extends StatefulWidget {
 class _DendyChatPanelState extends State<DendyChatPanel> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final List<DendyChatMessage> _messages = [];
+  static final List<DendyChatMessage> _persistentMessages = [];
+  List<DendyChatMessage> get _messages => _persistentMessages;
   bool _isListening = false;
   dynamic _speechRecognition;
 
@@ -51,13 +84,16 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
   @override
   void initState() {
     super.initState();
-    // Initial welcome message from Dendy
-    _messages.add(
-      DendyChatMessage(
-        text: l('ask_me_anything'),
-        isUser: false,
-      ),
-    );
+    // Initial welcome message from Dendy if empty
+    if (_persistentMessages.isEmpty) {
+      _persistentMessages.add(
+        DendyChatMessage(
+          text: l('ask_me_anything'),
+          isUser: false,
+        ),
+      );
+    }
+    _scrollToBottom();
   }
 
   @override

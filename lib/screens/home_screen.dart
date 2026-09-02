@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
               : FloatingActionButton.extended(
                   backgroundColor: ColorSystem.purple,
                   elevation: 6,
-                  icon: const DendyMascot(size: 26, mood: DendyMood.happy),
+                  icon: const DendyMascot(size: 26, mood: DendyMood.happy, enableChatShortcut: false),
                   label: const Text(
                     'ASK DENDY',
                     style: TextStyle(

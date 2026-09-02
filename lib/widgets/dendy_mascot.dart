@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../core/locator.dart';
 import '../core/theme/color_system.dart';
 import 'dendy_speak_button.dart';
+import 'dendy_chat_panel.dart';
+import '../services/sound_service.dart';
 
 enum DendyState {
   idle,
@@ -26,6 +28,8 @@ class DendyMascot extends StatefulWidget {
   final String? message;
   final double size;
   final String? skinId;
+  final VoidCallback? onTap;
+  final bool enableChatShortcut;
 
   const DendyMascot({
     Key? key,
@@ -34,6 +38,8 @@ class DendyMascot extends StatefulWidget {
     this.message,
     this.size = 90.0,
     this.skinId,
+    this.onTap,
+    this.enableChatShortcut = true,
   }) : super(key: key);
 
   @override
@@ -97,14 +103,29 @@ class _DendyMascotState extends State<DendyMascot> with SingleTickerProviderStat
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Floating Theme-Colored Fox Mascot
-              SizedBox(
-                width: widget.size,
-                height: widget.size,
-                child: CustomPaint(
-                  painter: _DendyPainter(
-                    state: _effectiveState,
-                    skinId: effectiveSkin,
+              // Floating Theme-Colored Fox Mascot (Tap to open Ask Dendy)
+              MouseRegion(
+                cursor: (widget.onTap != null || widget.enableChatShortcut)
+                    ? SystemMouseCursors.click
+                    : SystemMouseCursors.basic,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    if (widget.onTap != null) {
+                      widget.onTap!();
+                    } else if (widget.enableChatShortcut) {
+                      DendyChatPanel.open(context);
+                    }
+                  },
+                  child: SizedBox(
+                    width: widget.size,
+                    height: widget.size,
+                    child: CustomPaint(
+                      painter: _DendyPainter(
+                        state: _effectiveState,
+                        skinId: effectiveSkin,
+                      ),
+                    ),
                   ),
                 ),
               ),
