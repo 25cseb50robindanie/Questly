@@ -20,6 +20,7 @@ class LlamaEngine {
 
   Stream<String> generateStreaming({
     required String prompt,
+    String? userQuery,
     required String curriculumContext,
     int maxTokens = 150,
     double temperature = 0.3,
@@ -27,7 +28,7 @@ class LlamaEngine {
     // 1. If local Ollama or inference server is running on host machine, stream real LLM tokens
     bool usedServer = false;
     try {
-      final ollamaStream = _tryStreamOllama(prompt, curriculumContext);
+      final ollamaStream = _tryStreamOllama(userQuery ?? prompt, curriculumContext);
       await for (final token in ollamaStream) {
         usedServer = true;
         yield token;
@@ -39,7 +40,8 @@ class LlamaEngine {
     if (usedServer) return;
 
     // 2. High-performance conversational and reasoning synthesis
-    final response = _synthesizeGroundedResponse(prompt, curriculumContext);
+    final queryForSynthesis = userQuery ?? prompt;
+    final response = _synthesizeGroundedResponse(queryForSynthesis, curriculumContext);
     final words = response.split(' ');
 
     for (int i = 0; i < words.length; i++) {

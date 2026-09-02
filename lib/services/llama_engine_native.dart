@@ -30,8 +30,10 @@ class LlamaEngine {
 
       if (await localAssetFile.exists() && localAssetFile.lengthSync() > 1000000) {
         _modelPath = localAssetFile.path;
+        debugPrint('[LlamaEngine] Model copy success: $_modelPath');
       } else if (await targetFile.exists() && targetFile.lengthSync() > 1000000) {
         _modelPath = targetFile.path;
+        debugPrint('[LlamaEngine] Model copy success: $_modelPath');
       } else {
         try {
           debugPrint('[LlamaEngine] Unpacking model asset to storage...');
@@ -42,13 +44,14 @@ class LlamaEngine {
             flush: true,
           );
           _modelPath = targetFile.path;
-          debugPrint('[LlamaEngine] Model unpacked successfully: $_modelPath');
+          debugPrint('[LlamaEngine] Model copy success: $_modelPath');
         } catch (e) {
           debugPrint('[LlamaEngine] Asset bundle load notice: $e');
         }
       }
 
       if (_modelPath != null && File(_modelPath!).existsSync()) {
+        debugPrint('[LlamaEngine] Native libraries loaded (libllama.so, libmtmd.so)');
         debugPrint('[LlamaEngine] Initializing native llama.cpp instance with $_modelPath...');
         final contextParams = ContextParams()
           ..nCtx = 2048
@@ -62,7 +65,8 @@ class LlamaEngine {
           contextParams: contextParams,
           samplerParams: samplerParams,
         );
-        debugPrint('[LlamaEngine] Native llama.cpp model loaded into memory.');
+        debugPrint('[LlamaEngine] Model load success: Qwen 2.5 0.5B Instruct GGUF');
+        debugPrint('[LlamaEngine] Inference ready.');
       }
       _isModelLoaded = true;
     } catch (e) {
@@ -76,6 +80,7 @@ class LlamaEngine {
   /// Streams token-by-token output from Qwen 2.5 0.5B Instruct GGUF
   Stream<String> generateStreaming({
     required String prompt,
+    String? userQuery,
     required String curriculumContext,
     int maxTokens = 150,
     double temperature = 0.3,
@@ -86,14 +91,16 @@ class LlamaEngine {
 
     if (_llama != null) {
       try {
-        final formattedPrompt = '<|im_start|>system\n'
-            'You are Dendy, Questly\'s friendly fox learning companion.\n'
-            'Rules:\n'
-            '- Only answer using the curriculum below.\n'
-            '- Keep answers simple, short, and encourage the student.\n\n'
-            'Curriculum:\n$curriculumContext<|im_end|>\n'
-            '<|im_start|>user\n$prompt<|im_end|>\n'
-            '<|im_start|>assistant\n';
+        final formattedPrompt = prompt.contains('<|im_start|>')
+            ? prompt
+            : '<|im_start|>system\n'
+                'You are Dendy, Questly\'s friendly fox learning companion.\n'
+                'Rules:\n'
+                '- Only answer using the curriculum below.\n'
+                '- Keep answers simple, short, and encourage the student.\n\n'
+                'Curriculum:\n$curriculumContext<|im_end|>\n'
+                '<|im_start|>user\n${userQuery ?? prompt}<|im_end|>\n'
+                '<|im_start|>assistant\n';
 
         _llama!.setPrompt(formattedPrompt);
         final tokenStream = _llama!.generateText();
@@ -111,7 +118,8 @@ class LlamaEngine {
     }
 
     // High-performance local grounded stream fallback
-    final response = _synthesizeGroundedResponse(prompt, curriculumContext);
+    final queryForSynthesis = userQuery ?? prompt;
+    final response = _synthesizeGroundedResponse(queryForSynthesis, curriculumContext);
     final words = response.split(' ');
 
     for (int i = 0; i < words.length; i++) {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import '../models/curriculum_chunk.dart';
 import 'curriculum_retriever.dart';
 import 'llama_engine.dart';
@@ -73,34 +74,38 @@ class AITutorService {
     // 3. Format rolling history
     final historyContext = _rollingMemory.map((e) => 'Student: ${e.userMessage}\nDendy: ${e.dendyResponse}').join('\n');
 
-    // 4. Build prompt
-    final prompt = StringBuffer();
-    prompt.writeln('You are Dendy, Questly\'s friendly fox learning companion.');
-    prompt.writeln('Rules:');
-    prompt.writeln('- Only answer using the curriculum facts below.');
-    prompt.writeln('- Do not invent new science facts.');
-    prompt.writeln('- Keep answers simple, short, and encourage the student.');
-    prompt.writeln('- If no relevant curriculum exists, say: "Let\'s stay with today\'s lesson. Ask me something about density or buoyancy."\n');
-
+    // 4. Build complete ChatML prompt with system rules, curriculum, and rolling history
+    final promptBuilder = StringBuffer();
+    promptBuilder.writeln('<|im_start|>system');
+    promptBuilder.writeln('You are Dendy, Questly\'s friendly fox learning companion.');
+    promptBuilder.writeln('Rules:');
+    promptBuilder.writeln('- Only answer using the curriculum facts below.');
+    promptBuilder.writeln('- Do not invent new science facts.');
+    promptBuilder.writeln('- Keep answers simple, short, and encourage the student.');
+    promptBuilder.writeln('- If no relevant curriculum exists, say: "Let\'s stay with today\'s lesson. Ask me something about density or buoyancy."');
     if (curriculumContext.isNotEmpty) {
-      prompt.writeln('Curriculum Knowledge:');
-      prompt.writeln(curriculumContext);
-      prompt.writeln();
+      promptBuilder.writeln('\nCurriculum Knowledge:\n$curriculumContext');
+    }
+    promptBuilder.writeln('<|im_end|>');
+
+    // Add rolling conversation history turns (last 3 exchanges)
+    for (final exchange in _rollingMemory) {
+      promptBuilder.writeln('<|im_start|>user\n${exchange.userMessage}<|im_end|>');
+      promptBuilder.writeln('<|im_start|>assistant\n${exchange.dendyResponse}<|im_end|>');
     }
 
-    if (historyContext.isNotEmpty) {
-      prompt.writeln('Recent Conversation:');
-      prompt.writeln(historyContext);
-      prompt.writeln();
-    }
+    // Add current user question
+    promptBuilder.writeln('<|im_start|>user\n$trimmed<|im_end|>');
+    promptBuilder.writeln('<|im_start|>assistant');
 
-    prompt.writeln('Student: $trimmed');
-    prompt.writeln('Dendy:');
+    final fullPrompt = promptBuilder.toString();
+    debugPrint('[AITutorService] Full Prompt to Model:\n$fullPrompt');
 
-    // 5. Stream response tokens
+    // 5. Stream response tokens from engine
     final responseBuffer = StringBuffer();
     await for (final token in _engine.generateStreaming(
-      prompt: trimmed,
+      prompt: fullPrompt,
+      userQuery: trimmed,
       curriculumContext: curriculumContext,
     )) {
       responseBuffer.write(token);
