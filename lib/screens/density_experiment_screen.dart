@@ -8,6 +8,7 @@ import '../models/student.dart';
 import '../services/sound_service.dart';
 import '../services/localization_service.dart';
 import '../widgets/custom_button.dart';
+import '../widgets/dendy_chat_panel.dart';
 import '../widgets/dendy_mascot.dart';
 import '../widgets/dendy_speak_button.dart';
 import '../widgets/questly_background.dart';
@@ -113,6 +114,24 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
   bool _hasModifiedVolume = false;
   bool _hasComparedObjects = false;
 
+  // Adaptive Learning Engine State
+  int _attempts = 0;
+  int _correctAnswers = 0;
+  int _consecutiveWrong = 0;
+  int _repeatedMisconceptions = 0;
+  String _misconceptionType = '';
+  int _supportLevel = 0; // 0: Normal, 1: Hint, 2: Real-World, 3: Wildcard Practice
+  bool _wildcardTriggered = false;
+  bool _wildcardCompleted = false;
+  bool _showWildcardCard = false;
+  bool _wildcardShipDropped = false;
+  bool _wildcardStoneDropped = false;
+  String _adaptiveFeedback = '';
+  DendyState _dendyState = DendyState.idle;
+
+  bool _wasObjectAFloating = true;
+  bool _wasObjectBFloating = false;
+
   late AnimationController _waveController;
   late AnimationController _bobbingController;
   late AnimationController _transitionController;
@@ -167,7 +186,7 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
     super.dispose();
   }
 
-  void _triggerBubbles({int count = 12}) {
+  void _triggerBubbles({int count = 12, bool withSound = true}) {
     for (int i = 0; i < count; i++) {
       _bubbles.add(_Bubble(
         x: 0.2 + _rand.nextDouble() * 0.6,
@@ -176,9 +195,39 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
         speed: 0.004 + _rand.nextDouble() * 0.008,
       ));
     }
+    if (withSound) {
+      SoundService.playBubble();
+    }
+  }
+
+  void _checkBuoyancyStateChange() {
+    final densityA = _volumeA > 0 ? _massA / _volumeA : 0.0;
+    final isAFloating = densityA < 1.0;
+    if (isAFloating != _wasObjectAFloating) {
+      _wasObjectAFloating = isAFloating;
+      if (isAFloating) {
+        SoundService.playFloat();
+      } else {
+        SoundService.playSink();
+      }
+    }
+
+    if (_isCompareMode) {
+      final densityB = _volumeB > 0 ? _massB / _volumeB : 0.0;
+      final isBFloating = densityB < 1.0;
+      if (isBFloating != _wasObjectBFloating) {
+        _wasObjectBFloating = isBFloating;
+        if (isBFloating) {
+          SoundService.playFloat();
+        } else {
+          SoundService.playSink();
+        }
+      }
+    }
   }
 
   void _onMassChanged(double newMass) {
+    SoundService.playSliderTick();
     setState(() {
       if (_selectedObject == 0) {
         _massA = double.parse(newMass.toStringAsFixed(1));
@@ -186,15 +235,19 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
         _massB = double.parse(newMass.toStringAsFixed(1));
       }
       _hasModifiedMass = true;
-      _triggerBubbles(count: 3);
+      _triggerBubbles(count: 2, withSound: false);
+      _checkBuoyancyStateChange();
 
       if (_currentMission == LabMission.mission1Mass && _massA >= 4.0 && !_showingQuestion) {
         _showingQuestion = true;
+        _adaptiveFeedback = '';
+        SoundService.playHintReveal();
       }
     });
   }
 
   void _onVolumeChanged(double newVolume) {
+    SoundService.playSliderTick();
     setState(() {
       if (_selectedObject == 0) {
         _volumeA = double.parse(newVolume.toStringAsFixed(1));
@@ -202,16 +255,19 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
         _volumeB = double.parse(newVolume.toStringAsFixed(1));
       }
       _hasModifiedVolume = true;
-      _triggerBubbles(count: 3);
+      _triggerBubbles(count: 2, withSound: false);
+      _checkBuoyancyStateChange();
 
       if (_currentMission == LabMission.mission2Volume && (_volumeA >= 8.0 || _volumeA <= 2.0) && !_showingQuestion) {
         _showingQuestion = true;
+        _adaptiveFeedback = '';
+        SoundService.playHintReveal();
       }
     });
   }
 
   void _onMaterialSelected(LabMaterial mat) {
-    SoundService.playClick();
+    SoundService.playCardSelect();
     setState(() {
       final info = kMaterialData[mat]!;
       if (_selectedObject == 0) {
@@ -222,28 +278,110 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
         _massB = double.parse((info.density * _volumeB).clamp(1.0, 10.0).toStringAsFixed(1));
       }
       _hasComparedObjects = true;
-      _triggerBubbles(count: 6);
+      _triggerBubbles(count: 4, withSound: true);
+      _checkBuoyancyStateChange();
 
       if (_currentMission == LabMission.mission3Compare && !_showingQuestion) {
         _showingQuestion = true;
+        _adaptiveFeedback = '';
+        SoundService.playHintReveal();
       }
     });
   }
 
   void _handleAnswerSelected(int index) {
-    SoundService.playCorrect();
-    setState(() {
-      _showingQuestion = false;
+    _attempts++;
+    bool isCorrect = false;
+    String feedback = '';
 
-      if (_currentMission == LabMission.mission1Mass) {
-        _currentMission = LabMission.mission2Volume;
-      } else if (_currentMission == LabMission.mission2Volume) {
-        _currentMission = LabMission.mission3Compare;
-        _isCompareMode = true;
-      } else if (_currentMission == LabMission.mission3Compare) {
-        _currentMission = LabMission.discoveryComplete;
-        _showDiscoveryCard = true;
+    if (_currentMission == LabMission.mission1Mass) {
+      isCorrect = (index == 0); // 0: It sank deeper (Correct)
+      if (!isCorrect) {
+        _misconceptionType = (index == 1) ? 'confusing_mass_density' : 'ignoring_volume';
       }
+      feedback = l('adapt_l2_correct_mass');
+    } else if (_currentMission == LabMission.mission2Volume) {
+      isCorrect = (index == 0); // 0: It floated higher (Correct)
+      if (!isCorrect) {
+        _misconceptionType = (index == 1) ? 'larger_objects_dense' : 'ignoring_volume';
+      }
+      feedback = l('adapt_l2_correct_volume');
+    } else if (_currentMission == LabMission.mission3Compare) {
+      isCorrect = (index == 0); // 0: The denser object (Correct)
+      if (!isCorrect) {
+        _misconceptionType = (index == 1) ? 'larger_objects_dense' : 'confusing_mass_density';
+      }
+      feedback = l('adapt_l2_correct_compare');
+    }
+
+    setState(() {
+      if (isCorrect) {
+        _correctAnswers++;
+        _consecutiveWrong = 0;
+        _supportLevel = 0; // Reset support after mastery/understanding
+        _adaptiveFeedback = feedback;
+        _showingQuestion = false;
+        SoundService.playCorrect();
+
+        if (_currentMission == LabMission.mission1Mass) {
+          _currentMission = LabMission.mission2Volume;
+          SoundService.playMissionAdvance();
+        } else if (_currentMission == LabMission.mission2Volume) {
+          _currentMission = LabMission.mission3Compare;
+          _isCompareMode = true;
+          SoundService.playMissionAdvance();
+        } else if (_currentMission == LabMission.mission3Compare) {
+          _currentMission = LabMission.discoveryComplete;
+          _showDiscoveryCard = true;
+          SoundService.playDiscoveryMoment();
+        }
+      } else {
+        _consecutiveWrong++;
+        _repeatedMisconceptions++;
+
+        if (_consecutiveWrong >= 3 || _repeatedMisconceptions >= 2) {
+          // Repeated same misconception -> Activate Wildcard Support Mode
+          _supportLevel = 3;
+          _wildcardTriggered = true;
+          _showWildcardCard = true;
+          _adaptiveFeedback = l('adapt_real_world_ship');
+          SoundService.playSupportUnlocked();
+        } else if (_consecutiveWrong == 2) {
+          // Second wrong -> Real-world explanation
+          _supportLevel = 2;
+          _adaptiveFeedback = l('adapt_real_world_ship');
+          SoundService.playDiscoveryMoment();
+        } else {
+          // First wrong -> Conceptual Hint
+          _supportLevel = 1;
+          _adaptiveFeedback = l('adapt_hint_conceptual');
+          SoundService.playHintReveal();
+        }
+      }
+    });
+  }
+
+  void _testWildcardShip() {
+    SoundService.playFloat();
+    setState(() {
+      _wildcardShipDropped = true;
+    });
+  }
+
+  void _testWildcardStone() {
+    SoundService.playSink();
+    setState(() {
+      _wildcardStoneDropped = true;
+    });
+  }
+
+  void _completeWildcard() {
+    SoundService.playContinue();
+    setState(() {
+      _showWildcardCard = false;
+      _wildcardCompleted = true;
+      _supportLevel = 0; // Support resets upon understanding!
+      _adaptiveFeedback = l('adapt_wildcard_success');
     });
   }
 
@@ -326,13 +464,16 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
                     ),
                   ),
 
-                  // Bottom Dendy Guidance Banner
+                  // Bottom Persistent Dendy Guidance Banner
                   _buildDendyGuideBanner(),
                 ],
               ),
 
               // Smooth Welcome Transition Banner
               if (_showIntroBanner) _buildIntroTransition(),
+
+              // Inline Adaptive Support Wildcard Practice
+              if (_showWildcardCard) _buildWildcardPracticeModal(),
 
               // Beautiful Discovery Moment Modal
               if (_showDiscoveryCard) _buildDiscoveryModal(),
@@ -565,7 +706,7 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
     final isMaterialUnlocked = _currentMission == LabMission.mission3Compare || _currentMission == LabMission.discoveryComplete;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -578,245 +719,241 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
           ),
         ],
       ),
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Object Header with Density Live Badge
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: matInfo.primaryColor.withOpacity(0.25),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: matInfo.borderColor, width: 1.5),
-                      ),
-                      child: Icon(matInfo.icon, size: 16, color: matInfo.borderColor),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // Object Header with Density Live Badge
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 26,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      color: matInfo.primaryColor.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: matInfo.borderColor, width: 1.2),
                     ),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _isCompareMode
-                              ? (isObjectA ? l('object_a') : l('object_b'))
-                              : l(matInfo.nameKey).toUpperCase(),
-                          style: const TextStyle(
-                            fontFamily: 'Fredoka',
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w900,
-                            color: ColorSystem.plum,
-                          ),
-                        ),
-                        Text(
-                          l(matInfo.nameKey),
-                          style: TextStyle(
-                            fontFamily: 'Fredoka',
-                            fontSize: 9.5,
-                            color: ColorSystem.plum.withOpacity(0.6),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                // Live Density Metric
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
-                  decoration: BoxDecoration(
-                    color: currentDensity < 1.0
-                        ? ColorSystem.green.withOpacity(0.15)
-                        : ColorSystem.pink.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: currentDensity < 1.0 ? ColorSystem.green : ColorSystem.pink,
-                      width: 1.2,
-                    ),
+                    child: Icon(matInfo.icon, size: 14, color: matInfo.borderColor),
                   ),
-                  child: Text(
-                    '${currentDensity.toStringAsFixed(2)} kg/L (${currentDensity < 1.0 ? l('float').toUpperCase() : l('sink').toUpperCase()})',
-                    style: TextStyle(
+                  const SizedBox(width: 6),
+                  Text(
+                    _isCompareMode
+                        ? (isObjectA ? l('object_a') : l('object_b'))
+                        : l(matInfo.nameKey).toUpperCase(),
+                    style: const TextStyle(
                       fontFamily: 'Fredoka',
-                      fontSize: 10.5,
+                      fontSize: 11.5,
                       fontWeight: FontWeight.w900,
-                      color: currentDensity < 1.0 ? ColorSystem.green : ColorSystem.pink,
+                      color: ColorSystem.plum,
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
 
-            const Divider(color: ColorSystem.cream, thickness: 1.5, height: 12),
-
-            // 1. Mass Slider (Mission 1+)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      l('mass_kg'),
-                      style: const TextStyle(
-                        fontFamily: 'Fredoka',
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.bold,
-                        color: ColorSystem.plum,
-                      ),
-                    ),
-                    Text(
-                      '${currentMass.toStringAsFixed(1)} kg',
-                      style: const TextStyle(
-                        fontFamily: 'Fredoka',
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w900,
-                        color: ColorSystem.purple,
-                      ),
-                    ),
-                  ],
-                ),
-                SliderTheme(
-                  data: SliderThemeData(
-                    activeTrackColor: ColorSystem.purple,
-                    inactiveTrackColor: ColorSystem.purple.withOpacity(0.15),
-                    thumbColor: ColorSystem.purple,
-                    overlayColor: ColorSystem.purple.withOpacity(0.12),
-                    trackHeight: 5,
-                  ),
-                  child: Slider(
-                    value: currentMass,
-                    min: 1.0,
-                    max: 10.0,
-                    divisions: 18,
-                    onChanged: _onMassChanged,
+              // Live Density Metric
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                decoration: BoxDecoration(
+                  color: currentDensity < 1.0
+                      ? ColorSystem.green.withOpacity(0.15)
+                      : ColorSystem.pink.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: currentDensity < 1.0 ? ColorSystem.green : ColorSystem.pink,
+                    width: 1.0,
                   ),
                 ),
-              ],
-            ),
-
-            // 2. Volume Slider (Mission 2+)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      l('volume_l'),
-                      style: TextStyle(
-                        fontFamily: 'Fredoka',
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.bold,
-                        color: isVolumeUnlocked ? ColorSystem.plum : Colors.grey,
-                      ),
-                    ),
-                    Text(
-                      '${currentVolume.toStringAsFixed(1)} L',
-                      style: TextStyle(
-                        fontFamily: 'Fredoka',
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w900,
-                        color: isVolumeUnlocked ? ColorSystem.blue : Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-                SliderTheme(
-                  data: SliderThemeData(
-                    activeTrackColor: isVolumeUnlocked ? ColorSystem.blue : Colors.grey.shade300,
-                    inactiveTrackColor: ColorSystem.blue.withOpacity(0.15),
-                    thumbColor: isVolumeUnlocked ? ColorSystem.blue : Colors.grey,
-                    overlayColor: ColorSystem.blue.withOpacity(0.12),
-                    trackHeight: 5,
-                  ),
-                  child: Slider(
-                    value: currentVolume,
-                    min: 1.0,
-                    max: 10.0,
-                    divisions: 18,
-                    onChanged: isVolumeUnlocked ? _onVolumeChanged : null,
-                  ),
-                ),
-              ],
-            ),
-
-            // 3. Material Selector (Mission 3+)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l('materials').toUpperCase(),
+                child: Text(
+                  '${currentDensity.toStringAsFixed(2)} kg/L (${currentDensity < 1.0 ? l('float').toUpperCase() : l('sink').toUpperCase()})',
                   style: TextStyle(
                     fontFamily: 'Fredoka',
                     fontSize: 9.5,
-                    fontWeight: FontWeight.bold,
-                    color: isMaterialUnlocked ? ColorSystem.plum.withOpacity(0.6) : Colors.grey,
-                    letterSpacing: 0.5,
+                    fontWeight: FontWeight.w900,
+                    color: currentDensity < 1.0 ? ColorSystem.green : ColorSystem.pink,
                   ),
                 ),
-                const SizedBox(height: 4),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: LabMaterial.values.map((mat) {
-                      final isSel = currentMat == mat;
-                      final info = kMaterialData[mat]!;
+              ),
+            ],
+          ),
 
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 6),
-                        child: GestureDetector(
-                          onTap: isMaterialUnlocked ? () => _onMaterialSelected(mat) : null,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: isSel ? info.primaryColor.withOpacity(0.3) : (isMaterialUnlocked ? Colors.grey.shade50 : Colors.grey.shade100),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                color: isSel ? info.borderColor : Colors.grey.shade300,
-                                width: isSel ? 1.5 : 1,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  info.icon,
-                                  size: 11,
-                                  color: isMaterialUnlocked ? info.borderColor : Colors.grey,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  l(info.nameKey),
-                                  style: TextStyle(
-                                    fontFamily: 'Fredoka',
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: isMaterialUnlocked
-                                        ? (isSel ? ColorSystem.plum : ColorSystem.plum.withOpacity(0.6))
-                                        : Colors.grey,
-                                  ),
-                                ),
-                              ],
+          // 1. Mass Slider (Mission 1+)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l('mass_kg'),
+                    style: const TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.bold,
+                      color: ColorSystem.plum,
+                    ),
+                  ),
+                  Text(
+                    '${currentMass.toStringAsFixed(1)} kg',
+                    style: const TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w900,
+                      color: ColorSystem.purple,
+                    ),
+                  ),
+                ],
+              ),
+              SliderTheme(
+                data: SliderThemeData(
+                  activeTrackColor: ColorSystem.purple,
+                  inactiveTrackColor: ColorSystem.purple.withOpacity(0.15),
+                  thumbColor: ColorSystem.purple,
+                  overlayColor: ColorSystem.purple.withOpacity(0.12),
+                  trackHeight: 3.5,
+                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                ),
+                child: Slider(
+                  value: currentMass,
+                  min: 1.0,
+                  max: 10.0,
+                  divisions: 18,
+                  onChanged: _onMassChanged,
+                ),
+              ),
+            ],
+          ),
+
+          // 2. Volume Slider (Mission 2+)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        l('volume_liters'),
+                        style: TextStyle(
+                          fontFamily: 'Fredoka',
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.bold,
+                          color: isVolumeUnlocked ? ColorSystem.plum : Colors.grey,
+                        ),
+                      ),
+                      if (!isVolumeUnlocked) ...[
+                        const SizedBox(width: 4),
+                        const Icon(Icons.lock_rounded, size: 10, color: Colors.grey),
+                      ],
+                    ],
+                  ),
+                  Text(
+                    '${currentVolume.toStringAsFixed(1)} L',
+                    style: TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w900,
+                      color: isVolumeUnlocked ? ColorSystem.purple : Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+              SliderTheme(
+                data: SliderThemeData(
+                  activeTrackColor: isVolumeUnlocked ? ColorSystem.purple : Colors.grey.shade300,
+                  inactiveTrackColor: isVolumeUnlocked ? ColorSystem.purple.withOpacity(0.15) : Colors.grey.shade200,
+                  thumbColor: isVolumeUnlocked ? ColorSystem.purple : Colors.grey,
+                  overlayColor: isVolumeUnlocked ? ColorSystem.purple.withOpacity(0.12) : Colors.transparent,
+                  trackHeight: 3.5,
+                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                ),
+                child: Slider(
+                  value: currentVolume,
+                  min: 1.0,
+                  max: 10.0,
+                  divisions: 18,
+                  onChanged: isVolumeUnlocked ? _onVolumeChanged : null,
+                ),
+              ),
+            ],
+          ),
+
+          // 3. Materials Deck (Mission 3+)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l('material_types').toUpperCase(),
+                style: TextStyle(
+                  fontFamily: 'Fredoka',
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.bold,
+                  color: isMaterialUnlocked ? ColorSystem.plum.withOpacity(0.6) : Colors.grey,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Row(
+                children: LabMaterial.values.map((mat) {
+                  final isSel = currentMat == mat;
+                  final info = kMaterialData[mat]!;
+
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: GestureDetector(
+                        onTap: isMaterialUnlocked ? () => _onMaterialSelected(mat) : null,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isSel ? info.primaryColor.withOpacity(0.3) : (isMaterialUnlocked ? Colors.grey.shade50 : Colors.grey.shade100),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: isSel ? info.borderColor : Colors.grey.shade300,
+                              width: isSel ? 1.5 : 1,
                             ),
                           ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                info.icon,
+                                size: 12,
+                                color: isMaterialUnlocked ? info.borderColor : Colors.grey,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                l(info.nameKey),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontFamily: 'Fredoka',
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                  color: isMaterialUnlocked
+                                      ? (isSel ? ColorSystem.plum : ColorSystem.plum.withOpacity(0.6))
+                                      : Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -855,10 +992,13 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
         break;
     }
 
+    // Always show Dendy's question when question is active!
+    final displayMsg = _showingQuestion ? message : (_adaptiveFeedback.isNotEmpty ? _adaptiveFeedback : message);
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -873,11 +1013,19 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
       ),
       child: Row(
         children: [
-          DendyMascot(
-            state: _showingQuestion ? DendyState.thinking : DendyState.idle,
-            size: 48,
+          // Single Persistent Interactive Dendy Companion
+          GestureDetector(
+            onTap: () {
+              SoundService.playClick();
+              DendyChatPanel.open(context);
+            },
+            child: DendyMascot(
+              state: _showingQuestion ? DendyState.thinking : DendyState.idle,
+              mood: DendyMood.explaining,
+              size: 40,
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -885,36 +1033,38 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
               children: [
                 Row(
                   children: [
-                    Text(
-                      message,
-                      style: const TextStyle(
-                        fontFamily: 'Fredoka',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                        color: ColorSystem.plum,
+                    Expanded(
+                      child: Text(
+                        displayMsg,
+                        style: TextStyle(
+                          fontFamily: 'Fredoka',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          color: _showingQuestion ? ColorSystem.purple : (_adaptiveFeedback.isNotEmpty ? ColorSystem.purple : ColorSystem.plum),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 6),
-                    DendySpeakButton(textToSpeak: message, size: 20),
+                    DendySpeakButton(textToSpeak: displayMsg, size: 18),
                   ],
                 ),
                 if (_showingQuestion && choices.isNotEmpty) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Wrap(
-                    spacing: 8,
-                    runSpacing: 6,
+                    spacing: 6,
+                    runSpacing: 4,
                     children: List.generate(choices.length, (idx) {
                       return GestureDetector(
                         onTap: () => _handleAnswerSelected(idx),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: ColorSystem.purple,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
                             boxShadow: [
                               BoxShadow(
                                 color: ColorSystem.plum.withOpacity(0.2),
-                                offset: const Offset(0, 2),
+                                offset: const Offset(0, 1.5),
                                 blurRadius: 0,
                               ),
                             ],
@@ -923,7 +1073,7 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
                             choices[idx],
                             style: const TextStyle(
                               fontFamily: 'Fredoka',
-                              fontSize: 11,
+                              fontSize: 10.5,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -988,21 +1138,21 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
     );
   }
 
-  Widget _buildDiscoveryModal() {
+  Widget _buildWildcardPracticeModal() {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withOpacity(0.6),
+        color: Colors.black.withOpacity(0.65),
         child: Center(
           child: Container(
             width: 460,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: ColorSystem.plum, width: 2.5),
+              border: Border.all(color: ColorSystem.gold, width: 2.5),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withOpacity(0.18),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
@@ -1011,95 +1161,267 @@ class _DensityExperimentScreenState extends State<DensityExperimentScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const DendyMascot(state: DendyState.success, size: 64),
-                const SizedBox(height: 12),
-                Text(
-                  l('the_density_formula'),
-                  style: const TextStyle(
-                    fontFamily: 'Fredoka',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                    color: ColorSystem.purple,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Formula Highlight Card
                 Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: ColorSystem.gold.withOpacity(0.18),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: ColorSystem.gold, width: 2),
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Center(
-                    child: Text(
-                      l('density_equals_mass_divided_volume'),
-                      style: const TextStyle(
-                        fontFamily: 'Fredoka',
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        color: ColorSystem.plum,
-                      ),
+                  child: Text(
+                    l('adapt_wildcard_badge'),
+                    style: const TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      color: ColorSystem.plum,
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
-                  l('density_discovery_desc'),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
+                  l('adapt_wildcard_title'),
+                  style: const TextStyle(
                     fontFamily: 'Fredoka',
-                    fontSize: 12,
-                    color: ColorSystem.plum.withOpacity(0.8),
-                    height: 1.35,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                    color: ColorSystem.purple,
                   ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l('adapt_wildcard_desc'),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontFamily: 'Fredoka', fontSize: 10.5, color: ColorSystem.plum),
                 ),
                 const SizedBox(height: 10),
 
-                // Floating / Sinking Summary Pills
+                // 2 Test Buttons: Giant Ship & Small Pebble
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: ColorSystem.green.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(6),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _testWildcardShip,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _wildcardShipDropped ? ColorSystem.green.withOpacity(0.15) : ColorSystem.cream,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: _wildcardShipDropped ? ColorSystem.green : ColorSystem.plum.withOpacity(0.3),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              const Icon(Icons.directions_boat_rounded, size: 24, color: ColorSystem.purple),
+                              const SizedBox(height: 4),
+                              Text(
+                                l('adapt_wildcard_ship'),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _wildcardShipDropped ? l('adapt_wildcard_btn_ship') : 'TEST SHIP',
+                                style: TextStyle(
+                                  fontFamily: 'Fredoka',
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: _wildcardShipDropped ? ColorSystem.green : ColorSystem.purple,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      child: Text(
-                        l('less_dense_than_water_floats'),
-                        style: const TextStyle(
-                          fontFamily: 'Fredoka',
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: ColorSystem.green,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _testWildcardStone,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _wildcardStoneDropped ? ColorSystem.pink.withOpacity(0.15) : ColorSystem.cream,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: _wildcardStoneDropped ? ColorSystem.pink : ColorSystem.plum.withOpacity(0.3),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              const Icon(Icons.circle_rounded, size: 24, color: ColorSystem.plum),
+                              const SizedBox(height: 4),
+                              Text(
+                                l('adapt_wildcard_stone'),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _wildcardStoneDropped ? l('adapt_wildcard_btn_stone') : 'TEST PEBBLE',
+                                style: TextStyle(
+                                  fontFamily: 'Fredoka',
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: _wildcardStoneDropped ? ColorSystem.pink : ColorSystem.purple,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
 
-                SizedBox(
-                  width: double.infinity,
-                  child: CustomButton(
-                    text: l('continue_to_lesson_3').toUpperCase(),
-                    backgroundColor: ColorSystem.purple,
-                    textColor: Colors.white,
-                    height: 44,
-                    onPressed: () {
-                      SoundService.playClick();
-                      setState(() {
-                        _showDiscoveryCard = false;
-                      });
-                      _completeLesson();
-                    },
+                if (_wildcardShipDropped && _wildcardStoneDropped)
+                  SizedBox(
+                    width: double.infinity,
+                    child: CustomButton(
+                      text: l('adapt_wildcard_continue').toUpperCase(),
+                      backgroundColor: ColorSystem.purple,
+                      textColor: Colors.white,
+                      height: 36,
+                      onPressed: _completeWildcard,
+                    ),
                   ),
-                ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDiscoveryModal() {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withOpacity(0.65),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.94,
+              maxWidth: 460,
+            ),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: ColorSystem.gold, width: 2.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.18),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const DendyMascot(state: DendyState.success, size: 44),
+                    const SizedBox(height: 6),
+                    Text(
+                      l('adapt_l2_discovery_prompt'),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: ColorSystem.purple,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Density Grand Formula Highlight Card
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: ColorSystem.gold.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: ColorSystem.gold, width: 2),
+                      ),
+                      child: Center(
+                        child: Text(
+                          l('density_equals_mass_divided_volume'),
+                          style: const TextStyle(
+                            fontFamily: 'Fredoka',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: ColorSystem.plum,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l('adapt_l2_formula_desc'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: 10.5,
+                        color: ColorSystem.plum.withOpacity(0.85),
+                        height: 1.25,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Rewards Row (+60 XP, +15 Quest Coins)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: ColorSystem.cream,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: ColorSystem.plum.withOpacity(0.15)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.star_rounded, color: ColorSystem.gold, size: 16),
+                          const SizedBox(width: 4),
+                          const Text(
+                            '+60 XP',
+                            style: TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.w900, color: ColorSystem.purple),
+                          ),
+                          const SizedBox(width: 14),
+                          const Icon(Icons.monetization_on_rounded, color: ColorSystem.gold, size: 15),
+                          const SizedBox(width: 4),
+                          const Text(
+                            '+15 Coins',
+                            style: TextStyle(fontFamily: 'Fredoka', fontSize: 11, fontWeight: FontWeight.w900, color: ColorSystem.plum),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: CustomButton(
+                        text: l('adapt_l2_btn_mastery').toUpperCase(),
+                        backgroundColor: ColorSystem.purple,
+                        textColor: Colors.white,
+                        height: 38,
+                        onPressed: () {
+                          SoundService.playAchievementUnlocked();
+                          setState(() {
+                            _showDiscoveryCard = false;
+                          });
+                          _completeLesson();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -1172,19 +1494,19 @@ class _LivingWaterTankPainter extends CustomPainter {
     // 4. Draw Rising Ambient & Interaction Bubbles
     _drawBubbles(canvas, tankRect, waterSurfaceY);
 
-    // 5. Draw Objects in Tank
+    // 5. Draw Objects in Tank (Properly clamped to stay strictly inside tank glass)
     if (isCompareMode) {
       // Object A on left half
       final double centerAX = tankRect.left + (tankRect.width * 0.32);
-      _drawPhysicalBlock(canvas, centerAX, waterSurfaceY, densityA, volumeA, materialA, 'A');
+      _drawPhysicalBlock(canvas, centerAX, waterSurfaceY, densityA, volumeA, materialA, 'A', tankRect);
 
       // Object B on right half
       final double centerBX = tankRect.left + (tankRect.width * 0.68);
-      _drawPhysicalBlock(canvas, centerBX, waterSurfaceY, densityB, volumeB, materialB, 'B');
+      _drawPhysicalBlock(canvas, centerBX, waterSurfaceY, densityB, volumeB, materialB, 'B', tankRect);
     } else {
       // Single Object in center
       final double centerAX = tankRect.center.dx;
-      _drawPhysicalBlock(canvas, centerAX, waterSurfaceY, densityA, volumeA, materialA, '');
+      _drawPhysicalBlock(canvas, centerAX, waterSurfaceY, densityA, volumeA, materialA, '', tankRect);
     }
 
     // 6. Tank Glass Specular Highlights
@@ -1280,30 +1602,32 @@ class _LivingWaterTankPainter extends CustomPainter {
     double volume,
     LabMaterial material,
     String label,
+    Rect tankRect,
   ) {
     final matInfo = kMaterialData[material]!;
 
-    // Block dimensions scale smoothly with volume (1.0 L = 44px, 10.0 L = 88px)
-    final double blockSize = 44.0 + (volume * 4.4);
+    // Block dimensions scale smoothly with volume (1.0 L = 40px, 10.0 L = 76px)
+    final double blockSize = 40.0 + (volume * 3.6);
     final double blockRadius = 8.0;
 
     // Equilibrium calculation:
-    // Immersed fraction f = min(1.0, density / 1.0)
     final double submergedFrac = (density / 1.0).clamp(0.0, 1.0);
-
-    // Target Y:
-    // Floating: center aligns so that (submergedFrac * blockSize) is under surface
-    // Sinking (density >= 1.0): sinks to bottom
     final double bobbing = sin(bobbingPhase * 2 * pi) * (density < 1.0 ? 3.5 : 0.5);
+
+    final double maxBottomY = tankRect.bottom - 4.0;
+    final double minTopY = tankRect.top + 6.0;
 
     double blockTopY;
     if (density < 1.0) {
       // Floats at equilibrium
       blockTopY = surfaceY - (blockSize * (1.0 - submergedFrac)) + bobbing;
     } else {
-      // Sinks directly to floor of tank
-      blockTopY = surfaceY + (blockSize * 0.8) + (density * 2.0);
+      // Sinks directly to floor of tank, resting cleanly on the glass base
+      blockTopY = maxBottomY - blockSize;
     }
+
+    // Safety clamp to ensure block never breaches tank border
+    blockTopY = blockTopY.clamp(minTopY, maxBottomY - blockSize);
 
     final Rect blockRect = Rect.fromCenter(
       center: Offset(centerX, blockTopY + (blockSize / 2)),
@@ -1369,12 +1693,11 @@ class _LivingWaterTankPainter extends CustomPainter {
 
   void _drawGlassHighlights(Canvas canvas, Rect tankRect) {
     // Outer Tank Frame
-    final framePaint = Paint()
+    final borderPaint = Paint()
       ..color = ColorSystem.plum
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5;
-
-    canvas.drawRRect(RRect.fromRectAndRadius(tankRect, const Radius.circular(12)), framePaint);
+      ..strokeWidth = 2.0;
+    canvas.drawRRect(RRect.fromRectAndRadius(tankRect, const Radius.circular(12)), borderPaint);
 
     // Specular glass shine corner line
     final shinePaint = Paint()

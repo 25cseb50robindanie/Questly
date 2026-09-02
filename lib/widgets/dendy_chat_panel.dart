@@ -37,7 +37,7 @@ class DendyChatPanel extends StatefulWidget {
 
   /// Global launcher to open the exact same right-side sliding chat panel from anywhere in the app
   static void open(BuildContext context) {
-    SoundService.playClick();
+    SoundService.playPanelOpen();
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -50,7 +50,10 @@ class DendyChatPanel extends StatefulWidget {
           child: Material(
             color: Colors.transparent,
             child: DendyChatPanel(
-              onClose: () => Navigator.of(ctx).pop(),
+              onClose: () {
+                SoundService.playPanelClose();
+                Navigator.of(ctx).pop();
+              },
             ),
           ),
         );
@@ -165,7 +168,7 @@ class _DendyChatPanelState extends State<DendyChatPanel> {
         _scrollToBottom();
         await Future.delayed(const Duration(milliseconds: 15));
       }
-      SoundService.playStarPop();
+      SoundService.playHintReveal();
     } catch (e) {
       if (mounted) {
         final fallbackAnswer = LocalizationService.translate(DendyNlpService.answer(text));

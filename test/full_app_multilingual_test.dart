@@ -103,22 +103,50 @@ void main() {
       for (final lang in supportedLanguages) {
         LocalizationService.setLanguageCode(lang);
 
-        // Lesson 3: Apply
-        expect(l('lesson_3_apply_header'), isNotEmpty);
-        expect(l('lesson_3_apply_title'), isNotEmpty);
-        expect(l('lesson_3_summary_title'), isNotEmpty);
-        expect(l('what_you_discovered'), isNotEmpty);
-        expect(l('density_master_key'), isNotEmpty);
-        expect(l('complete_unlock_challenge_btn'), isNotEmpty);
+        // Lesson 3: Mission Rescue Board
+        expect(l('mission_rescue_board'), isNotEmpty);
+        expect(l('mission_rescue_desc'), isNotEmpty);
+        expect(l('mission_boat_title'), isNotEmpty);
+        expect(l('mission_boat_sub'), isNotEmpty);
+        expect(l('mission_oil_title'), isNotEmpty);
+        expect(l('mission_oil_sub'), isNotEmpty);
+        expect(l('mission_treasure_title'), isNotEmpty);
+        expect(l('mission_treasure_sub'), isNotEmpty);
+        expect(l('mission_factory_title'), isNotEmpty);
+        expect(l('mission_factory_sub'), isNotEmpty);
+        expect(l('m1_intro'), isNotEmpty);
+        expect(l('m1_success'), isNotEmpty);
+        expect(l('m2_intro'), isNotEmpty);
+        expect(l('m2_success'), isNotEmpty);
+        expect(l('m3_intro'), isNotEmpty);
+        expect(l('m3_success'), isNotEmpty);
+        expect(l('m4_intro'), isNotEmpty);
+        expect(l('m4_success'), isNotEmpty);
+        expect(l('l3_all_complete_title'), isNotEmpty);
+        expect(l('l3_btn_continue_les4'), isNotEmpty);
+        expect(l('mini_practice_title'), isNotEmpty);
 
-        // Lesson 4: Detective
-        expect(l('lesson_4_challenge_header'), isNotEmpty);
-        expect(l('lesson_4_challenge_title'), isNotEmpty);
-        expect(l('WHAT DO YOU DEDUCE?'), isNotEmpty);
-        expect(l('CHECK DEDUCTION'), isNotEmpty);
-        expect(l('ONE LAST CASE: THE MASSIVE DUO'), isNotEmpty);
-        expect(l('FINAL TRICK CASE'), isNotEmpty);
-        expect(l('DENSITY DETECTIVE: CASE CLOSED'), isNotEmpty);
+        // Lesson 4: Density Tower (Template Library)
+        expect(l('density_tower_title'), isNotEmpty);
+        expect(l('density_tower_desc'), isNotEmpty);
+        expect(l('liquid_honey'), isNotEmpty);
+        expect(l('liquid_water'), isNotEmpty);
+        expect(l('liquid_oil'), isNotEmpty);
+        expect(l('liquid_alcohol'), isNotEmpty);
+        expect(l('empty_cylinder'), isNotEmpty);
+        expect(l('dt_prompt_intro'), isNotEmpty);
+        expect(l('dt_prompt_settling'), isNotEmpty);
+        expect(l('dt_hint_mistake1'), isNotEmpty);
+        expect(l('dt_hint_mistake2'), isNotEmpty);
+        expect(l('dt_perfect_pour'), isNotEmpty);
+        expect(l('dt_layer_master'), isNotEmpty);
+        expect(l('dt_easy_practice_title'), isNotEmpty);
+        expect(l('dt_easy_practice_desc'), isNotEmpty);
+        expect(l('dt_complete_title'), isNotEmpty);
+        expect(l('dt_complete_msg'), isNotEmpty);
+        expect(l('dt_btn_continue_les5'), isNotEmpty);
+        expect(l('dt_tap_to_pour'), isNotEmpty);
+        expect(l('dt_reset'), isNotEmpty);
 
         // Lesson 5: Teach-Back
         expect(l('lesson_5_teach_header'), isNotEmpty);
@@ -128,6 +156,37 @@ void main() {
         expect(l('apply'), isNotEmpty);
         expect(l('challenge'), isNotEmpty);
         expect(l('teach_back'), isNotEmpty);
+
+        // Lesson 1: Adaptive Learning Engine & Wildcard Support
+        expect(l('adapt_correct_reinforce'), isNotEmpty);
+        expect(l('adapt_hint_conceptual'), isNotEmpty);
+        expect(l('adapt_real_world_ship'), isNotEmpty);
+        expect(l('adapt_real_world_stone'), isNotEmpty);
+        expect(l('adapt_wildcard_badge'), isNotEmpty);
+        expect(l('adapt_wildcard_title'), isNotEmpty);
+        expect(l('adapt_wildcard_desc'), isNotEmpty);
+        expect(l('adapt_wildcard_ship'), isNotEmpty);
+        expect(l('adapt_wildcard_stone'), isNotEmpty);
+        expect(l('adapt_wildcard_btn_ship'), isNotEmpty);
+        expect(l('adapt_wildcard_btn_stone'), isNotEmpty);
+        expect(l('adapt_wildcard_success'), isNotEmpty);
+        expect(l('adapt_wildcard_continue'), isNotEmpty);
+        expect(l('adapt_summary_header'), isNotEmpty);
+        expect(l('adapt_summary_p1'), isNotEmpty);
+        expect(l('adapt_summary_p2'), isNotEmpty);
+        expect(l('adapt_summary_p3'), isNotEmpty);
+        // Lesson 1 & 2: Adaptive Scaffolding & Grand Formula
+        expect(l('adapt_l1_good_obs'), isNotEmpty);
+        expect(l('adapt_l1_struggle_obs'), isNotEmpty);
+        expect(l('adapt_dendy_noticed_examples'), isNotEmpty);
+        expect(l('adapt_dendy_noticed_quick'), isNotEmpty);
+        expect(l('adapt_btn_continue_experiment'), isNotEmpty);
+        expect(l('adapt_l2_correct_mass'), isNotEmpty);
+        expect(l('adapt_l2_correct_volume'), isNotEmpty);
+        expect(l('adapt_l2_correct_compare'), isNotEmpty);
+        expect(l('adapt_l2_discovery_prompt'), isNotEmpty);
+        expect(l('adapt_l2_formula_desc'), isNotEmpty);
+        expect(l('adapt_l2_btn_mastery'), isNotEmpty);
       }
     });
 

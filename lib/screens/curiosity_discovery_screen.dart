@@ -59,6 +59,20 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
   final Set<String> _testedObjectIds = {};
   String? _feedbackMessage;
 
+  // Adaptive Learning Engine State
+  int _correctPredictions = 0;
+  int _consecutiveWrong = 0;
+  int _repeatedHeavyMisconceptions = 0;
+  String? _misconceptionType;
+  int _supportLevel = 0; // 0: baseline, 1: conceptual hint, 2: real world, 3: wildcard support
+  bool _wildcardTriggered = false;
+  bool _wildcardCompleted = false;
+  bool _showWildcardCard = false;
+  int _wildcardShipDropped = 0; // 0: unplaced, 1: tested
+  int _wildcardStoneDropped = 0; // 0: unplaced, 1: tested
+  String _adaptiveFeedback = '';
+  DendyState _dendyState = DendyState.thinking;
+
   // Selected reflection prompt
   int _selectedReflectionIndex = -1;
 
@@ -170,16 +184,22 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
     });
   }
 
-  // Start sequential testing
+  // Start sequential testing with Adaptive Learning Engine
   Future<void> _startTesting() async {
     if (_predictions.length < _objects.length) return;
 
-    SoundService.playSwitch();
+    SoundService.playContinue();
     setState(() {
       _stage = LessonStage.testing;
       _currentTestingIndex = 0;
       _testedObjectIds.clear();
+      _correctPredictions = 0;
+      _consecutiveWrong = 0;
+      _repeatedHeavyMisconceptions = 0;
+      _supportLevel = 0;
+      _showWildcardCard = false;
       _feedbackMessage = l('curiosity_testing_object', args: {'name': _objects[0].name});
+      _adaptiveFeedback = '';
     });
 
     for (int i = 0; i < _objects.length; i++) {
@@ -208,6 +228,49 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
       final matched = (pred == PredictionChoice.float && currentObj.actuallyFloats) ||
           (pred == PredictionChoice.sink && !currentObj.actuallyFloats);
 
+      if (matched) {
+        _correctPredictions++;
+        _consecutiveWrong = 0;
+        _supportLevel = 0; // reset support level upon understanding
+        _dendyState = DendyState.success;
+        _adaptiveFeedback = l('adapt_correct_reinforce');
+        SoundService.playCorrect();
+      } else {
+        _consecutiveWrong++;
+
+        // Misconception Classification
+        if (currentObj.id == 'wood_block' || currentObj.id == 'empty_bottle') {
+          _misconceptionType = 'heavy_objects_sink';
+          _repeatedHeavyMisconceptions++;
+        } else if (currentObj.id == 'river_stone' || currentObj.id == 'metal_cube') {
+          _misconceptionType = 'ignoring_volume';
+        } else {
+          _misconceptionType = 'confusing_mass_density';
+        }
+
+        // Adaptive Support Strategy
+        if (_repeatedHeavyMisconceptions >= 2 || _consecutiveWrong >= 3) {
+          // Repeated same misconception detected -> Activate Wildcard Support Mode
+          _supportLevel = 3;
+          _wildcardTriggered = true;
+          _dendyState = DendyState.thinking;
+          _adaptiveFeedback = l('adapt_real_world_ship');
+          SoundService.playSupportUnlocked();
+        } else if (_consecutiveWrong == 2) {
+          // Second wrong -> Real-world explanation
+          _supportLevel = 2;
+          _dendyState = DendyState.thinking;
+          _adaptiveFeedback = l('adapt_real_world_ship');
+          SoundService.playDiscoveryMoment();
+        } else {
+          // First wrong -> Conceptual Hint
+          _supportLevel = 1;
+          _dendyState = DendyState.thinking;
+          _adaptiveFeedback = l('adapt_hint_conceptual');
+          SoundService.playHintReveal();
+        }
+      }
+
       setState(() {
         _testedObjectIds.add(currentObj.id);
         final resultText = currentObj.actuallyFloats ? l('curiosity_status_floats') : l('curiosity_status_sinks');
@@ -218,15 +281,21 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
         }
       });
 
-      await Future.delayed(const Duration(milliseconds: 1200));
+      await Future.delayed(const Duration(milliseconds: 1400));
     }
 
-    // All objects tested -> transition to reflection
+    // All objects tested -> Check if Wildcard Practice is needed
     if (!mounted) return;
-    setState(() {
-      _stage = LessonStage.reflection;
-      _feedbackMessage = null;
-    });
+    if (_wildcardTriggered && !_wildcardCompleted) {
+      setState(() {
+        _showWildcardCard = true;
+      });
+    } else {
+      setState(() {
+        _stage = LessonStage.reflection;
+        _feedbackMessage = null;
+      });
+    }
   }
 
   // Finish Lesson and persist rewards
@@ -260,10 +329,9 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
     await Locator.studentRepository.updateStudentProfile(updated);
 
     SoundService.playLevelComplete();
+    SoundService.playContinue();
     if (!mounted) return;
-    setState(() {
-      _stage = LessonStage.completed;
-    });
+    Navigator.pushReplacementNamed(context, '/density_experiment');
   }
 
   @override
@@ -576,7 +644,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
     );
   }
 
-  // 2. Main Discovery View: Left (Water Tank), Right (Hypothesis Station / Reflection)
+  // 2. Main Discovery View: Left (Water Tank), Right (Hypothesis Station / Wildcard / Reflection)
   Widget _buildExperimentAndHypothesisView() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -588,12 +656,14 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
         ),
         const SizedBox(width: 12),
 
-        // Right Column: Hypothesis Station or Reflection
+        // Right Column: Hypothesis Station, Wildcard Practice, or Reflection
         Expanded(
           flex: 10,
-          child: _stage == LessonStage.reflection
-              ? _buildReflectionCard()
-              : _buildHypothesisStationCard(),
+          child: _showWildcardCard
+              ? _buildWildcardPracticeCard()
+              : (_stage == LessonStage.reflection
+                  ? _buildReflectionCard()
+                  : _buildHypothesisStationCard()),
         ),
       ],
     );
@@ -682,6 +752,339 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                 },
               ),
             ),
+          ),
+
+          // Live Dendy Adaptive Speech Observation Bar (Only during active testing)
+          if (_stage == LessonStage.testing && (_adaptiveFeedback.isNotEmpty || _feedbackMessage != null)) ...[
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: ColorSystem.cream,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: ColorSystem.purple.withOpacity(0.25)),
+              ),
+              child: Row(
+                children: [
+                  DendyMascot(
+                    state: _dendyState,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      _adaptiveFeedback.isNotEmpty ? _adaptiveFeedback : _feedbackMessage!,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontFamilyFallback: _fontFallbacks,
+                        fontSize: isShort ? 8.5 : 9.5,
+                        fontWeight: FontWeight.bold,
+                        color: ColorSystem.plum,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  DendySpeakButton(
+                    textToSpeak: _adaptiveFeedback.isNotEmpty ? _adaptiveFeedback : _feedbackMessage!,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // Wildcard Learning Moment Card (Adaptive Support Mode)
+  Widget _buildWildcardPracticeCard() {
+    final size = MediaQuery.of(context).size;
+    final isShort = size.height < 450;
+    final bothCompleted = _wildcardShipDropped > 0 && _wildcardStoneDropped > 0;
+
+    return Container(
+      padding: EdgeInsets.all(isShort ? 10 : 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: ColorSystem.purple, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: ColorSystem.purple.withOpacity(0.08),
+            offset: const Offset(0, 4),
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: ColorSystem.lavender.withOpacity(0.4),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              l('adapt_wildcard_badge'),
+              style: const TextStyle(
+                fontFamily: 'Fredoka',
+                fontFamilyFallback: _fontFallbacks,
+                fontSize: 8.5,
+                fontWeight: FontWeight.w900,
+                color: ColorSystem.purple,
+                letterSpacing: 0.4,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            l('adapt_wildcard_title'),
+            style: TextStyle(
+              fontFamily: 'Fredoka',
+              fontFamilyFallback: _fontFallbacks,
+              fontSize: isShort ? 12 : 14,
+              fontWeight: FontWeight.w900,
+              color: ColorSystem.plum,
+            ),
+          ),
+          Text(
+            l('adapt_wildcard_desc'),
+            style: TextStyle(
+              fontFamily: 'Fredoka',
+              fontFamilyFallback: _fontFallbacks,
+              fontSize: isShort ? 9 : 10,
+              color: ColorSystem.plum.withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // 2 Comparative Cards
+          Expanded(
+            child: Column(
+              children: [
+                // Item 1: Giant Cruise Ship
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 6),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: _wildcardShipDropped > 0
+                          ? ColorSystem.blue.withOpacity(0.08)
+                          : ColorSystem.cream,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: _wildcardShipDropped > 0
+                            ? ColorSystem.blue
+                            : ColorSystem.plum.withOpacity(0.15),
+                        width: 1.2,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.directions_boat_rounded, color: ColorSystem.blue, size: 28),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                l('adapt_wildcard_ship'),
+                                style: const TextStyle(
+                                  fontFamily: 'Fredoka',
+                                  fontFamilyFallback: _fontFallbacks,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: ColorSystem.plum,
+                                ),
+                              ),
+                              Text(
+                                _wildcardShipDropped > 0
+                                    ? l('adapt_wildcard_btn_ship')
+                                    : l('adapt_real_world_ship'),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontFamily: 'Fredoka',
+                                  fontFamilyFallback: _fontFallbacks,
+                                  fontSize: 8.5,
+                                  color: _wildcardShipDropped > 0
+                                      ? ColorSystem.blue
+                                      : ColorSystem.plum.withOpacity(0.65),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        GestureDetector(
+                          onTap: () {
+                            SoundService.playFloat();
+                            setState(() {
+                              _wildcardShipDropped = 1;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: _wildcardShipDropped > 0 ? ColorSystem.blue : ColorSystem.purple,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              _wildcardShipDropped > 0 ? "✓ FLOATS" : "TEST",
+                              style: const TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Item 2: Small Pebble
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: _wildcardStoneDropped > 0
+                          ? ColorSystem.gold.withOpacity(0.08)
+                          : ColorSystem.cream,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: _wildcardStoneDropped > 0
+                            ? ColorSystem.gold
+                            : ColorSystem.plum.withOpacity(0.15),
+                        width: 1.2,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.circle, color: ColorSystem.plum, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                l('adapt_wildcard_stone'),
+                                style: const TextStyle(
+                                  fontFamily: 'Fredoka',
+                                  fontFamilyFallback: _fontFallbacks,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: ColorSystem.plum,
+                                ),
+                              ),
+                              Text(
+                                _wildcardStoneDropped > 0
+                                    ? l('adapt_wildcard_btn_stone')
+                                    : l('adapt_real_world_stone'),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontFamily: 'Fredoka',
+                                  fontFamilyFallback: _fontFallbacks,
+                                  fontSize: 8.5,
+                                  color: _wildcardStoneDropped > 0
+                                      ? ColorSystem.plum
+                                      : ColorSystem.plum.withOpacity(0.65),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        GestureDetector(
+                          onTap: () {
+                            SoundService.playSink();
+                            setState(() {
+                              _wildcardStoneDropped = 1;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: _wildcardStoneDropped > 0 ? ColorSystem.plum : ColorSystem.purple,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              _wildcardStoneDropped > 0 ? "✓ SINKS" : "TEST",
+                              style: const TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          // Dendy Conclusion when both tested
+          if (bothCompleted) ...[
+            Row(
+              children: [
+                DendyMascot(
+                  state: DendyState.success,
+                  size: 26,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    l('adapt_wildcard_success'),
+                    style: const TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontFamilyFallback: _fontFallbacks,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.bold,
+                      color: ColorSystem.purple,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                DendySpeakButton(
+                  textToSpeak: l('adapt_wildcard_success'),
+                  size: 20,
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+          ],
+
+          CustomButton(
+            text: bothCompleted ? l('adapt_wildcard_continue') : "TEST BOTH OBJECTS",
+            backgroundColor: bothCompleted ? ColorSystem.purple : Colors.grey.shade400,
+            textColor: Colors.white,
+            height: isShort ? 36 : 40,
+            onPressed: bothCompleted
+                ? () {
+                    SoundService.playContinue();
+                    setState(() {
+                      _supportLevel = 0; // Reset support after understanding
+                      _showWildcardCard = false;
+                      _wildcardCompleted = true;
+                      _stage = LessonStage.reflection;
+                    });
+                  }
+                : () {},
           ),
         ],
       ),
@@ -995,10 +1398,15 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
     );
   }
 
-  // 3. Reflection Stage Card
+  // 3. Reflection Stage Card with Personalized Adaptive Insights
   Widget _buildReflectionCard() {
     final size = MediaQuery.of(context).size;
     final isShort = size.height < 450;
+    final isWell = _correctPredictions >= 4;
+    final String adaptivePrompt = isWell ? l('adapt_l1_good_obs') : l('adapt_l1_struggle_obs');
+    final String dendyNoticed = (isWell && !_wildcardTriggered)
+        ? l('adapt_dendy_noticed_quick')
+        : l('adapt_dendy_noticed_examples');
 
     return Container(
       padding: EdgeInsets.all(isShort ? 12 : 16),
@@ -1015,7 +1423,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
               const Icon(Icons.lightbulb_outline_rounded, color: ColorSystem.gold, size: 18),
               const SizedBox(width: 5),
               Text(
-                l('curiosity_refl_header'),
+                l('adapt_summary_header'),
                 style: TextStyle(
                   fontFamily: 'Fredoka',
                   fontFamilyFallback: _fontFallbacks,
@@ -1027,30 +1435,69 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
               ),
             ],
           ),
-          SizedBox(height: isShort ? 4 : 8),
+          SizedBox(height: isShort ? 4 : 6),
 
-          Text(
-            l('curiosity_refl_summary'),
-            style: TextStyle(
-              fontFamily: 'Fredoka',
-              fontFamilyFallback: _fontFallbacks,
-              fontSize: isShort ? 13 : 15,
-              fontWeight: FontWeight.w900,
-              color: ColorSystem.plum,
+          // Key Discoveries
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: ColorSystem.cream,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: ColorSystem.plum.withOpacity(0.12)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l('adapt_summary_p1'),
+                  style: const TextStyle(
+                    fontFamily: 'Fredoka',
+                    fontFamilyFallback: _fontFallbacks,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.bold,
+                    color: ColorSystem.plum,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l('adapt_summary_p2'),
+                  style: const TextStyle(
+                    fontFamily: 'Fredoka',
+                    fontFamilyFallback: _fontFallbacks,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.bold,
+                    color: ColorSystem.plum,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l('adapt_summary_p3'),
+                  style: const TextStyle(
+                    fontFamily: 'Fredoka',
+                    fontFamilyFallback: _fontFallbacks,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.bold,
+                    color: ColorSystem.plum,
+                  ),
+                ),
+              ],
             ),
           ),
+          SizedBox(height: isShort ? 6 : 8),
+
+          // Adaptive Prompt
           Text(
-            l('curiosity_refl_q'),
+            adaptivePrompt,
             style: TextStyle(
               fontFamily: 'Fredoka',
               fontFamilyFallback: _fontFallbacks,
-              fontSize: isShort ? 12 : 13,
+              fontSize: isShort ? 10.5 : 11.5,
               fontStyle: FontStyle.italic,
               fontWeight: FontWeight.bold,
               color: ColorSystem.purple,
             ),
           ),
-          SizedBox(height: isShort ? 6 : 10),
+          SizedBox(height: isShort ? 4 : 6),
 
           // Observation Prompts
           Expanded(
@@ -1062,13 +1509,13 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                   title: l('curiosity_refl_opt0_title'),
                   subtitle: l('curiosity_refl_opt0_sub'),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 _buildReflectionOption(
                   index: 1,
                   title: l('curiosity_refl_opt1_title'),
                   subtitle: l('curiosity_refl_opt1_sub'),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 _buildReflectionOption(
                   index: 2,
                   title: l('curiosity_refl_opt2_title'),
@@ -1079,38 +1526,61 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
           ),
           const SizedBox(height: 6),
 
-          // Companion Note
-          Row(
-            children: [
-              DendyMascot(
-                state: DendyState.thinking,
-                size: isShort ? 36 : 44,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  l('curiosity_refl_note'),
-                  style: TextStyle(
-                    fontFamily: 'Fredoka',
-                    fontFamilyFallback: _fontFallbacks,
-                    fontSize: isShort ? 9.5 : 10.5,
-                    color: ColorSystem.plum.withOpacity(0.8),
-                    height: 1.25,
+          // Companion Adaptive Note
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+            decoration: BoxDecoration(
+              color: ColorSystem.lavender.withOpacity(0.35),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                DendyMascot(
+                  state: DendyState.idle,
+                  mood: DendyMood.explaining,
+                  size: isShort ? 28 : 34,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l('adapt_dendy_noticed_title'),
+                        style: const TextStyle(
+                          fontFamily: 'Fredoka',
+                          fontFamilyFallback: _fontFallbacks,
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w900,
+                          color: ColorSystem.purple,
+                        ),
+                      ),
+                      Text(
+                        dendyNoticed,
+                        style: TextStyle(
+                          fontFamily: 'Fredoka',
+                          fontFamilyFallback: _fontFallbacks,
+                          fontSize: isShort ? 9 : 10,
+                          color: ColorSystem.plum.withOpacity(0.85),
+                          height: 1.25,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(width: 6),
-              DendySpeakButton(
-                textToSpeak: l('curiosity_refl_note'),
-                size: 24,
-              ),
-            ],
+                const SizedBox(width: 6),
+                DendySpeakButton(
+                  textToSpeak: '$adaptivePrompt $dendyNoticed',
+                  size: 22,
+                ),
+              ],
+            ),
           ),
           SizedBox(height: isShort ? 6 : 10),
 
-          // Complete Button
+          // Complete / Continue to Experiment Button
           CustomButton(
-            text: l('curiosity_btn_complete'),
+            text: l('adapt_btn_continue_experiment'),
             backgroundColor: ColorSystem.purple,
             textColor: Colors.white,
             height: isShort ? 36 : 40,
@@ -1195,6 +1665,12 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
   Widget _buildCompletedView() {
     final size = MediaQuery.of(context).size;
     final isShort = size.height < 450;
+    final accuracy = ((_correctPredictions / _objects.length) * 100).round();
+    final String dendyNoticed = (accuracy >= 80)
+        ? l('adapt_dendy_noticed_high', args: {'accuracy': '$accuracy'})
+        : (_wildcardTriggered
+            ? l('adapt_dendy_noticed_adapted')
+            : l('adapt_dendy_noticed_good'));
 
     return Center(
       child: ConstrainedBox(
@@ -1253,42 +1729,70 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                 ),
                 SizedBox(height: isShort ? 10 : 14),
 
-                // Concept Mastery Star Box
+                // Adaptive Learning Summary Box
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     color: ColorSystem.cream,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: ColorSystem.gold, width: 1.5),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.star_rounded, color: ColorSystem.gold, size: 24),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
+                        children: [
+                          const Icon(Icons.star_rounded, color: ColorSystem.gold, size: 20),
+                          const SizedBox(width: 6),
+                          Text(
+                            l('adapt_summary_header'),
+                            style: const TextStyle(
+                              fontFamily: 'Fredoka',
+                              fontFamilyFallback: _fontFallbacks,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900,
+                              color: ColorSystem.plum,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        l('adapt_summary_p1'),
+                        style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, color: ColorSystem.plum),
+                      ),
+                      Text(
+                        l('adapt_summary_p2'),
+                        style: const TextStyle(fontFamily: 'Fredoka', fontSize: 9.5, color: ColorSystem.plum),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
                           children: [
-                            Text(
-                              l('curiosity_star_title'),
-                              style: const TextStyle(
-                                fontFamily: 'Fredoka',
-                                fontFamilyFallback: _fontFallbacks,
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w900,
-                                color: ColorSystem.plum,
+                            DendyMascot(
+                              state: DendyState.idle,
+                              mood: DendyMood.explaining,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                dendyNoticed,
+                                style: const TextStyle(
+                                  fontFamily: 'Fredoka',
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: ColorSystem.purple,
+                                ),
                               ),
                             ),
-                            Text(
-                              l('curiosity_star_desc'),
-                              style: TextStyle(
-                                fontFamily: 'Fredoka',
-                                fontFamilyFallback: _fontFallbacks,
-                                fontSize: 9,
-                                color: ColorSystem.plum.withOpacity(0.65),
-                              ),
-                            ),
+                            const SizedBox(width: 4),
+                            DendySpeakButton(textToSpeak: dendyNoticed, size: 20),
                           ],
                         ),
                       ),
@@ -1373,7 +1877,7 @@ class _CuriosityDiscoveryScreenState extends State<CuriosityDiscoveryScreen> wit
                         textColor: Colors.white,
                         height: isShort ? 36 : 40,
                         onPressed: () {
-                          SoundService.playClick();
+                          SoundService.playContinue();
                           Navigator.pushReplacementNamed(context, '/density_experiment');
                         },
                       ),

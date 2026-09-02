@@ -173,7 +173,7 @@ class _DensityTeachBackScreenState extends State<DensityTeachBackScreen> {
         _isEvaluating = false;
         _stage = _TeachBackStage.mastery;
       });
-      SoundService.playSuccess();
+      SoundService.playMasteryCelebration();
       // Read out Dendy's feedback
       try {
         Locator.readAloudService.speak(eval.feedbackBody, languageCode: LocalizationService.currentLanguage);

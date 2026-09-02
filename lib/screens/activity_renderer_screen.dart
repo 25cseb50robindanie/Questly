@@ -462,7 +462,7 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
                       _quizAnswered = true;
                       _quizCorrect = false;
                     });
-                    SoundService.playSwitch();
+                    SoundService.playWrong();
                   },
                 ),
               ),
@@ -506,7 +506,7 @@ class _ActivityRendererScreenState extends State<ActivityRendererScreen> {
             _quizAnswered = true;
             _quizCorrect = false;
           });
-          SoundService.playSwitch(); // Error sound
+          SoundService.playWrong(); // Soft error sound
         }
       },
       child: Container(
